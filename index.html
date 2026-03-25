@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Katja Norstad — Data Scientist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f2ed;
+      --ink: #1a1814;
+      --muted: #7a7570;
+      --accent: #c4501a;
+      --line: #d8d3cc;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 18px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ─── LAYOUT ─── */
+    .wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      padding: 5rem 0 3rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.4rem;
+      opacity: 0;
+      animation: rise 0.8s ease forwards 0.1s;
+    }
+
+    h1 {
+      font-size: clamp(2.8rem, 8vw, 4.8rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.25s;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .tagline {
+      margin-top: 1.4rem;
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 480px;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.45s;
+    }
+
+    /* ─── CONTACT STRIP ─── */
+    .contact-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 2rem;
+      padding: 2rem 0;
+      border-bottom: 1px solid var(--line);
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.6s;
+    }
+
+    .contact-strip a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.2s;
+    }
+
+    .contact-strip a:hover { color: var(--accent); }
+
+    .contact-strip a svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* ─── SECTIONS ─── */
+    section {
+      padding: 3.5rem 0;
+      border-bottom: 1px solid var(--line);
+      opacity: 0;
+      animation: rise 1s ease forwards;
+    }
+
+    section:nth-of-type(1) { animation-delay: 0.7s; }
+    section:nth-of-type(2) { animation-delay: 0.85s; }
+    section:nth-of-type(3) { animation-delay: 1s; }
+    section:nth-of-type(4) { animation-delay: 1.1s; }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2rem;
+    }
+
+    /* ─── EXPERIENCE ─── */
+    .job { margin-bottom: 2.2rem; }
+    .job:last-child { margin-bottom: 0; }
+
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.2rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .job-title {
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+
+    .job-period {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .job-company {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .job-desc {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ─── SKILLS ─── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.6rem 3rem;
+    }
+
+    .skill-group-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      padding: 0.15rem 0.55rem;
+      border-radius: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .tag:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ─── EDUCATION ─── */
+    .edu { margin-bottom: 1.6rem; }
+    .edu:last-child { margin-bottom: 0; }
+
+    .edu-degree {
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    .edu-school {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .edu-period {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    /* ─── LANGUAGES ─── */
+    .lang-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 2.5rem;
+    }
+
+    .lang-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+
+    .lang-name {
+      font-weight: 400;
+      font-size: 1rem;
+    }
+
+    .lang-level {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 2.5rem 0;
+      text-align: center;
+    }
+
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    /* ─── ANIMATION ─── */
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 520px) {
+      .skills-grid { grid-template-columns: 1fr; }
+      .job-header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <p class="eyebrow">Data Scientist · Oslo, Norway</p>
+      <h1>Katja <em>Norstad</em></h1>
+      <p class="tagline">
+        Building data-driven products that save money, increase revenue,
+        and make organisations smarter — since 2012.
+      </p>
+    </header>
+
+    <!-- CONTACT -->
+    <div class="contact-strip">
+      <a href="tel:+4797962671">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3.09 4.18 2 2 0 0 1 5.07 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L9.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 23 17z"/></svg>
+        (+47) 979 62 671
+      </a>
+      <a href="mailto:katja.norstad@gmail.com">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        katja.norstad@gmail.com
+      </a>
+      <a href="https://www.linkedin.com/in/katja-norstad" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        linkedin.com/in/katja-norstad
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Ris skolevei 25E, 0373 Oslo
+      </a>
+    </div>
+
+    <!-- EXPERIENCE -->
+    <section>
+      <p class="section-label">Experience</p>
+
+      <div class="job">
+        <div class="job-header">
+          <span class="job-title">Data Scientist</span>
+          <span class="job-period">Mar 2019 — Present</span>
+        </div>
+        <div class="job-company">Storebrand, Oslo</div>
+        <p class="job-desc">
+          Led delivery of multiple data-driven projects across business analytics, insurance, marketing and SMB —
+          including customer lifetime value, churn reduction, wealth segmentation, fraud detection, and automated
+          customer inquiry classification. Estimated savings of tens of millions NOK. Evaluated 200+ applicants
+          for the Center of Excellence for Data &amp; Analytics.
+          <br/><span style="font-style:italic;font-size:0.85rem;">Snowflake · Databricks · Python · PySpark · SQL · Power BI</span>
+        </p>
+      </div>
+
+      <div class="job">
+        <div class="job-header">
+          <span class="job-title">Business Analyst → Senior Data Analyst / Data Scientist</span>
+          <span class="job-period">Aug 2015 — Mar 2019</span>
+        </div>
+        <div class="job-company">Sopra Steria, Oslo</div>
+        <p class="job-desc">
+          Built bespoke DWH, ETL, and data visualisation solutions across health, retail, transport, petroleum,
+          and finance. Promoted to Senior after three years. Helped numerous clients adopt dashboards and
+          insight-driven decision-making for the first time.
+          <br/><span style="font-style:italic;font-size:0.85rem;">Tableau · Power BI · Qlik · SAS · Python · SQL · C#</span>
+        </p>
+      </div>
+
+      <div class="job">
+        <div class="job-header">
+          <span class="job-title">Analyst / Quantitative Researcher</span>
+          <span class="job-period">Jun 2013 — Aug 2013</span>
+        </div>
+        <div class="job-company">HedgeSPA, Singapore</div>
+        <p class="job-desc">
+          Developed portfolio optimisation tools for stocks, bonds, and commodities. Hand-picked by a former
+          BlackRock manager; participated in investor meetings with Sequoia Capital and offered a permanent role.
+          <br/><span style="font-style:italic;font-size:0.85rem;">C++ · MATLAB</span>
+        </p>
+      </div>
+
+      <div class="job">
+        <div class="job-header">
+          <span class="job-title">Analyst</span>
+          <span class="job-period">Jun 2014 — Aug 2014</span>
+        </div>
+        <div class="job-company">If Forsikring, Oslo</div>
+        <p class="job-desc">
+          Built probability models for home insurance sales and analysed performance of internal units.
+          <br/><span style="font-style:italic;font-size:0.85rem;">SAS</span>
+        </p>
+      </div>
+
+      <div class="job">
+        <div class="job-header">
+          <span class="job-title">Algorithm Analyst</span>
+          <span class="job-period">Jun 2012 — Jul 2012</span>
+        </div>
+        <div class="job-company">EMGS, Oslo</div>
+        <p class="job-desc">
+          Analysed and optimised seabed-scanning algorithms; results deployed globally with estimated savings
+          of several million NOK.
+        </p>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section>
+      <p class="section-label">Skills &amp; Tools</p>
+      <div class="skills-grid">
+        <div>
+          <p class="skill-group-label">Languages</p>
+          <div class="skill-tags">
+            <span class="tag">Python</span>
+            <span class="tag">PySpark</span>
+            <span class="tag">SQL</span>
+            <span class="tag">R</span>
+            <span class="tag">C++</span>
+            <span class="tag">MATLAB</span>
+          </div>
+        </div>
+        <div>
+          <p class="skill-group-label">Platforms</p>
+          <div class="skill-tags">
+            <span class="tag">Databricks</span>
+            <span class="tag">Snowflake</span>
+            <span class="tag">DWH / ETL</span>
+            <span class="tag">GitHub</span>
+            <span class="tag">Salesforce</span>
+          </div>
+        </div>
+        <div>
+          <p class="skill-group-label">Analytics &amp; BI</p>
+          <div class="skill-tags">
+            <span class="tag">Power BI</span>
+            <span class="tag">Tableau</span>
+            <span class="tag">Qlik</span>
+            <span class="tag">SAS</span>
+          </div>
+        </div>
+        <div>
+          <p class="skill-group-label">Domains</p>
+          <div class="skill-tags">
+            <span class="tag">Churn / CLV</span>
+            <span class="tag">Fraud Detection</span>
+            <span class="tag">NLP / Classification</span>
+            <span class="tag">Segmentation</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section>
+      <p class="section-label">Education</p>
+
+      <div class="edu">
+        <p class="edu-degree">M.Sc. Physics &amp; Mathematics — Statistics</p>
+        <p class="edu-school">NTNU — Norwegian University of Science and Technology, Trondheim</p>
+        <p class="edu-period">2010 — 2015 · Grade average: B</p>
+      </div>
+
+      <div class="edu">
+        <p class="edu-degree">Entrepreneurship — 30 ECTS</p>
+        <p class="edu-school">Gründerskolen (UiO / NUS MBA), Singapore</p>
+        <p class="edu-period">2013 · Top grades from both programmes</p>
+      </div>
+
+      <div class="edu">
+        <p class="edu-degree">Introduction to Public-Sector Interpreting</p>
+        <p class="edu-school">OsloMet, Oslo</p>
+        <p class="edu-period">Feb 2023 — Nov 2023</p>
+      </div>
+    </section>
+
+    <!-- LANGUAGES -->
+    <section>
+      <p class="section-label">Languages</p>
+      <div class="lang-row">
+        <div class="lang-item">
+          <span class="lang-name">Russian</span>
+          <span class="lang-level">native</span>
+        </div>
+        <div class="lang-item">
+          <span class="lang-name">Ukrainian</span>
+          <span class="lang-level">fluent</span>
+        </div>
+        <div class="lang-item">
+          <span class="lang-name">Norwegian</span>
+          <span class="lang-level">fluent</span>
+        </div>
+        <div class="lang-item">
+          <span class="lang-name">English</span>
+          <span class="lang-level">fluent</span>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2026 Katja Norstad &nbsp;·&nbsp; Oslo, Norway</p>
+    </footer>
+
+  </div>
+</body>
+</html>
