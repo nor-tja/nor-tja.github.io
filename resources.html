@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Katja Norstad — Resources</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f2ed; --ink: #1a1814; --muted: #7a7570; --accent: #c4501a; --line: #d8d3cc;
+    }
+    body {
+      background: var(--bg); color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 18px; line-height: 1.7; min-height: 100vh;
+    }
+    .wrap { max-width: 780px; margin: 0 auto; padding: 0 2rem; }
+
+    .back {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; padding: 1.8rem 0 0;
+      transition: color 0.2s;
+    }
+    .back:hover { color: var(--accent); }
+
+    header {
+      padding: 3rem 0 3rem;
+      border-bottom: 1px solid var(--line);
+      opacity: 0;
+      animation: rise 0.8s ease forwards 0.1s;
+    }
+    .eyebrow {
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+    h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 300; }
+    h1 em { font-style: italic; color: var(--accent); }
+
+    .resource-list {
+      padding: 3rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .resource {
+      padding: 2.2rem 0;
+      border-bottom: 1px solid var(--line);
+      opacity: 0;
+      animation: rise 0.9s ease forwards;
+    }
+    .resource:nth-child(1) { animation-delay: 0.3s; }
+    .resource:nth-child(2) { animation-delay: 0.5s; }
+
+    .resource-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.7rem;
+    }
+    .resource-type {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.1rem 0.5rem;
+      border-radius: 2px;
+    }
+
+    .resource-title {
+      font-size: 1.15rem;
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+    .resource-title a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .resource-title a:hover { color: var(--accent); border-color: var(--accent); }
+
+    .resource-summary {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 580px;
+    }
+
+    /* YouTube embed */
+    .video-wrap {
+      margin-top: 1.2rem;
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 3px;
+      max-width: 560px;
+    }
+    .video-wrap iframe {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    footer { padding: 2.5rem 0; text-align: center; }
+    footer p { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; color: var(--muted); }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 520px) { .video-wrap { max-width: 100%; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a href="index.html" class="back">← Back</a>
+
+    <header>
+      <p class="eyebrow">A small collection</p>
+      <h1>Things I find <em>worth your time</em></h1>
+    </header>
+
+    <div class="resource-list">
+
+      <div class="resource">
+        <div class="resource-meta">
+          <span class="resource-type">Article</span>
+        </div>
+        <p class="resource-title">
+          <a href="https://waitbutwhy.com/2016/10/100-blocks-day.html" target="_blank" rel="noopener">
+            100 Blocks a Day — Wait But Why
+          </a>
+        </p>
+        <p class="resource-summary">
+          A simple but striking way to think about time. You have about 1,000 waking minutes each day —
+          or 100 blocks of 10 minutes each. The article invites you to ask: what are you actually spending
+          those blocks on? How many go toward creating something versus consuming? Toward other people versus
+          yourself? Toward your future versus just today? It won't give you a system, but it might make you
+          pause before you open your next tab.
+        </p>
+      </div>
+
+      <div class="resource">
+        <div class="resource-meta">
+          <span class="resource-type">Video</span>
+        </div>
+        <p class="resource-title">
+          <a href="https://www.youtube.com/watch?v=RedrKy57GQ0" target="_blank" rel="noopener">
+            Watch on YouTube ↗
+          </a>
+        </p>
+        <div class="video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/RedrKy57GQ0"
+            title="YouTube video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+
+    </div>
+
+    <footer><p>© 2026 Katja Norstad</p></footer>
+  </div>
+</body>
+</html>
