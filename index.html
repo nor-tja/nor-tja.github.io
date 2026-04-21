@@ -30,17 +30,18 @@
 
     /* ── coffee ring stain ── */
     .mug-stain {
-      position: fixed;
-      bottom: -40px;
-      right: -30px;
-      width: 260px;
-      height: 260px;
-      opacity: 0.18;
-      pointer-events: none;
-      animation: fadeStain 2s ease forwards 1.2s;
-      opacity: 0;
+    position: fixed;
+    bottom: -40px;
+    right: -30px;
+    width: 1440px;
+    height: 804px;
+    opacity: 0;
+    pointer-events: none;
+    animation: fadeStain 2s ease forwards 1.2s;
     }
+    
     @keyframes fadeStain {
+      from { opacity: 0; }
       to { opacity: 0.18; }
     }
 
@@ -98,7 +99,7 @@
 <body>
 
   <!-- Coffee mug ring stain -->
-<img class="mug-stain" src="assets/coffee-stain.avif" alt="coffee stain" />
+  <img class="mug-stain" src="assets/coffee-stain.webp" alt="coffee stain" />
 
   <div class="center">
     <p class="greeting">
