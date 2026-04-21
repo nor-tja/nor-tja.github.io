@@ -24,10 +24,31 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
+
+    /* ── coffee ring stain ── */
+    .mug-stain {
+      position: fixed;
+      bottom: -40px;
+      right: -30px;
+      width: 260px;
+      height: 260px;
+      opacity: 0.18;
+      pointer-events: none;
+      animation: fadeStain 2s ease forwards 1.2s;
+      opacity: 0;
+    }
+    @keyframes fadeStain {
+      to { opacity: 0.18; }
+    }
+
     .center {
       max-width: 520px;
       padding: 2rem;
+      position: relative;
+      z-index: 1;
     }
     .greeting {
       font-size: clamp(1.5rem, 5vw, 2.1rem);
@@ -75,16 +96,38 @@
   </style>
 </head>
 <body>
+
+  <!-- Coffee mug ring stain -->
+  <svg class="mug-stain" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+    <!-- outer ring -->
+    <circle cx="130" cy="130" r="118" fill="none" stroke="#7a4a1a" stroke-width="7" opacity="0.9"/>
+    <circle cx="130" cy="130" r="112" fill="none" stroke="#9a5f28" stroke-width="2" opacity="0.5"/>
+    <!-- inner ring -->
+    <circle cx="130" cy="130" r="96" fill="none" stroke="#7a4a1a" stroke-width="5" opacity="0.7"/>
+    <circle cx="130" cy="130" r="90" fill="none" stroke="#b07040" stroke-width="1.5" opacity="0.4"/>
+    <!-- subtle fill for the ring band -->
+    <circle cx="130" cy="130" r="114" fill="#8b5e30" opacity="0.04"/>
+    <!-- texture dots -->
+    <circle cx="55"  cy="100" r="2.5" fill="#7a4a1a" opacity="0.3"/>
+    <circle cx="200" cy="160" r="2"   fill="#7a4a1a" opacity="0.25"/>
+    <circle cx="170" cy="45"  r="1.8" fill="#7a4a1a" opacity="0.2"/>
+    <circle cx="80"  cy="210" r="2.2" fill="#7a4a1a" opacity="0.25"/>
+    <circle cx="220" cy="90"  r="1.5" fill="#7a4a1a" opacity="0.2"/>
+    <!-- small drip at bottom -->
+    <ellipse cx="148" cy="248" rx="4" ry="6" fill="#7a4a1a" opacity="0.2" transform="rotate(-15 148 248)"/>
+  </svg>
+
   <div class="center">
     <p class="greeting">
       Hello, I am <em>Katja</em>. I am a data scientist who enjoys building
       and organising things. Here are links to my CV, my (ancient) blog,
-      and resources I appreciate.
+      resources I appreciate, and my favourite coffee spots.
     </p>
     <nav class="links">
       <a href="cv.html">CV</a>
       <a href="https://katjanorstad.medium.com/" target="_blank" rel="noopener">Blog</a>
       <a href="resources.html">Resources</a>
+      <a href="coffee.html">Coffee</a>
     </nav>
   </div>
 </body>
