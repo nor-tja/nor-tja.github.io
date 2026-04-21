@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Katja Norstad</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjVmMmVkIi8+CiAgPHRleHQgeD0iMTYiIHk9IjIzIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjQwMCIgCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2M0NTAxYSIgbGV0dGVyLXNwYWNpbmc9IjEiPktOPC90ZXh0Pgo8L3N2Zz4=" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
   <style>
@@ -24,27 +25,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
       overflow: hidden;
+      position: relative;
     }
 
-    /* ── coffee ring stain ── */
-    .mug-stain {
-    position: fixed;
-    bottom: -120px;
-    right: -120px;
-    width: 420px;
-    height: auto;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 0;
-    animation: fadeStain 2s ease forwards 1.2s;
+    /* ── Coffee ring stain — bottom right, transparent SVG ── */
+    .stain {
+      position: fixed;
+      bottom: -60px;
+      right: -50px;
+      width: 320px;
+      height: 320px;
+      pointer-events: none;
+      opacity: 0;
+      animation: fadeStain 2.5s ease forwards 1.4s;
     }
-
-    @keyframes fadeStain {
-      from { opacity: 0; }
-      to { opacity: 0.18; }
-    }
+    @keyframes fadeStain { to { opacity: 1; } }
 
     .center {
       max-width: 520px;
@@ -60,10 +56,11 @@
       animation: rise 0.9s ease forwards 0.15s;
     }
     .greeting em { font-style: italic; color: var(--accent); }
+
     .links {
       display: flex;
       flex-direction: column;
-      gap: 0.9rem;
+      gap: 0.85rem;
       opacity: 0;
       animation: rise 0.9s ease forwards 0.4s;
     }
@@ -76,20 +73,28 @@
       text-decoration: none;
       display: flex;
       align-items: center;
-      gap: 0.7rem;
+      gap: 0.75rem;
       transition: color 0.2s;
     }
-    .links a::before {
+    .links a .icon {
+      font-size: 1rem;
+      line-height: 1;
+      flex-shrink: 0;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .links a::after {
       content: '';
       display: block;
-      width: 24px;
       height: 1px;
+      flex: 1;
       background: var(--line);
-      transition: width 0.25s, background 0.2s;
-      flex-shrink: 0;
+      transition: background 0.2s;
+      max-width: 28px;
     }
     .links a:hover { color: var(--accent); }
-    .links a:hover::before { width: 40px; background: var(--accent); }
+    .links a:hover .icon { opacity: 1; }
+    .links a:hover::after { background: var(--accent); max-width: 44px; }
 
     @keyframes rise {
       from { opacity: 0; transform: translateY(16px); }
@@ -99,8 +104,44 @@
 </head>
 <body>
 
-  <!-- Coffee mug ring stain -->
-  <img class="mug-stain" src="coffee_stain.webp" alt="coffee stain" />
+  <!-- Coffee ring stain: two concentric rings with organic imperfection, fully transparent bg -->
+  <svg class="stain" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Outer ring gradient: darker at edges, fades to transparent -->
+      <radialGradient id="ringOuter" cx="50%" cy="50%" r="50%">
+        <stop offset="82%" stop-color="#6b3d12" stop-opacity="0"/>
+        <stop offset="88%" stop-color="#7a4a1e" stop-opacity="0.28"/>
+        <stop offset="93%" stop-color="#8b5520" stop-opacity="0.38"/>
+        <stop offset="97%" stop-color="#7a4a1e" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="#6b3d12" stop-opacity="0.05"/>
+      </radialGradient>
+      <!-- Inner ring gradient -->
+      <radialGradient id="ringInner" cx="50%" cy="50%" r="50%">
+        <stop offset="70%" stop-color="#6b3d12" stop-opacity="0"/>
+        <stop offset="78%" stop-color="#7a4a1e" stop-opacity="0.18"/>
+        <stop offset="84%" stop-color="#8b5520" stop-opacity="0.25"/>
+        <stop offset="90%" stop-color="#7a4a1e" stop-opacity="0.14"/>
+        <stop offset="100%" stop-color="#6b3d12" stop-opacity="0"/>
+      </radialGradient>
+      <!-- Slight noise/texture filter -->
+      <filter id="roughen">
+        <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="4" seed="8" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+
+    <!-- Outer ring -->
+    <circle cx="160" cy="160" r="148" fill="url(#ringOuter)" filter="url(#roughen)"/>
+
+    <!-- Inner ring (second smaller stain inside) -->
+    <circle cx="160" cy="160" r="108" fill="url(#ringInner)" filter="url(#roughen)"/>
+
+    <!-- A tiny drip running down from the outer ring -->
+    <ellipse cx="182" cy="306" rx="5" ry="8" fill="#7a4a1e" opacity="0.12" filter="url(#roughen)" transform="rotate(10 182 306)"/>
+    <!-- Small spot/splash bottom left of ring -->
+    <circle cx="72" cy="258" r="4" fill="#7a4a1e" opacity="0.08" filter="url(#roughen)"/>
+    <circle cx="60" cy="268" r="2.5" fill="#7a4a1e" opacity="0.06"/>
+  </svg>
 
   <div class="center">
     <p class="greeting">
@@ -109,10 +150,10 @@
       resources I appreciate, and my favourite coffee spots.
     </p>
     <nav class="links">
-      <a href="cv.html">CV</a>
-      <a href="https://katjanorstad.medium.com/" target="_blank" rel="noopener">Blog</a>
-      <a href="resources.html">Resources</a>
-      <a href="coffee.html">Coffee</a>
+      <a href="cv.html"><span class="icon">📄</span> CV</a>
+      <a href="https://katjanorstad.medium.com/" target="_blank" rel="noopener"><span class="icon">✍️</span> Blog</a>
+      <a href="resources.html"><span class="icon">📚</span> Resources</a>
+      <a href="coffee.html"><span class="icon">☕</span> Coffee</a>
     </nav>
   </div>
 </body>
