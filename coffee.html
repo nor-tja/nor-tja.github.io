@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Katja Norstad — Coffee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f2ed; --ink: #1a1814; --muted: #7a7570; --accent: #c4501a; --line: #d8d3cc;
+    }
+    body {
+      background: var(--bg); color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 18px; line-height: 1.7; min-height: 100vh;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+
+    .back {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; padding: 1.8rem 0 0;
+      transition: color 0.2s;
+    }
+    .back:hover { color: var(--accent); }
+
+    header {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--line);
+      opacity: 0;
+      animation: rise 0.8s ease forwards 0.1s;
+    }
+    .eyebrow {
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+    h1 { font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 300; line-height: 1.1; }
+    h1 em { font-style: italic; color: var(--accent); }
+    .intro { margin-top: 1rem; color: var(--muted); font-size: 1rem; max-width: 540px; }
+
+    /* ── MAP ── */
+    .map-section {
+      padding: 2.5rem 0 0;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.3s;
+    }
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1.2rem;
+    }
+    #map {
+      width: 100%; height: 380px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      margin-bottom: 0;
+    }
+
+    /* ── PLACES ── */
+    .places-section {
+      padding: 3rem 0;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.5s;
+    }
+
+    .place {
+      padding: 2rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .place:first-child { padding-top: 0; }
+
+    .place-header {
+      display: flex; align-items: baseline;
+      justify-content: space-between; flex-wrap: wrap;
+      gap: 0.3rem; margin-bottom: 0.3rem;
+    }
+    .place-name { font-size: 1.2rem; font-weight: 400; }
+    .place-address {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      color: var(--muted); letter-spacing: 0.05em;
+    }
+    .place-summary {
+      font-style: italic; color: var(--muted);
+      font-size: 0.95rem; margin-bottom: 1.2rem;
+    }
+
+    /* beans list */
+    .beans { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .bean {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.3rem 1rem;
+      align-items: start;
+      padding: 0.6rem 0.8rem;
+      border-left: 2px solid var(--line);
+      transition: border-color 0.2s;
+    }
+    .bean:hover { border-color: var(--accent); }
+    .bean.fav { border-color: var(--accent); }
+
+    .bean-name {
+      font-size: 0.92rem; font-weight: 400; line-height: 1.3;
+    }
+    .bean-notes {
+      font-size: 0.85rem; color: var(--muted);
+      font-style: italic; line-height: 1.4;
+      grid-column: 1;
+    }
+    .bean-score {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      color: var(--accent); white-space: nowrap;
+      align-self: start;
+    }
+    .bean-fav {
+      font-size: 0.75rem; color: var(--accent);
+      grid-column: 2; grid-row: 1;
+      align-self: start;
+    }
+
+    footer { padding: 2.5rem 0; text-align: center; }
+    footer p { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; color: var(--muted); }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="back">← Back</a>
+
+  <header>
+    <p class="eyebrow">Oslo specialty coffee</p>
+    <h1>My <em>coffee</em> notes</h1>
+    <p class="intro">Tasting notes from Oslo's best specialty coffee bars. ❤️ marks a personal favourite.</p>
+  </header>
+
+  <div class="map-section">
+    <p class="section-label">On the map</p>
+    <div id="map"></div>
+  </div>
+
+  <div class="places-section">
+    <p class="section-label">The places</p>
+
+    <!-- TIM WENDELBOE -->
+    <div class="place">
+      <div class="place-header">
+        <span class="place-name">Tim Wendelboe</span>
+        <span class="place-address">Grüners gate 1</span>
+      </div>
+      <p class="place-summary">Oslo's most celebrated roastery — founded by a World Barista Champion. Expect precise, bright filter coffees with extraordinary provenance. Heavy on Ethiopian and Kenyan lots, often floral and fruit-forward. The range rewards repeat visits.</p>
+      <div class="beans">
+        <div class="bean">
+          <span class="bean-name">Tatmara Ethiopia 74110 — Natural</span>
+          <span class="bean-score">4 / 5</span>
+          <span class="bean-notes">Floral, tropical fruit, strawberry. Slightly burnt finish.</span>
+        </div>
+        <div class="bean fav">
+          <span class="bean-name">Caballero — Honduras</span>
+          <span class="bean-fav">❤️</span>
+          <span class="bean-notes">Niacinamento process. 4.5/5. SL28 variety — red berries, deeply satisfying.</span>
+          <span class="bean-score">4.5 / 5</span>
+        </div>
+        <div class="bean fav">
+          <span class="bean-name">Geisha El Vikingo — Honduras Washed</span>
+          <span class="bean-fav">❤️</span>
+          <span class="bean-notes">Herbal, floral, citrus. One of the best.</span>
+          <span class="bean-score">5 / 5</span>
+        </div>
+        <div class="bean fav">
+          <span class="bean-name">Finca Tamana — Colombia Washed</span>
+          <span class="bean-fav">❤️</span>
+          <span class="bean-notes">Herbal, caramel, chocolate. A repeat favourite.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Finca Tamana Variedad — El Pital, Huila, Colombia Washed</span>
+          <span class="bean-score">4.5 / 5</span>
+          <span class="bean-notes">Sweet chocolate, caramel & red fruits.</span>
+        </div>
+        <div class="bean fav">
+          <span class="bean-name">Echemo — Ethiopia Heirloom Washed</span>
+          <span class="bean-fav">❤️</span>
+          <span class="bean-score">5 / 5</span>
+          <span class="bean-notes">Floral, white tea, stone fruits. Exceptional.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Karogoto — Kenya SL28, SL14, Batian Washed</span>
+          <span class="bean-score">4.5 / 5</span>
+          <span class="bean-notes">Blackberry, hibiscus, blackcurrant. Dark chocolate, slightly heavy.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Caballero Honduras Pacamara — Washed</span>
+          <span class="bean-score">4.5 / 5</span>
+          <span class="bean-notes">Winery, ripe red berries, tropical fruits.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Cielito Lindo Ihcafe90 — Honduras Washed</span>
+          <span class="bean-score">3.5 / 5</span>
+          <span class="bean-notes">Forest berries, herbal, cacao.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Nacimiento El Salvador Pacas — Washed</span>
+          <span class="bean-score">4 / 5</span>
+          <span class="bean-notes">Stone fruits, red berries, herbal. A little too bitter.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Los Pirineos Pacamara — Honey</span>
+          <span class="bean-notes">Winey, stone fruits, cacao nibs.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Kapsokisio — Kenya K7, SL28 & SL34 Washed</span>
+          <span class="bean-score">4 / 5</span>
+          <span class="bean-notes">Rose hips, hibiscus & red berries.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FUGLEN -->
+    <div class="place">
+      <div class="place-header">
+        <span class="place-name">Fuglen Coffee Roasters</span>
+        <span class="place-address">St. Halvards gate 33</span>
+      </div>
+      <p class="place-summary">Roastery-café with a cocktail bar soul. The coffee programme is serious and the vibe is relaxed Nordic. Strong on Kenyan and Peruvian lots. Several 5/5 standouts — particularly the Kenyan Ngurueri and Kiambara.</p>
+      <div class="beans">
+        <div class="bean fav">
+          <span class="bean-name">Ei Rejo — Washed</span>
+          <span class="bean-fav">❤️</span>
+          <span class="bean-notes">Stone fruit, raspberry, apricot.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Peru — La Chancha Washed</span>
+          <span class="bean-score">5 / 5</span>
+          <span class="bean-notes">Passionfruit, pear, yellow plum.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Peru — La Mandarina</span>
+          <span class="bean-score">5 / 5</span>
+          <span class="bean-notes">Orange marmalade, wild berries, white tea.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Guatemala — Valentín Carrillo Washed</span>
+          <span class="bean-score">4 / 5</span>
+          <span class="bean-notes">Raisin, dark chocolate, honeycomb.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Ngurueri PB — Kenya Washed (Kiamabara, Riuru 11, SL28, SL34, K7)</span>
+          <span class="bean-score">5 / 5</span>
+          <span class="bean-notes">Plum, orange, papaya.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Kiambara — Kenya, Mugaga Cooperative, Nyeri (SL28, SL34, K7, Riuru 11) Washed</span>
+          <span class="bean-score">5 / 5</span>
+          <span class="bean-notes">Black tea, rosehip, blackcurrant.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Colombia Santa Barbara — Castillo Natural Anaerobic, Huila</span>
+          <span class="bean-score">4.5 / 5</span>
+          <span class="bean-notes">Strawberry, mango, cocoa, funky, lemon candy.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Saime Cardenas — Costa Rica, Red Honey, West Valley</span>
+          <span class="bean-score">4.5 / 5</span>
+          <span class="bean-notes">Red honey process, West Valley region.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KAFFEBRENNERIET -->
+    <div class="place">
+      <div class="place-header">
+        <span class="place-name">Kaffebrenneriet</span>
+        <span class="place-address">Akersgata 16 (and other locations)</span>
+      </div>
+      <p class="place-summary">Oslo's most widespread specialty chain, with consistently good quality. The Kenyan lots are particular highlights — especially the Muranga Gatagua and Yirgacheffe Banko Gotiti. Some Norwegian-seasonal blends worth trying too.</p>
+      <div class="beans">
+        <div class="bean">
+          <span class="bean-name">La Tia — Blue, Jasmine Honey, Berry-dried</span>
+          <span class="bean-score">3 / 5</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Sommernatt</span>
+          <span class="bean-score">4 / 5</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Muranga — Kenya Gatagua (SL-28, SL-34, Ruiri 11)</span>
+          <span class="bean-score">5 / 5</span>
+          <span class="bean-notes">Blackcurrant, pineapple & lemon balm.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Kirinyaga — Kenya Kiburi (SL-28, SL-34, Ruiri 11) Dried without pulp</span>
+          <span class="bean-score">4.5 / 5</span>
+          <span class="bean-notes">Plum, lime & vanilla. Gets slightly rancid/sour toward the end.</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Yirgacheffe — Ethiopia Heirloom Banko Gotiti</span>
+          <span class="bean-score">5 / 5</span>
+          <span class="bean-notes">Passionfruit, jasmine & honey.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- JAVA -->
+    <div class="place">
+      <div class="place-header">
+        <span class="place-name">Java</span>
+        <span class="place-address">Ullevålsveien 47</span>
+      </div>
+      <p class="place-summary">A small neighbourhood gem near Bislett. Light-roast focused, excellent single-origin filter. The Peruvian Damian Espinoza was a standout — hazelnut, stone fruit, and vanilla biscuit in a very refined cup.</p>
+      <div class="beans">
+        <div class="bean">
+          <span class="bean-name">Kaffa Oslo — Light roast, Damian Espinoza, Cajamarca Peru</span>
+          <span class="bean-score">5 / 5</span>
+          <span class="bean-notes">Hazelnut, stone fruit, vanilla biscuit.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAKONE -->
+    <div class="place">
+      <div class="place-header">
+        <span class="place-name">Hakone Coffee</span>
+        <span class="place-address">Storgata 23c</span>
+      </div>
+      <p class="place-summary">Japanese-influenced café with a strong specialty programme and excellent pastries. Consistently impressive — multiple 5/5 coffees noted. The Mr. Mengeche Derso from Yirgacheffe and Finca El Placer Pink Bourbon are exceptional.</p>
+      <div class="beans">
+        <div class="bean">
+          <span class="bean-name">Mr. Mengeche Derso — Ethiopia Heirloom, Gedeo Yirgacheffe Natural</span>
+          <span class="bean-score">5 / 5</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Finca El Placer — Pink Bourbon</span>
+          <span class="bean-score">5 / 5</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Las Mishas — Organic</span>
+          <span class="bean-score">5 / 5</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">AA Gondo</span>
+          <span class="bean-score">4.5 / 5</span>
+        </div>
+        <div class="bean">
+          <span class="bean-name">Bombe</span>
+          <span class="bean-score">5 / 5</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end places-section -->
+
+  <footer><p>© 2026 Katja Norstad</p></footer>
+</div>
+
+<script>
+  function initMap() {
+    const center = { lat: 59.916, lng: 10.752 };
+    const map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 13,
+      center: center,
+      styles: [
+        { elementType: "geometry", stylers: [{ color: "#f0ebe3" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#5a4a3a" }] },
+        { elementType: "labels.text.stroke", stylers: [{ color: "#f0ebe3" }] },
+        { featureType: "road", elementType: "geometry", stylers: [{ color: "#e0d8cc" }] },
+        { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#d4c8b8" }] },
+        { featureType: "water", elementType: "geometry", stylers: [{ color: "#c8d8e8" }] },
+        { featureType: "poi", elementType: "geometry", stylers: [{ color: "#e8e0d4" }] },
+        { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#d8e8d0" }] },
+        { featureType: "transit", elementType: "geometry", stylers: [{ color: "#e0d8cc" }] }
+      ]
+    });
+
+    const places = [
+      { name: "Tim Wendelboe", lat: 59.9233709, lng: 10.7556998, summary: "World-class roastery. Bright, precise filter coffees. Many 5/5 lots." },
+      { name: "Fuglen Coffee Roasters", lat: 59.9062171, lng: 10.7746492, summary: "Roastery-café. Exceptional Kenyan and Peruvian lots. Multiple 5/5." },
+      { name: "Kaffebrenneriet", lat: 59.9120349, lng: 10.7403625, summary: "Best specialty chain in Oslo. Strong on Kenyan and Ethiopian." },
+      { name: "Java", lat: 59.924436, lng: 10.739647, summary: "Neighbourhood gem. Light-roast focused, very refined cups." },
+      { name: "Hakone Coffee", lat: 59.9138937, lng: 10.7507774, summary: "Japanese-influenced. Consistently impressive — lots of 5/5." }
+    ];
+
+    const infoWindow = new google.maps.InfoWindow();
+
+    places.forEach(p => {
+      const marker = new google.maps.Marker({
+        position: { lat: p.lat, lng: p.lng },
+        map,
+        title: p.name,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: "#c4501a",
+          fillOpacity: 1,
+          strokeColor: "#f5f2ed",
+          strokeWeight: 2
+        }
+      });
+      marker.addListener("click", () => {
+        infoWindow.setContent(`
+          <div style="font-family:'DM Mono',monospace;font-size:11px;padding:4px 2px;max-width:200px;line-height:1.5;">
+            <strong style="font-size:12px;display:block;margin-bottom:4px;">${p.name}</strong>
+            <span style="color:#7a7570;">${p.summary}</span>
+          </div>
+        `);
+        infoWindow.open(map, marker);
+      });
+    });
+  }
+</script>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY&callback=initMap">
+</script>
+
+</body>
+</html>
