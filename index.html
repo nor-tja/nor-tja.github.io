@@ -31,15 +31,16 @@
     /* ── coffee ring stain ── */
     .mug-stain {
     position: fixed;
-    bottom: -40px;
-    right: -30px;
-    width: 1440px;
-    height: 804px;
+    bottom: -120px;
+    right: -120px;
+    width: 420px;
+    height: auto;
     opacity: 0;
     pointer-events: none;
+    z-index: 0;
     animation: fadeStain 2s ease forwards 1.2s;
     }
-    
+
     @keyframes fadeStain {
       from { opacity: 0; }
       to { opacity: 0.18; }
