@@ -1,0 +1,17 @@
+.mug-stain {
+  position: fixed;
+  bottom: -40px;
+  right: -30px;
+
+  width: 1440px;
+  height: 804px;
+
+  opacity: 0;
+  pointer-events: none;
+
+  animation: fadeStain 2s ease forwards 1.2s;
+}
+
+@keyframes fadeStain {
+  to { opacity: 0.18; }
+}
