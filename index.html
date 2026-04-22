@@ -28,20 +28,37 @@
       overflow: hidden;
     }
 
-    /* ── coffee ring stain ── */
-    .mug-stain {
+    /* ── coffee cup and stain ── */
+    .coffee-scene {
       position: fixed;
-      bottom: -40px;
-      right: -30px;
-      width: 260px;
-      height: 260px;
-      opacity: 0.18;
-      pointer-events: none;
-      animation: fadeStain 2s ease forwards 1.2s;
+      bottom: -60px;
+      right: -40px;
+      width: 320px;
+      height: 320px;
       opacity: 0;
+      animation: fadeStain 2s ease forwards 1.2s;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .coffee-scene:hover .cup-link-text {
+      opacity: 1;
+    }
+    .cup-link-text {
+      position: absolute;
+      top: 90px;
+      left: 95px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--bg);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      text-shadow: 0 0 8px rgba(74, 56, 37, 0.4);
     }
     @keyframes fadeStain {
-      to { opacity: 0.18; }
+      to { opacity: 1; }
     }
 
     .center {
@@ -97,69 +114,131 @@
 </head>
 <body>
 
-  <!-- Coffee mug ring stain -->
-  <svg class="mug-stain" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <!-- Organic distortion filter -->
-      <filter id="organic">
-        <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="8" />
-        <feDisplacementMap in="SourceGraphic" scale="12" />
-        <feGaussianBlur stdDeviation="0.6" />
-      </filter>
+  <!-- Coffee cup and stain scene -->
+  <a href="coffee.html" class="coffee-scene">
+    <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Organic distortion for stain -->
+        <filter id="organic">
+          <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="8" />
+          <feDisplacementMap in="SourceGraphic" scale="12" />
+          <feGaussianBlur stdDeviation="0.6" />
+        </filter>
 
-      <!-- Coffee texture -->
-      <filter id="texture">
-        <feTurbulence type="fractalNoise" baseFrequency="2" numOctaves="4" seed="3" />
-        <feColorMatrix type="saturate" values="0.2" />
-        <feComponentTransfer>
-          <feFuncA type="linear" slope="0.12" />
-        </feComponentTransfer>
-        <feBlend in="SourceGraphic" mode="multiply" />
-      </filter>
+        <!-- Coffee texture -->
+        <filter id="texture">
+          <feTurbulence type="fractalNoise" baseFrequency="2" numOctaves="4" seed="3" />
+          <feColorMatrix type="saturate" values="0.2" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.12" />
+          </feComponentTransfer>
+          <feBlend in="SourceGraphic" mode="multiply" />
+        </filter>
 
-      <!-- Main ring gradient - dark outer edge -->
-      <radialGradient id="ring">
-        <stop offset="0%" stop-color="#8b7355" stop-opacity="0.02" />
-        <stop offset="60%" stop-color="#7a6448" stop-opacity="0.04" />
-        <stop offset="80%" stop-color="#5c4a36" stop-opacity="0.08" />
-        <stop offset="88%" stop-color="#3d2f1f" stop-opacity="0.45" />
-        <stop offset="91%" stop-color="#4a3825" stop-opacity="0.65" />
-        <stop offset="94%" stop-color="#3d2f1f" stop-opacity="0.52" />
-        <stop offset="97%" stop-color="#5c4a36" stop-opacity="0.28" />
-        <stop offset="100%" stop-color="#6b5442" stop-opacity="0.08" />
-      </radialGradient>
-    </defs>
+        <!-- Stain ring gradient -->
+        <radialGradient id="stainRing">
+          <stop offset="0%" stop-color="#8b7355" stop-opacity="0.02" />
+          <stop offset="60%" stop-color="#7a6448" stop-opacity="0.04" />
+          <stop offset="80%" stop-color="#5c4a36" stop-opacity="0.08" />
+          <stop offset="88%" stop-color="#3d2f1f" stop-opacity="0.45" />
+          <stop offset="91%" stop-color="#4a3825" stop-opacity="0.65" />
+          <stop offset="94%" stop-color="#3d2f1f" stop-opacity="0.52" />
+          <stop offset="97%" stop-color="#5c4a36" stop-opacity="0.28" />
+          <stop offset="100%" stop-color="#6b5442" stop-opacity="0.08" />
+        </radialGradient>
 
-    <!-- Main stain circle with organic edges -->
-    <circle cx="130" cy="130" r="80" fill="url(#ring)" filter="url(#organic) url(#texture)" />
+        <!-- Cup ceramic gradient -->
+        <linearGradient id="cupCeramic" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#e8e3db" />
+          <stop offset="50%" stop-color="#f5f0e8" />
+          <stop offset="100%" stop-color="#dad5cd" />
+        </linearGradient>
 
-    <!-- Subtle pooling variations inside -->
-    <ellipse cx="142" cy="118" rx="16" ry="20" fill="#5c4a36" opacity="0.08"
-             filter="url(#texture)" transform="rotate(22 142 118)" />
-    <ellipse cx="115" cy="142" rx="20" ry="14" fill="#4a3825" opacity="0.1"
-             filter="url(#texture)" transform="rotate(-18 115 142)" />
-    <circle cx="132" cy="135" r="10" fill="#6b5442" opacity="0.06" filter="url(#texture)" />
+        <!-- Coffee liquid gradient -->
+        <radialGradient id="coffeeLiquid">
+          <stop offset="0%" stop-color="#3d2f1f" />
+          <stop offset="70%" stop-color="#4a3825" />
+          <stop offset="100%" stop-color="#2d2318" />
+        </radialGradient>
 
-    <!-- Small scattered drips -->
-    <ellipse cx="72" cy="98" rx="2.8" ry="4.5" fill="#5c4a36" opacity="0.28"
-             filter="url(#organic)" transform="rotate(48 72 98)" />
-    <circle cx="192" cy="165" r="2.2" fill="#4a3825" opacity="0.32" filter="url(#organic)" />
-    <ellipse cx="98" cy="188" rx="2.4" ry="3.8" fill="#5c4a36" opacity="0.25"
-             filter="url(#organic)" transform="rotate(-35 98 188)" />
-    <circle cx="158" cy="68" r="1.8" fill="#6b5442" opacity="0.22" filter="url(#organic)" />
-  </svg>
+        <!-- Shadow -->
+        <filter id="cupShadow">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+          <feOffset dx="2" dy="4" result="offsetblur" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.3" />
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- Coffee stain under cup -->
+      <circle cx="165" cy="195" r="70" fill="url(#stainRing)"
+              filter="url(#organic) url(#texture)" opacity="0.9" />
+      <ellipse cx="172" cy="188" rx="14" ry="18" fill="#5c4a36" opacity="0.08"
+               filter="url(#texture)" transform="rotate(22 172 188)" />
+      <ellipse cx="155" cy="202" rx="18" ry="12" fill="#4a3825" opacity="0.1"
+               filter="url(#texture)" transform="rotate(-18 155 202)" />
+
+      <!-- Cup body -->
+      <g filter="url(#cupShadow)">
+        <!-- Main cup shape -->
+        <path d="M 100 120 Q 98 85 100 80 L 180 80 Q 182 85 180 120 Q 178 150 175 165
+                 L 105 165 Q 102 150 100 120 Z"
+              fill="url(#cupCeramic)" stroke="#b8b3ab" stroke-width="1.5" />
+
+        <!-- Inner rim shadow -->
+        <ellipse cx="140" cy="80" rx="40" ry="6" fill="#d0cbc3" opacity="0.6" />
+
+        <!-- Coffee inside -->
+        <ellipse cx="140" cy="88" rx="36" ry="8" fill="url(#coffeeLiquid)" />
+
+        <!-- Highlight on coffee surface -->
+        <ellipse cx="125" cy="87" rx="12" ry="3" fill="#5c4a36" opacity="0.4" />
+
+        <!-- Cup handle -->
+        <path d="M 180 95 Q 205 95 210 110 Q 212 125 205 135 Q 198 142 185 140
+                 L 182 132 Q 192 133 196 125 Q 198 115 195 105 Q 190 98 182 100 Z"
+              fill="url(#cupCeramic)" stroke="#b8b3ab" stroke-width="1.5" />
+
+        <!-- Handle inner highlight -->
+        <path d="M 184 100 Q 195 100 200 112 Q 201 120 198 128"
+              fill="none" stroke="#f5f0e8" stroke-width="1" opacity="0.5" />
+
+        <!-- Cup rim -->
+        <ellipse cx="140" cy="80" rx="40" ry="7" fill="none"
+                 stroke="#b8b3ab" stroke-width="1.5" />
+
+        <!-- Ceramic highlights -->
+        <path d="M 110 90 Q 108 110 107 130" stroke="#ffffff"
+              stroke-width="1.5" opacity="0.4" fill="none" />
+        <path d="M 170 90 Q 171 110 170 130" stroke="#e0dbd3"
+              stroke-width="1" opacity="0.3" fill="none" />
+      </g>
+
+      <!-- Small drips around stain -->
+      <ellipse cx="120" cy="180" rx="2.5" ry="4" fill="#5c4a36" opacity="0.25"
+               filter="url(#organic)" transform="rotate(48 120 180)" />
+      <circle cx="215" cy="215" r="2" fill="#4a3825" opacity="0.28" filter="url(#organic)" />
+      <ellipse cx="145" cy="245" rx="2.2" ry="3.5" fill="#5c4a36" opacity="0.22"
+               filter="url(#organic)" transform="rotate(-35 145 245)" />
+    </svg>
+    <span class="cup-link-text">Coffee</span>
+  </a>
 
   <div class="center">
     <p class="greeting">
       Hello, I am <em>Katja</em>. I am a data scientist who enjoys building
       and organising things. Here are links to my CV, my (ancient) blog,
-      resources I appreciate, and my favourite coffee spots.
+      and resources I appreciate.
     </p>
     <nav class="links">
       <a href="cv.html">CV</a>
       <a href="https://katjanorstad.medium.com/" target="_blank" rel="noopener">Blog</a>
       <a href="resources.html">Resources</a>
-      <a href="coffee.html">Coffee</a>
     </nav>
   </div>
 </body>
