@@ -100,73 +100,52 @@
   <!-- Coffee mug ring stain -->
   <svg class="mug-stain" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <!-- Filters for realistic texture -->
-      <filter id="coffeeBlur">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="0.8" />
-      </filter>
-      <filter id="stainTexture">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="2" />
-        <feColorMatrix type="saturate" values="0.3" />
-        <feComponentTransfer>
-          <feFuncA type="linear" slope="0.4" />
-        </feComponentTransfer>
-        <feBlend in="SourceGraphic" in2="stainTexture" mode="multiply" />
+      <!-- Turbulence for organic edge -->
+      <filter id="organicEdge">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="5" />
+        <feDisplacementMap in="SourceGraphic" scale="8" />
+        <feGaussianBlur stdDeviation="0.5" />
       </filter>
 
-      <!-- Gradients for organic color variation -->
-      <radialGradient id="ringGrad1">
-        <stop offset="0%" style="stop-color:#8b6f47;stop-opacity:0" />
-        <stop offset="70%" style="stop-color:#8b6f47;stop-opacity:0.6" />
-        <stop offset="85%" style="stop-color:#6d5638;stop-opacity:0.85" />
-        <stop offset="100%" style="stop-color:#8b6f47;stop-opacity:0.4" />
-      </radialGradient>
-      <radialGradient id="ringGrad2">
-        <stop offset="0%" style="stop-color:#9d7d54;stop-opacity:0" />
-        <stop offset="75%" style="stop-color:#9d7d54;stop-opacity:0.45" />
-        <stop offset="90%" style="stop-color:#7a5f3d;stop-opacity:0.7" />
-        <stop offset="100%" style="stop-color:#9d7d54;stop-opacity:0.3" />
-      </radialGradient>
-      <radialGradient id="innerStain">
-        <stop offset="0%" style="stop-color:#7a5f3d;stop-opacity:0.2" />
-        <stop offset="50%" style="stop-color:#8b6f47;stop-opacity:0.35" />
-        <stop offset="100%" style="stop-color:#6d5638;stop-opacity:0.15" />
+      <!-- Texture for stain surface -->
+      <filter id="coffeeTexture">
+        <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="5" seed="12" />
+        <feColorMatrix values="1 0 0 0 0
+                                0 1 0 0 0
+                                0 0 1 0 0
+                                0 0 0 0.15 0" />
+        <feBlend in="SourceGraphic" mode="multiply" />
+      </filter>
+
+      <!-- Radial gradient for realistic coffee stain -->
+      <radialGradient id="coffeeRing">
+        <stop offset="0%" style="stop-color:#a0826d;stop-opacity:0.08" />
+        <stop offset="50%" style="stop-color:#8b7355;stop-opacity:0.12" />
+        <stop offset="82%" style="stop-color:#6b5442;stop-opacity:0.25" />
+        <stop offset="88%" style="stop-color:#4a3a28;stop-opacity:0.65" />
+        <stop offset="92%" style="stop-color:#5d4a35;stop-opacity:0.75" />
+        <stop offset="96%" style="stop-color:#4a3a28;stop-opacity:0.55" />
+        <stop offset="100%" style="stop-color:#6b5442;stop-opacity:0.15" />
       </radialGradient>
     </defs>
 
-    <!-- Main coffee ring - outer -->
-    <ellipse cx="135" cy="128" rx="82" ry="78" fill="none" stroke="url(#ringGrad1)"
-             stroke-width="3.2" opacity="0.9" filter="url(#coffeeBlur)"
-             transform="rotate(-8 135 128)" />
+    <!-- Light interior wash -->
+    <circle cx="130" cy="130" r="75" fill="url(#coffeeRing)"
+            filter="url(#organicEdge) url(#coffeeTexture)" />
 
-    <!-- Secondary ring - slightly irregular -->
-    <ellipse cx="133" cy="127" rx="76" ry="73" fill="none" stroke="url(#ringGrad2)"
-             stroke-width="2.8" opacity="0.75" filter="url(#coffeeBlur)"
-             transform="rotate(-12 133 127)" />
+    <!-- Additional darker spots where coffee pooled -->
+    <ellipse cx="145" cy="115" rx="18" ry="22" fill="#5d4a35" opacity="0.15"
+             filter="url(#coffeeTexture)" transform="rotate(25 145 115)" />
+    <ellipse cx="108" cy="145" rx="22" ry="16" fill="#4a3a28" opacity="0.18"
+             filter="url(#coffeeTexture)" transform="rotate(-15 108 145)" />
+    <circle cx="135" cy="138" r="12" fill="#6b5442" opacity="0.12" filter="url(#coffeeTexture)" />
 
-    <!-- Inner filled stain area -->
-    <ellipse cx="134" cy="127.5" rx="68" ry="65" fill="url(#innerStain)"
-             filter="url(#stainTexture)" transform="rotate(-10 134 127.5)" />
-
-    <!-- Tertiary faint ring -->
-    <ellipse cx="134.5" cy="128.5" rx="88" ry="84" fill="none" stroke="#9d7d54"
-             stroke-width="1.8" opacity="0.4" filter="url(#coffeeBlur)"
-             transform="rotate(-6 134.5 128.5)" />
-
-    <!-- Organic splatters and drips -->
-    <circle cx="95" cy="162" r="4.5" fill="#8b6f47" opacity="0.5" filter="url(#coffeeBlur)" />
-    <ellipse cx="178" cy="94" rx="3.2" ry="5.8" fill="#7a5f3d" opacity="0.45"
-             filter="url(#coffeeBlur)" transform="rotate(25 178 94)" />
-    <circle cx="115" cy="68" r="2.8" fill="#9d7d54" opacity="0.4" filter="url(#coffeeBlur)" />
-    <ellipse cx="188" cy="145" rx="2.5" ry="4.2" fill="#8b6f47" opacity="0.5"
-             filter="url(#coffeeBlur)" transform="rotate(-15 188 145)" />
-    <circle cx="82" cy="118" r="3.5" fill="#7a5f3d" opacity="0.42" filter="url(#coffeeBlur)" />
-    <ellipse cx="156" cy="182" rx="4" ry="2.8" fill="#9d7d54" opacity="0.38"
-             filter="url(#coffeeBlur)" transform="rotate(42 156 182)" />
-
-    <!-- Small detail splatters -->
-    <circle cx="142" cy="74" r="1.8" fill="#8b6f47" opacity="0.35" filter="url(#coffeeBlur)" />
-    <circle cx="200" cy="122" r="2.2" fill="#7a5f3d" opacity="0.4" filter="url(#coffeeBlur)" />
-    <circle cx="108" cy="188" r="2.5" fill="#9d7d54" opacity="0.32" filter="url(#coffeeBlur)" />
+    <!-- Small drips outside main ring -->
+    <ellipse cx="75" cy="95" rx="3" ry="5" fill="#6b5442" opacity="0.35"
+             filter="url(#organicEdge)" transform="rotate(45 75 95)" />
+    <circle cx="188" cy="168" r="2.5" fill="#5d4a35" opacity="0.4" filter="url(#organicEdge)" />
+    <ellipse cx="95" cy="185" rx="2.5" ry="4" fill="#6b5442" opacity="0.3"
+             filter="url(#organicEdge)" transform="rotate(-30 95 185)" />
   </svg>
 
   <div class="center">
