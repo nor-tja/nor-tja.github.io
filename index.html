@@ -45,17 +45,17 @@
     }
     .cup-link-text {
       position: absolute;
-      top: 90px;
-      left: 95px;
+      top: 80px;
+      left: 118px;
       font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--bg);
+      color: var(--ink);
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
-      text-shadow: 0 0 8px rgba(74, 56, 37, 0.4);
+      font-weight: 400;
     }
     @keyframes fadeStain {
       to { opacity: 1; }
@@ -146,85 +146,41 @@
           <stop offset="97%" stop-color="#5c4a36" stop-opacity="0.28" />
           <stop offset="100%" stop-color="#6b5442" stop-opacity="0.08" />
         </radialGradient>
-
-        <!-- Cup ceramic gradient -->
-        <linearGradient id="cupCeramic" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#e8e3db" />
-          <stop offset="50%" stop-color="#f5f0e8" />
-          <stop offset="100%" stop-color="#dad5cd" />
-        </linearGradient>
-
-        <!-- Coffee liquid gradient -->
-        <radialGradient id="coffeeLiquid">
-          <stop offset="0%" stop-color="#3d2f1f" />
-          <stop offset="70%" stop-color="#4a3825" />
-          <stop offset="100%" stop-color="#2d2318" />
-        </radialGradient>
-
-        <!-- Shadow -->
-        <filter id="cupShadow">
-          <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
-          <feOffset dx="2" dy="4" result="offsetblur" />
-          <feComponentTransfer>
-            <feFuncA type="linear" slope="0.3" />
-          </feComponentTransfer>
-          <feMerge>
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
       </defs>
 
       <!-- Coffee stain under cup -->
-      <circle cx="165" cy="195" r="70" fill="url(#stainRing)"
+      <circle cx="160" cy="200" r="65" fill="url(#stainRing)"
               filter="url(#organic) url(#texture)" opacity="0.9" />
-      <ellipse cx="172" cy="188" rx="14" ry="18" fill="#5c4a36" opacity="0.08"
-               filter="url(#texture)" transform="rotate(22 172 188)" />
-      <ellipse cx="155" cy="202" rx="18" ry="12" fill="#4a3825" opacity="0.1"
-               filter="url(#texture)" transform="rotate(-18 155 202)" />
-
-      <!-- Cup body -->
-      <g filter="url(#cupShadow)">
-        <!-- Main cup shape -->
-        <path d="M 100 120 Q 98 85 100 80 L 180 80 Q 182 85 180 120 Q 178 150 175 165
-                 L 105 165 Q 102 150 100 120 Z"
-              fill="url(#cupCeramic)" stroke="#b8b3ab" stroke-width="1.5" />
-
-        <!-- Inner rim shadow -->
-        <ellipse cx="140" cy="80" rx="40" ry="6" fill="#d0cbc3" opacity="0.6" />
-
-        <!-- Coffee inside -->
-        <ellipse cx="140" cy="88" rx="36" ry="8" fill="url(#coffeeLiquid)" />
-
-        <!-- Highlight on coffee surface -->
-        <ellipse cx="125" cy="87" rx="12" ry="3" fill="#5c4a36" opacity="0.4" />
-
-        <!-- Cup handle -->
-        <path d="M 180 95 Q 205 95 210 110 Q 212 125 205 135 Q 198 142 185 140
-                 L 182 132 Q 192 133 196 125 Q 198 115 195 105 Q 190 98 182 100 Z"
-              fill="url(#cupCeramic)" stroke="#b8b3ab" stroke-width="1.5" />
-
-        <!-- Handle inner highlight -->
-        <path d="M 184 100 Q 195 100 200 112 Q 201 120 198 128"
-              fill="none" stroke="#f5f0e8" stroke-width="1" opacity="0.5" />
-
-        <!-- Cup rim -->
-        <ellipse cx="140" cy="80" rx="40" ry="7" fill="none"
-                 stroke="#b8b3ab" stroke-width="1.5" />
-
-        <!-- Ceramic highlights -->
-        <path d="M 110 90 Q 108 110 107 130" stroke="#ffffff"
-              stroke-width="1.5" opacity="0.4" fill="none" />
-        <path d="M 170 90 Q 171 110 170 130" stroke="#e0dbd3"
-              stroke-width="1" opacity="0.3" fill="none" />
-      </g>
+      <ellipse cx="167" cy="193" rx="13" ry="16" fill="#5c4a36" opacity="0.08"
+               filter="url(#texture)" transform="rotate(22 167 193)" />
+      <ellipse cx="152" cy="207" rx="16" ry="11" fill="#4a3825" opacity="0.1"
+               filter="url(#texture)" transform="rotate(-18 152 207)" />
 
       <!-- Small drips around stain -->
-      <ellipse cx="120" cy="180" rx="2.5" ry="4" fill="#5c4a36" opacity="0.25"
-               filter="url(#organic)" transform="rotate(48 120 180)" />
-      <circle cx="215" cy="215" r="2" fill="#4a3825" opacity="0.28" filter="url(#organic)" />
-      <ellipse cx="145" cy="245" rx="2.2" ry="3.5" fill="#5c4a36" opacity="0.22"
-               filter="url(#organic)" transform="rotate(-35 145 245)" />
+      <ellipse cx="118" cy="188" rx="2.3" ry="3.8" fill="#5c4a36" opacity="0.25"
+               filter="url(#organic)" transform="rotate(48 118 188)" />
+      <circle cx="208" cy="218" r="1.9" fill="#4a3825" opacity="0.28" filter="url(#organic)" />
+      <ellipse cx="142" cy="245" rx="2.1" ry="3.3" fill="#5c4a36" opacity="0.22"
+               filter="url(#organic)" transform="rotate(-35 142 245)" />
+
+      <!-- Minimalist line-drawn coffee cup -->
+      <g stroke="#1a1814" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Steam -->
+        <path d="M 145 35 Q 148 28 145 22 Q 142 15 145 10" />
+        <path d="M 160 40 Q 164 32 160 25 Q 156 18 160 12" />
+
+        <!-- Cup body -->
+        <path d="M 120 70 Q 118 75 120 110 L 130 140 L 190 140 L 200 110 Q 202 75 200 70" />
+
+        <!-- Cup rim (ellipse top) -->
+        <ellipse cx="160" cy="70" rx="40" ry="8" />
+
+        <!-- Coffee surface inside -->
+        <ellipse cx="160" cy="78" rx="36" ry="6" />
+
+        <!-- Handle -->
+        <path d="M 200 85 Q 220 85 225 95 Q 228 105 225 115 Q 220 122 205 120" />
+      </g>
     </svg>
     <span class="cup-link-text">Coffee</span>
   </a>
