@@ -28,13 +28,13 @@
       overflow: hidden;
     }
 
-    /* ── coffee cup and stain ── */
+    /* ── coffee cup ── */
     .coffee-scene {
       position: fixed;
-      bottom: -60px;
-      right: -40px;
-      width: 320px;
-      height: 320px;
+      bottom: 20px;
+      right: 40px;
+      width: 225px;
+      height: 225px;
       opacity: 0;
       animation: fadeStain 2s ease forwards 1.2s;
       cursor: pointer;
@@ -43,15 +43,23 @@
     .coffee-scene:hover .cup-link-text {
       opacity: 1;
     }
+    .coffee-mug-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: brightness(1.05) contrast(0.95) saturate(0.85);
+      mix-blend-mode: darken;
+      opacity: 0.9;
+    }
     .cup-link-text {
       position: absolute;
-      top: 80px;
-      left: 118px;
+      top: 90px;
+      left: 62px;
       font-family: 'DM Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.14em;
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--ink);
+      color: var(--accent);
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
@@ -114,75 +122,10 @@
 </head>
 <body>
 
-  <!-- Coffee cup and stain scene -->
+  <!-- Coffee cup scene -->
   <a href="coffee.html" class="coffee-scene">
-    <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <!-- Organic distortion for stain -->
-        <filter id="organic">
-          <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="8" />
-          <feDisplacementMap in="SourceGraphic" scale="12" />
-          <feGaussianBlur stdDeviation="0.6" />
-        </filter>
-
-        <!-- Coffee texture -->
-        <filter id="texture">
-          <feTurbulence type="fractalNoise" baseFrequency="2" numOctaves="4" seed="3" />
-          <feColorMatrix type="saturate" values="0.2" />
-          <feComponentTransfer>
-            <feFuncA type="linear" slope="0.12" />
-          </feComponentTransfer>
-          <feBlend in="SourceGraphic" mode="multiply" />
-        </filter>
-
-        <!-- Stain ring gradient -->
-        <radialGradient id="stainRing">
-          <stop offset="0%" stop-color="#8b7355" stop-opacity="0.02" />
-          <stop offset="60%" stop-color="#7a6448" stop-opacity="0.04" />
-          <stop offset="80%" stop-color="#5c4a36" stop-opacity="0.08" />
-          <stop offset="88%" stop-color="#3d2f1f" stop-opacity="0.45" />
-          <stop offset="91%" stop-color="#4a3825" stop-opacity="0.65" />
-          <stop offset="94%" stop-color="#3d2f1f" stop-opacity="0.52" />
-          <stop offset="97%" stop-color="#5c4a36" stop-opacity="0.28" />
-          <stop offset="100%" stop-color="#6b5442" stop-opacity="0.08" />
-        </radialGradient>
-      </defs>
-
-      <!-- Coffee stain under cup -->
-      <circle cx="160" cy="200" r="65" fill="url(#stainRing)"
-              filter="url(#organic) url(#texture)" opacity="0.9" />
-      <ellipse cx="167" cy="193" rx="13" ry="16" fill="#5c4a36" opacity="0.08"
-               filter="url(#texture)" transform="rotate(22 167 193)" />
-      <ellipse cx="152" cy="207" rx="16" ry="11" fill="#4a3825" opacity="0.1"
-               filter="url(#texture)" transform="rotate(-18 152 207)" />
-
-      <!-- Small drips around stain -->
-      <ellipse cx="118" cy="188" rx="2.3" ry="3.8" fill="#5c4a36" opacity="0.25"
-               filter="url(#organic)" transform="rotate(48 118 188)" />
-      <circle cx="208" cy="218" r="1.9" fill="#4a3825" opacity="0.28" filter="url(#organic)" />
-      <ellipse cx="142" cy="245" rx="2.1" ry="3.3" fill="#5c4a36" opacity="0.22"
-               filter="url(#organic)" transform="rotate(-35 142 245)" />
-
-      <!-- Minimalist line-drawn coffee cup -->
-      <g stroke="#1a1814" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <!-- Steam -->
-        <path d="M 145 35 Q 148 28 145 22 Q 142 15 145 10" />
-        <path d="M 160 40 Q 164 32 160 25 Q 156 18 160 12" />
-
-        <!-- Cup body -->
-        <path d="M 120 70 Q 118 75 120 110 L 130 140 L 190 140 L 200 110 Q 202 75 200 70" />
-
-        <!-- Cup rim (ellipse top) -->
-        <ellipse cx="160" cy="70" rx="40" ry="8" />
-
-        <!-- Coffee surface inside -->
-        <ellipse cx="160" cy="78" rx="36" ry="6" />
-
-        <!-- Handle -->
-        <path d="M 200 85 Q 220 85 225 95 Q 228 105 225 115 Q 220 122 205 120" />
-      </g>
-    </svg>
-    <span class="cup-link-text">Coffee</span>
+    <img src="coffee_mug.png" alt="Coffee mug" class="coffee-mug-img">
+    <span class="cup-link-text">Coffee?</span>
   </a>
 
   <div class="center">
