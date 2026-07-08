@@ -3,38 +3,145 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Katja Norstad — Coffee</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjVmMmVkIi8+CiAgPHRleHQgeD0iMTYiIHk9IjIzIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjQwMCIgCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2M0NTAxYSIgbGV0dGVyLXNwYWNpbmc9IjEiPktOPC90ZXh0Pgo8L3N2Zz4=" />
+  <title>Katja Norstad</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
-  <!-- Leaflet — free, no API key -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#c4501a; --line:#d8d3cc; }
-    body { background:var(--bg); color:var(--ink); font-family:'Cormorant Garamond',serif; font-weight:300; font-size:18px; line-height:1.7; min-height:100vh; }
-    .wrap { max-width:860px; margin:0 auto; padding:0 2rem; }
+    :root {
+      --bg: #f5f2ed;
+      --ink: #1a1814;
+      --muted: #7a7570;
+      --accent: #c4501a;
+      --line: #d8d3cc;
+    }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
 
-    .back { display:inline-flex; align-items:center; gap:.4rem; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:1.8rem 0 0; transition:color .2s; }
-    .back:hover { color:var(--accent); }
+    /* ── coffee cup ── */
+    .coffee-scene {
+      position: fixed;
+      bottom: 20px;
+      right: 32px;
+      width: 100px;
+      height: 100px;
+      opacity: 0;
+      animation: fadeStain 2s ease forwards 1.2s;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .coffee-scene:hover .cup-link-text {
+      opacity: 1;
+    }
+    .coffee-mug-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: brightness(1.05) contrast(0.95) saturate(0.85);
+      mix-blend-mode: darken;
+      opacity: 0.9;
+    }
+    .cup-link-text {
+      position: absolute;
+      top: 40px;
+      left: 27px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      font-weight: 400;
+    }
+    @keyframes fadeStain {
+      to { opacity: 1; }
+    }
 
-    header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
-    .eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
-    h1 { font-size:clamp(2rem,6vw,3.2rem); font-weight:300; line-height:1.1; }
-    h1 em { font-style:italic; color:var(--accent); }
-    .intro { margin-top:1rem; color:var(--muted); font-size:1rem; max-width:540px; }
+    .center {
+      max-width: 520px;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .greeting {
+      font-size: clamp(1.5rem, 5vw, 2.1rem);
+      line-height: 1.55;
+      margin-bottom: 2.4rem;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.15s;
+    }
+    .greeting em { font-style: italic; color: var(--accent); }
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.4s;
+    }
+    .links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      transition: color 0.2s;
+    }
+    .links a::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--line);
+      transition: width 0.25s, background 0.2s;
+      flex-shrink: 0;
+    }
+    .links a:hover { color: var(--accent); }
+    .links a:hover::before { width: 40px; background: var(--accent); }
 
-    /* QUICK STATS */
-    .stats-strip { display:flex; flex-wrap:wrap; gap:2.4rem; padding:1.6rem 0; border-bottom:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .2s; }
-    .stat { display:flex; flex-direction:column; gap:.15rem; }
-    .stat-value { font-family:'DM Mono',monospace; font-size:1.5rem; color:var(--accent); font-weight:400; line-height:1; }
-    .stat-label { font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
 
-    /* MAP */
-    .map-section { padding:2.5rem 0 0; opacity:0; animation:rise .9s ease forwards .3s; }
-    .section-label { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.2rem; }
-    #map { width:100%; height:380px; border-radius:4px; border:1px solid var(--line); }
+  <!-- Coffee cup scene -->
+  <a href="coffee.html" class="coffee-scene">
+    <img src="coffee_mug.png" alt="Coffee mug" class="coffee-mug-img">
+    <span class="cup-link-text">Coffee?</span>
+  </a>
+
+  <div class="center">
+    <p class="greeting">
+      Hello, I am <em>Katja</em>. I am a data scientist who enjoys building
+      and organising things. Here are links to my CV, my (ancient) blog,
+      and resources I appreciate.
+    </p>
+    <nav class="links">
+      <a href="cv.html">CV</a>
+      <a href="https://katjanorstad.medium.com/" target="_blank" rel="noopener">Blog</a>
+      <a href="resources.html">Resources</a>
+    </nav>
+  </div>
+</body>
+</html>    #map { width:100%; height:380px; border-radius:4px; border:1px solid var(--line); }
 
     /* Leaflet popup overrides */
     .leaflet-popup-content-wrapper { border-radius:4px; font-family:'DM Mono',monospace; font-size:11px; color:var(--ink); background:var(--bg); border:1px solid var(--line); box-shadow:none; }
