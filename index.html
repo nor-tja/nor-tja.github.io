@@ -31,10 +31,10 @@
     /* ── coffee cup ── */
     .coffee-scene {
       position: fixed;
-      bottom: 40px;
-      right: 32px;
-      width: 150px;
-      height: 150px;
+      bottom: clamp(24px, 5vw, 56px);
+      right: clamp(18px, 4vw, 44px);
+      width: clamp(150px, 18vw, 260px);
+      height: clamp(150px, 18vw, 260px);
       opacity: 0;
       animation: fadeStain 2s ease forwards 1.2s;
       cursor: pointer;
@@ -53,8 +53,8 @@
     }
     .cup-link-text {
       position: absolute;
-      top: 60px;
-      left: 27px;
+      top: 40%;
+      left: 18%;
       font-family: 'DM Mono', monospace;
       font-size: 0.5rem;
       letter-spacing: 0.16em;
@@ -118,6 +118,15 @@
       from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+
+    @media (max-width: 480px) {
+      .coffee-scene {
+        width: clamp(110px, 30vw, 150px);
+        height: clamp(110px, 30vw, 150px);
+        bottom: 18px;
+        right: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -136,6 +145,7 @@
     <nav class="links">
       <a href="cv.html">CV</a>
       <a href="resources.html">Resources</a>
+      <a href="pomodoro.html">Pomodoro</a>
     </nav>
   </div>
 </body>
