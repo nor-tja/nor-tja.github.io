@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Katja Norstad — Mots du jour</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjVmMmVkIi8+CiAgPHRleHQgeD0iMTYiIHk9IjIzIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjQwMCIgCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2M0NTAxYSIgbGV0dGVyLXNwYWNpbmc9IjEiPktOPC90ZXh0Pgo8L3N2Zz4=" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#c4501a; --line:#d8d3cc; }
+    body { background:var(--bg); color:var(--ink); font-family:'Cormorant Garamond',serif; font-weight:300; font-size:18px; line-height:1.7; min-height:100vh; }
+    .wrap { max-width:640px; margin:0 auto; padding:0 2rem 4rem; }
+
+    .back { display:inline-flex; align-items:center; gap:.4rem; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:1.8rem 0 0; transition:color .2s; }
+    .back:hover { color:var(--accent); }
+
+    header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
+    .eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
+    h1 { font-size:clamp(2rem,6vw,3.2rem); font-weight:300; line-height:1.1; }
+    h1 em { font-style:italic; color:var(--accent); }
+    .intro { margin-top:1rem; color:var(--muted); font-size:1rem; max-width:480px; }
+    .date-line { margin-top:.9rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+
+    .streak { margin-top:1.2rem; display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); opacity:0; transition:opacity .3s; }
+    .streak.visible { opacity:1; }
+
+    .words { padding:2.2rem 0; display:flex; flex-direction:column; }
+    .word-card {
+      display:flex; align-items:center; gap:1.1rem;
+      padding:1.5rem 0; border-bottom:1px solid var(--line);
+      opacity:0; animation:rise .8s ease forwards;
+    }
+    .word-card:nth-of-type(1){ animation-delay:.25s; }
+    .word-card:nth-of-type(2){ animation-delay:.35s; }
+    .word-card:nth-of-type(3){ animation-delay:.45s; }
+    .word-card:nth-of-type(4){ animation-delay:.55s; }
+    .word-card:nth-of-type(5){ animation-delay:.65s; }
+
+    .play-btn {
+      flex-shrink:0; width:44px; height:44px; border-radius:50%;
+      border:1px solid var(--line); background:transparent; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      color:var(--accent); font-size:1.1rem; transition:all .2s;
+    }
+    .play-btn:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
+    .play-btn:active { transform:scale(.94); }
+    .play-btn.playing { background:var(--accent); color:#fdf9f2; }
+
+    .word-body { flex:1; min-width:0; }
+    .word-top { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
+    .word-fr { font-size:1.5rem; font-weight:400; }
+    .word-pos { font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:.15rem .4rem; }
+    .word-ipa { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--accent); margin-top:.25rem; }
+    .word-en { font-style:italic; color:var(--muted); font-size:.98rem; margin-top:.15rem; }
+
+    .learned-dot {
+      flex-shrink:0; width:9px; height:9px; border-radius:50%;
+      border:1px solid var(--line); cursor:pointer; transition:background .25s,border-color .25s;
+    }
+    .learned-dot.on { background:var(--accent); border-color:var(--accent); }
+
+    .no-speech { font-size:.85rem; color:var(--muted); font-style:italic; padding:1rem 0; }
+
+    .settings { margin-top:1rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .8s; }
+    .settings-trigger {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:1.1rem 0; cursor:pointer; list-style:none; user-select:none;
+      font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+    }
+    .settings-trigger::-webkit-details-marker { display:none; }
+    .settings-chevron { color:var(--muted); transition:transform .25s; }
+    details[open] .settings-chevron { transform:rotate(90deg); }
+    .settings-body { padding:.2rem 0 2rem; font-size:.85rem; color:var(--muted); line-height:1.6; }
+    .settings-body p + p { margin-top:.6rem; }
+
+    footer { padding:1rem 0 1rem; text-align:center; }
+    footer p { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; color:var(--muted); }
+
+    @keyframes rise { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    @media (max-width:520px) {
+      .wrap { padding:0 1.2rem 3rem; }
+      .word-fr { font-size:1.3rem; }
+      .play-btn { width:38px; height:38px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="back">← Back</a>
+
+  <header>
+    <p class="eyebrow">A little daily practice</p>
+    <h1>Five <em>French</em> words a day</h1>
+    <p class="intro">A fresh set of five common French words, chosen automatically for today. Tap the circle to hear each one pronounced — come back tomorrow for five new ones.</p>
+    <p class="date-line" id="dateLine"></p>
+    <p class="streak" id="streakLine"></p>
+  </header>
+
+  <div class="words" id="words"></div>
+
+  <details class="settings">
+    <summary class="settings-trigger">
+      <span>How this works</span>
+      <span class="settings-chevron">›</span>
+    </summary>
+    <div class="settings-body">
+      <p>The five words are picked automatically from a rotating list of 100 common French words, based on today's date — no server, no schedule, it just recalculates whenever the page loads. Each block of 5 stays fixed for the whole day, and the list reshuffles into a new order roughly every 20 days so you eventually see everything again in a different sequence.</p>
+      <p>Pronunciation uses your browser's built-in French voice (Web Speech API), so quality depends on your browser and OS. Chrome and Safari on Mac/iOS generally have good French voices built in.</p>
+      <p>Tap the small dot next to a word to mark it as practiced today — that's saved locally in your browser, not shared anywhere.</p>
+    </div>
+  </details>
+
+  <footer><p>© 2026 Katja Norstad</p></footer>
+</div>
+
+<script>
+(function () {
+  var WORDS = [
+    ["bonjour","/bɔ̃.ʒuʁ/","hello / good day","interj."],
+    ["merci","/mɛʁ.si/","thank you","interj."],
+    ["s'il vous plaît","/sil vu plɛ/","please","phrase"],
+    ["au revoir","/o ʁə.vwaʁ/","goodbye","phrase"],
+    ["oui","/wi/","yes","adv."],
+    ["non","/nɔ̃/","no","adv."],
+    ["pardon","/paʁ.dɔ̃/","sorry / excuse me","interj."],
+    ["bienvenue","/bjɛ̃.və.ny/","welcome","n.f."],
+    ["salut","/sa.ly/","hi / bye (informal)","interj."],
+    ["à bientôt","/a bjɛ̃.to/","see you soon","phrase"],
+    ["la maison","/la mɛ.zɔ̃/","the house","n.f."],
+    ["le chat","/lə ʃa/","the cat","n.m."],
+    ["le chien","/lə ʃjɛ̃/","the dog","n.m."],
+    ["l'eau","/lo/","the water","n.f."],
+    ["le pain","/lə pɛ̃/","the bread","n.m."],
+    ["le temps","/lə tɑ̃/","the time / weather","n.m."],
+    ["la vie","/la vi/","the life","n.f."],
+    ["l'ami","/la.mi/","the friend","n.m."],
+    ["le travail","/lə tʁa.vaj/","the work","n.m."],
+    ["la famille","/la fa.mij/","the family","n.f."],
+    ["le jour","/lə ʒuʁ/","the day","n.m."],
+    ["la nuit","/la nɥi/","the night","n.f."],
+    ["l'école","/le.kɔl/","the school","n.f."],
+    ["la voiture","/la vwa.tyʁ/","the car","n.f."],
+    ["la ville","/la vil/","the city","n.f."],
+    ["le livre","/lə livʁ/","the book","n.m."],
+    ["la table","/la tabl/","the table","n.f."],
+    ["la fenêtre","/la fə.nɛtʁ/","the window","n.f."],
+    ["la porte","/la pɔʁt/","the door","n.f."],
+    ["le café","/lə ka.fe/","the coffee","n.m."],
+    ["un","/œ̃/","one","num."],
+    ["deux","/dø/","two","num."],
+    ["trois","/tʁwa/","three","num."],
+    ["quatre","/katʁ/","four","num."],
+    ["cinq","/sɛ̃k/","five","num."],
+    ["six","/sis/","six","num."],
+    ["sept","/sɛt/","seven","num."],
+    ["huit","/ɥit/","eight","num."],
+    ["neuf","/nœf/","nine","num."],
+    ["dix","/dis/","ten","num."],
+    ["rouge","/ʁuʒ/","red","adj."],
+    ["bleu","/blø/","blue","adj."],
+    ["vert","/vɛʁ/","green","adj."],
+    ["jaune","/ʒon/","yellow","adj."],
+    ["noir","/nwaʁ/","black","adj."],
+    ["blanc","/blɑ̃/","white","adj."],
+    ["gris","/gʁi/","grey","adj."],
+    ["orange","/ɔ.ʁɑ̃ʒ/","orange","adj."],
+    ["être","/ɛtʁ/","to be","v."],
+    ["avoir","/a.vwaʁ/","to have","v."],
+    ["aller","/a.le/","to go","v."],
+    ["faire","/fɛʁ/","to do / make","v."],
+    ["voir","/vwaʁ/","to see","v."],
+    ["savoir","/sa.vwaʁ/","to know","v."],
+    ["pouvoir","/pu.vwaʁ/","to be able to","v."],
+    ["vouloir","/vu.lwaʁ/","to want","v."],
+    ["venir","/və.niʁ/","to come","v."],
+    ["prendre","/pʁɑ̃dʁ/","to take","v."],
+    ["parler","/paʁ.le/","to speak","v."],
+    ["manger","/mɑ̃.ʒe/","to eat","v."],
+    ["boire","/bwaʁ/","to drink","v."],
+    ["dormir","/dɔʁ.miʁ/","to sleep","v."],
+    ["aimer","/ɛ.me/","to love / like","v."],
+    ["grand","/gʁɑ̃/","big / tall","adj."],
+    ["petit","/pə.ti/","small","adj."],
+    ["beau","/bo/","beautiful","adj."],
+    ["joli","/ʒɔ.li/","pretty","adj."],
+    ["bon","/bɔ̃/","good","adj."],
+    ["mauvais","/mo.vɛ/","bad","adj."],
+    ["heureux","/œ.ʁø/","happy","adj."],
+    ["triste","/tʁist/","sad","adj."],
+    ["facile","/fa.sil/","easy","adj."],
+    ["difficile","/di.fi.sil/","difficult","adj."],
+    ["nouveau","/nu.vo/","new","adj."],
+    ["vieux","/vjø/","old","adj."],
+    ["aujourd'hui","/o.ʒuʁ.dɥi/","today","adv."],
+    ["demain","/də.mɛ̃/","tomorrow","adv."],
+    ["hier","/jɛʁ/","yesterday","adv."],
+    ["maintenant","/mɛ̃t.nɑ̃/","now","adv."],
+    ["le matin","/lə ma.tɛ̃/","the morning","n.m."],
+    ["le soir","/lə swaʁ/","the evening","n.m."],
+    ["la semaine","/la sə.mɛn/","the week","n.f."],
+    ["le mois","/lə mwa/","the month","n.m."],
+    ["l'année","/la.ne/","the year","n.f."],
+    ["le soleil","/lə sɔ.lɛj/","the sun","n.m."],
+    ["le fromage","/lə fʁɔ.maʒ/","the cheese","n.m."],
+    ["le vin","/lə vɛ̃/","the wine","n.m."],
+    ["la viande","/la vjɑ̃d/","the meat","n.f."],
+    ["le légume","/lə le.gym/","the vegetable","n.m."],
+    ["le fruit","/lə fʁɥi/","the fruit","n.m."],
+    ["le poisson","/lə pwa.sɔ̃/","the fish","n.m."],
+    ["le sucre","/lə sykʁ/","the sugar","n.m."],
+    ["le sel","/lə sɛl/","the salt","n.m."],
+    ["le gâteau","/lə gɑ.to/","the cake","n.m."],
+    ["la soupe","/la sup/","the soup","n.f."],
+    ["l'argent","/laʁ.ʒɑ̃/","the money","n.m."],
+    ["l'amour","/la.muʁ/","the love","n.m."],
+    ["la musique","/la my.zik/","the music","n.f."],
+    ["la montagne","/la mɔ̃.taɲ/","the mountain","n.f."],
+    ["la mer","/la mɛʁ/","the sea","n.f."]
+  ];
+
+  var PER_DAY = 5;
+  var CYCLE_LEN = Math.ceil(WORDS.length / PER_DAY);
+
+  function mulberry32(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function seededShuffle(arr, seed) {
+    var rand = mulberry32(seed);
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(rand() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function dayIndexFor(date) {
+    // days since epoch, using local calendar date so it flips at local midnight
+    var utcMidnight = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    return Math.floor(utcMidnight / 86400000);
+  }
+
+  function todaysWords(date) {
+    var dayIndex = dayIndexFor(date);
+    var cycleNum = Math.floor(dayIndex / CYCLE_LEN);
+    var posInCycle = dayIndex % CYCLE_LEN;
+    var order = seededShuffle(WORDS.map(function (_, i) { return i; }), cycleNum + 1);
+    var slice = order.slice(posInCycle * PER_DAY, posInCycle * PER_DAY + PER_DAY);
+    return slice.map(function (i) { return WORDS[i]; });
+  }
+
+  // ── speech ──
+  var frVoice = null;
+  function loadVoice() {
+    if (!('speechSynthesis' in window)) return;
+    var voices = speechSynthesis.getVoices();
+    frVoice = voices.find(function (v) { return v.lang && v.lang.toLowerCase().indexOf('fr') === 0; }) || null;
+  }
+  if ('speechSynthesis' in window) {
+    loadVoice();
+    speechSynthesis.onvoiceschanged = loadVoice;
+  }
+
+  function speak(text, btn) {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'fr-FR';
+    u.rate = 0.85;
+    if (frVoice) u.voice = frVoice;
+    if (btn) {
+      btn.classList.add('playing');
+      u.onend = function () { btn.classList.remove('playing'); };
+      u.onerror = function () { btn.classList.remove('playing'); };
+    }
+    speechSynthesis.speak(u);
+  }
+
+  // ── learned dots (per-day, stored locally) ──
+  var todayKey = 'motsDuJour:' + new Date().toISOString().slice(0, 10);
+  function getLearned() {
+    try { return JSON.parse(localStorage.getItem(todayKey) || '[]'); } catch (e) { return []; }
+  }
+  function toggleLearned(word) {
+    var list = getLearned();
+    var idx = list.indexOf(word);
+    if (idx === -1) list.push(word); else list.splice(idx, 1);
+    try { localStorage.setItem(todayKey, JSON.stringify(list)); } catch (e) {}
+    return list;
+  }
+
+  function updateStreak() {
+    try {
+      var todayStr = new Date().toISOString().slice(0, 10);
+      var last = localStorage.getItem('motsDuJour:lastPracticed');
+      var streak = parseInt(localStorage.getItem('motsDuJour:streak') || '0', 10);
+      var learnedToday = getLearned().length > 0;
+      if (learnedToday && last !== todayStr) {
+        var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        streak = (last === yesterday) ? streak + 1 : 1;
+        localStorage.setItem('motsDuJour:streak', String(streak));
+        localStorage.setItem('motsDuJour:lastPracticed', todayStr);
+      }
+      var el = document.getElementById('streakLine');
+      if (streak > 0) {
+        el.textContent = '🔥 ' + streak + '-day streak';
+        el.classList.add('visible');
+      }
+    } catch (e) { /* localStorage unavailable — skip streak */ }
+  }
+
+  function render() {
+    var now = new Date();
+    document.getElementById('dateLine').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    var words = todaysWords(now);
+    var learned = getLearned();
+    var container = document.getElementById('words');
+    container.innerHTML = '';
+
+    if (!('speechSynthesis' in window)) {
+      var notice = document.createElement('p');
+      notice.className = 'no-speech';
+      notice.textContent = "Your browser doesn't support spoken pronunciation — try Chrome or Safari for audio.";
+      container.appendChild(notice);
+    }
+
+    words.forEach(function (w) {
+      var fr = w[0], ipa = w[1], en = w[2], pos = w[3];
+      var card = document.createElement('div');
+      card.className = 'word-card';
+
+      var btn = document.createElement('button');
+      btn.className = 'play-btn';
+      btn.setAttribute('aria-label', 'Play pronunciation of ' + fr);
+      btn.innerHTML = '🔊';
+      btn.addEventListener('click', function () { speak(fr, btn); });
+
+      var body = document.createElement('div');
+      body.className = 'word-body';
+      body.innerHTML =
+        '<div class="word-top"><span class="word-fr">' + fr + '</span><span class="word-pos">' + pos + '</span></div>' +
+        '<div class="word-ipa">' + ipa + '</div>' +
+        '<div class="word-en">' + en + '</div>';
+
+      var dot = document.createElement('span');
+      dot.className = 'learned-dot' + (learned.indexOf(fr) !== -1 ? ' on' : '');
+      dot.title = 'Mark as practiced today';
+      dot.addEventListener('click', function () {
+        var list = toggleLearned(fr);
+        dot.classList.toggle('on', list.indexOf(fr) !== -1);
+        updateStreak();
+      });
+
+      card.appendChild(btn);
+      card.appendChild(body);
+      card.appendChild(dot);
+      container.appendChild(card);
+    });
+
+    updateStreak();
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
