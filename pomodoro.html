@@ -103,6 +103,15 @@
     .btn.primary:hover { background:#a8430f; border-color:#a8430f; color:#fdf9f2; }
     .btn:active { transform: translateY(1px); }
 
+    .ambience-row { margin-top:1.4rem; }
+    .ambience-btn {
+      font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
+      padding:.7rem 1.3rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
+      background:transparent; color:var(--ink); transition:all .2s; display:inline-flex; align-items:center; gap:.55rem;
+    }
+    .ambience-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .ambience-btn.playing { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
+
     /* ── SETTINGS ── */
     .settings { margin-top:2.6rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .4s; }
     .settings-trigger {
@@ -222,6 +231,10 @@
     <div class="controls">
       <button class="btn primary" id="startPauseBtn">Start</button>
       <button class="btn" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="ambience-row">
+      <button class="ambience-btn" id="noiseBtn">🌸 Play pink noise</button>
     </div>
   </div>
 
@@ -454,6 +467,89 @@
     });
   });
   cyclesInput.addEventListener('change', buildDots);
+
+  // ── pink noise ambience — synthesized entirely with Web Audio, no audio files ──
+  (function () {
+    var noiseBtn = document.getElementById('noiseBtn');
+    var pinkNoise = null;
+
+    // Paul Kellet's well-known pink noise approximation (equal energy per
+    // octave), which is what makes pink noise sound smooth and "warm"
+    // rather than the hissy, harsh quality of plain white noise.
+    function makePinkNoiseBuffer(ctx, seconds) {
+      var buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
+      var data = buffer.getChannelData(0);
+      var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (var i = 0; i < data.length; i++) {
+        var white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        b6 = white * 0.115926;
+        data[i] = pink * 0.11;
+      }
+      return buffer;
+    }
+
+    function startPinkNoise(ctx) {
+      var src = ctx.createBufferSource();
+      src.buffer = makePinkNoiseBuffer(ctx, 6);
+      src.loop = true;
+
+      // soften the very top end slightly so it stays smooth, not hissy
+      var lowpass = ctx.createBiquadFilter();
+      lowpass.type = 'lowpass';
+      lowpass.frequency.value = 8500;
+
+      var highpass = ctx.createBiquadFilter();
+      highpass.type = 'highpass';
+      highpass.frequency.value = 40;
+
+      var gain = ctx.createGain();
+      var target = 0.22;
+
+      src.connect(highpass).connect(lowpass).connect(gain).connect(ctx.destination);
+
+      var t0 = ctx.currentTime;
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(target, t0 + 1.2);
+      src.start();
+
+      return {
+        stop: function () {
+          var t1 = ctx.currentTime;
+          gain.gain.cancelScheduledValues(t1);
+          gain.gain.setValueAtTime(Math.max(gain.gain.value, 0.0001), t1);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t1 + 0.4);
+          setTimeout(function () { src.stop(); }, 450);
+        }
+      };
+    }
+
+    if (noiseBtn) {
+      noiseBtn.addEventListener('click', function () {
+        unlockAudio();
+        if (!audioCtx) {
+          noiseBtn.textContent = 'Audio not supported in this browser';
+          return;
+        }
+        if (pinkNoise) {
+          pinkNoise.stop();
+          pinkNoise = null;
+          noiseBtn.textContent = 'Play pink noise';
+          noiseBtn.classList.remove('playing');
+        } else {
+          pinkNoise = startPinkNoise(audioCtx);
+          noiseBtn.textContent = '⏸ Pause pink noise';
+          noiseBtn.classList.add('playing');
+        }
+      });
+    }
+  })();
 
   buildDots();
   startSession('focus', true);
