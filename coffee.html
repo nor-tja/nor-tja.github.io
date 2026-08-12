@@ -34,6 +34,9 @@
     }
     .ambience-btn:hover { border-color:var(--accent); color:var(--accent); }
     .ambience-btn.playing { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
+    .ambience-credit { font-family:'DM Mono',monospace; font-size:.58rem; color:var(--muted); letter-spacing:.04em; margin-top:.6rem; }
+    .ambience-credit a { color:var(--muted); }
+    .ambience-credit a:hover { color:var(--accent); }
 
     .stats-strip { display:flex; flex-wrap:wrap; gap:2.4rem; padding:1.6rem 0; border-bottom:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .2s; }
     .stat { display:flex; flex-direction:column; gap:.15rem; }
@@ -132,6 +135,8 @@
 
   <div class="ambience-row">
     <button class="ambience-btn" id="cafeAmbienceBtn">☕ Play café ambience</button>
+    <audio id="cafeAudio" loop preload="none" src="ambience-coffee.mp3"></audio>
+    <p class="ambience-credit">Field recording: "Ambience Coffee" by <a href="https://freesound.org/people/Matias44/sounds/689957/" target="_blank" rel="noopener">Matias44</a>, Freesound (CC0)</p>
   </div>
 
   <div class="stats-strip" aria-label="Coffee notes summary">
@@ -361,96 +366,37 @@
       .bindPopup(`<span class="popup-name">${p.name}</span><span class="popup-note">${p.note}</span>`);
   });
 
-  // ── café ambience — synthesized entirely with Web Audio, no audio files ──
+</script>
+
+<!-- Kept in its own script tag, independent of the map above, so a Leaflet/
+     CDN hiccup can never prevent this button from working. -->
+<script>
   (function () {
     var btn = document.getElementById('cafeAmbienceBtn');
-    var audioCtx = null;
-    var ambience = null;
+    var audio = document.getElementById('cafeAudio');
+    if (!btn || !audio) return;
 
-    function makeNoiseBuffer(ctx, seconds) {
-      var buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
-      var data = buffer.getChannelData(0);
-      for (var i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-      return buffer;
-    }
+    audio.volume = 0.55;
 
-    function startCafeAmbience(ctx) {
-      var noise = ctx.createBufferSource();
-      noise.buffer = makeNoiseBuffer(ctx, 3);
-      noise.loop = true;
-
-      var bandpass = ctx.createBiquadFilter();
-      bandpass.type = 'bandpass';
-      bandpass.frequency.value = 850;
-      bandpass.Q.value = 0.6;
-
-      var murmurGain = ctx.createGain();
-      murmurGain.gain.value = 0.05;
-
-      var lfo = ctx.createOscillator();
-      lfo.frequency.value = 0.13;
-      var lfoGain = ctx.createGain();
-      lfoGain.gain.value = 0.02;
-      lfo.connect(lfoGain);
-      lfoGain.connect(murmurGain.gain);
-
-      noise.connect(bandpass);
-      bandpass.connect(murmurGain);
-      murmurGain.connect(ctx.destination);
-
-      noise.start();
-      lfo.start();
-
-      var clinkTimeoutId;
-      function playClink() {
-        var t0 = ctx.currentTime;
-        var osc = ctx.createOscillator();
-        osc.type = 'triangle';
-        osc.frequency.value = 1700 + Math.random() * 900;
-        var g = ctx.createGain();
-        g.gain.setValueAtTime(0.0001, t0);
-        g.gain.exponentialRampToValueAtTime(0.06, t0 + 0.006);
-        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.25);
-        osc.connect(g).connect(ctx.destination);
-        osc.start(t0);
-        osc.stop(t0 + 0.3);
-      }
-      function scheduleClink() {
-        var delay = 2200 + Math.random() * 5200;
-        clinkTimeoutId = setTimeout(function () { playClink(); scheduleClink(); }, delay);
-      }
-      scheduleClink();
-
-      return {
-        stop: function () {
-          noise.stop();
-          lfo.stop();
-          clearTimeout(clinkTimeoutId);
-        }
-      };
-    }
-
-    if (btn) {
-      btn.addEventListener('click', function () {
-        try {
-          audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-          if (audioCtx.state === 'suspended') audioCtx.resume();
-        } catch (e) {
-          btn.textContent = 'Audio not supported in this browser';
-          return;
-        }
-        if (ambience) {
-          ambience.stop();
-          ambience = null;
-          btn.textContent = '☕ Play café ambience';
-          btn.classList.remove('playing');
-        } else {
-          ambience = startCafeAmbience(audioCtx);
+    btn.addEventListener('click', function () {
+      if (audio.paused) {
+        audio.play().then(function () {
           btn.textContent = '⏸ Pause café ambience';
           btn.classList.add('playing');
-        }
-      });
-    }
+        }).catch(function () {
+          btn.textContent = 'Could not play audio — try again';
+        });
+      } else {
+        audio.pause();
+        btn.textContent = '☕ Play café ambience';
+        btn.classList.remove('playing');
+      }
+    });
+
+    audio.addEventListener('error', function () {
+      btn.textContent = 'Audio failed to load';
+      btn.disabled = true;
+    });
   })();
 </script>
 </body>
