@@ -91,6 +91,14 @@
     .dot { width:7px; height:7px; border-radius:50%; border:1px solid var(--line); transition: background .3s, border-color .3s; }
     .dot.filled { background: var(--accent); border-color: var(--accent); }
 
+    .daily-summary { margin-top:1.8rem; text-align:center; max-width:320px; }
+    .daily-hourglasses { display:flex; flex-wrap:wrap; justify-content:center; gap:.25rem .3rem; margin-bottom:.55rem; }
+    .daily-hourglasses span { font-size:.85rem; line-height:1; opacity:.9; }
+    .daily-text {
+      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase;
+      color:var(--muted);
+    }
+
     /* ── CONTROLS ── */
     .controls { display:flex; gap:.9rem; margin-top:1.8rem; }
     .btn {
@@ -228,6 +236,11 @@
     <div class="mode-label" id="modeLabel">Focus</div>
     <div class="dots" id="dots"></div>
 
+    <div class="daily-summary">
+      <div class="daily-hourglasses" id="dailyHourglasses" aria-hidden="true"></div>
+      <p class="daily-text" id="dailyText"></p>
+    </div>
+
     <div class="controls">
       <button class="btn primary" id="startPauseBtn">Start</button>
       <button class="btn" id="resetBtn">Reset</button>
@@ -283,6 +296,8 @@
   const shortBreakInput = $('shortBreakInput');
   const longBreakInput = $('longBreakInput');
   const cyclesInput = $('cyclesInput');
+  const dailyHourglasses = $('dailyHourglasses');
+  const dailyText = $('dailyText');
 
   const TOP_TOP = 15, TOP_BOTTOM = 250;     // vertical span of top bulb
   const BOT_TOP = 270, BOT_BOTTOM = 505;    // vertical span of bottom bulb
@@ -315,6 +330,54 @@
     const n = totalCycles();
     const filled = completedFocusSessions % n;
     [...dotsWrap.children].forEach((d, i) => d.classList.toggle('filled', i < filled));
+  }
+
+  // ── daily focus tally — persists across sessions, resets each new day ──
+  const DAILY_KEY = 'pomodoro:daily';
+
+  function todayISO() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function loadDaily() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(DAILY_KEY) || 'null');
+      if (raw && raw.date === todayISO()) return raw;
+    } catch (e) { /* storage unavailable or corrupt — start fresh */ }
+    return { date: todayISO(), sessions: 0, minutes: 0 };
+  }
+
+  function saveDaily(daily) {
+    try { localStorage.setItem(DAILY_KEY, JSON.stringify(daily)); } catch (e) {}
+  }
+
+  function formatDuration(totalMinutes) {
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    if (h === 0) return m + 'm';
+    if (m === 0) return h + 'h';
+    return h + 'h ' + m + 'm';
+  }
+
+  function renderDaily() {
+    const daily = loadDaily();
+    dailyHourglasses.innerHTML = '';
+    for (let i = 0; i < daily.sessions; i++) {
+      const s = document.createElement('span');
+      s.textContent = '⏳';
+      dailyHourglasses.appendChild(s);
+    }
+    dailyText.textContent = daily.sessions === 0
+      ? 'No focus sessions yet today'
+      : daily.sessions + (daily.sessions === 1 ? ' session' : ' sessions') + ' · ' + formatDuration(daily.minutes) + ' focused today';
+  }
+
+  function recordFocusCompleted(minutes) {
+    const daily = loadDaily();
+    daily.sessions += 1;
+    daily.minutes += minutes;
+    saveDaily(daily);
+    renderDaily();
   }
 
   function fmt(sec) {
@@ -405,6 +468,7 @@
     if (mode === 'focus') {
       completedFocusSessions++;
       updateDots();
+      recordFocusCompleted(Math.round(durationSec / 60));
       const isLong = completedFocusSessions % totalCycles() === 0;
       return isLong ? 'long' : 'short';
     }
@@ -499,6 +563,7 @@
   })();
 
   buildDots();
+  renderDaily();
   startSession('focus', true);
 })();
 </script>
