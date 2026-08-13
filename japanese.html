@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Katja Norstad — Mots du jour</title>
+  <title>Katja Norstad — 今日の単語</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjVmMmVkIi8+CiAgPHRleHQgeD0iMTYiIHk9IjIzIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjQwMCIgCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2M0NTAxYSIgbGV0dGVyLXNwYWNpbmc9IjEiPktOPC90ZXh0Pgo8L3N2Zz4=" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#c4501a; --line:#d8d3cc; }
@@ -56,7 +56,7 @@
 
     .word-body { flex:1; min-width:0; }
     .word-top { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
-    .word-fr { font-size:1.5rem; font-weight:400; }
+    .word-fr { font-family:'Noto Sans JP','Cormorant Garamond',serif; font-size:1.5rem; font-weight:400; }
     .word-pos { font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:.15rem .4rem; }
     .word-ipa { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--accent); margin-top:.25rem; }
     .word-en { font-style:italic; color:var(--muted); font-size:.98rem; margin-top:.15rem; }
@@ -82,7 +82,7 @@
     .review-fr { font-size:1.15rem; }
     .review-answer { margin-top:.3rem; display:none; }
     .review-answer.shown { display:block; }
-    .review-fr-answer { font-style:italic; font-size:1.15rem; }
+    .review-fr-answer { font-family:'Noto Sans JP','Cormorant Garamond',serif; font-style:normal; font-size:1.15rem; }
     .review-ipa { font-family:'DM Mono',monospace; font-size:.78rem; color:var(--accent); margin-left:.5rem; }
     .review-actions { flex-shrink:0; display:flex; gap:.5rem; }
     .review-btn {
@@ -100,7 +100,7 @@
     .phrase-play { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:.9rem; transition:all .2s; margin-top:.1rem; }
     .phrase-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
     .phrase-play.playing { background:var(--accent); color:#fdf9f2; }
-    .phrase-fr { font-size:1.08rem; }
+    .phrase-fr { font-family:'Noto Sans JP','Cormorant Garamond',serif; font-size:1.08rem; }
     .phrase-en { font-style:italic; color:var(--muted); font-size:.85rem; margin-top:.2rem; }
 
     .settings { margin-top:1rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .8s; }
@@ -137,8 +137,8 @@
 
   <header>
     <p class="eyebrow">A little daily practice</p>
-    <h1>Five <em>French</em> words a day</h1>
-    <p class="intro">A fresh set of five common French words, chosen automatically for today, each with a small picture cue. Tap the circle to hear each one pronounced — come back tomorrow for five new ones.</p>
+    <h1>Five <em>Japanese</em> words a day</h1>
+    <p class="intro">A fresh set of five common Japanese words, chosen automatically for today, each shown in kana/kanji with a romaji reading and a small picture cue. Tap the circle to hear each one pronounced — come back tomorrow for five new ones.</p>
     <p class="date-line" id="dateLine"></p>
     <p class="streak" id="streakLine"></p>
   </header>
@@ -155,8 +155,9 @@
       <span class="settings-chevron">›</span>
     </summary>
     <div class="settings-body">
-      <p>The five words are picked automatically from a list of 100 common French words, grouped into 20 fixed sets of 5, based on today's date — no server, no schedule, it just recalculates whenever the page loads. The same 20 sets repeat in order every 20 days.</p>
-      <p>Pronunciation uses your browser's built-in French voice (Web Speech API), so quality depends on your browser and OS. Chrome and Safari on Mac/iOS generally have good French voices built in.</p>
+      <p>The five words are picked automatically from a list of 100 common Japanese words, grouped into 20 fixed sets of 5, based on today's date — no server, no schedule, it just recalculates whenever the page loads. The same 20 sets repeat in order every 20 days.</p>
+      <p>Each word is shown in kana/kanji with a romaji (romanized) reading underneath, since that's the most useful format if you're not fully comfortable reading kana yet.</p>
+      <p>Pronunciation uses your browser's built-in Japanese voice (Web Speech API), so quality depends on your browser and OS. Chrome and Safari on Mac/iOS generally have a good Japanese voice built in.</p>
       <p>Tap the small dot next to a word to mark it as practiced today — that's saved locally in your browser, not shared anywhere.</p>
       <p>Below the words, two short sentences combine most of that day's words together, using common everyday phrasing, so you can hear them used in context rather than in isolation.</p>
       <p>The Review section uses spaced repetition: every word you've ever marked with the dot goes into your personal review pool. New words come back the next day; after that, saying "Got it" pushes the next review further out (1 day, then 6, then longer each time), while "Still learning" brings it back tomorrow. Everything is stored locally in your browser, going all the way back to the first word you marked.</p>
@@ -169,106 +170,106 @@
 <script>
 (function () {
   var WORDS = [
-    ["bonjour","/bɔ̃.ʒuʁ/","hello / good day","interj.","👋"],
-    ["merci","/mɛʁ.si/","thank you","interj.","🙏"],
-    ["s'il vous plaît","/sil vu plɛ/","please","phrase","🤲"],
-    ["au revoir","/o ʁə.vwaʁ/","goodbye","phrase","👋"],
-    ["oui","/wi/","yes","adv.","✅"],
-    ["non","/nɔ̃/","no","adv.","❌"],
-    ["pardon","/paʁ.dɔ̃/","sorry / excuse me","interj.","🙇"],
-    ["bienvenue","/bjɛ̃.və.ny/","welcome","n.f.","🎉"],
-    ["salut","/sa.ly/","hi / bye (informal)","interj.","🙋"],
-    ["à bientôt","/a bjɛ̃.to/","see you soon","phrase","⏳"],
-    ["la maison","/la mɛ.zɔ̃/","the house","n.f.","🏠"],
-    ["le chat","/lə ʃa/","the cat","n.m.","🐱"],
-    ["le chien","/lə ʃjɛ̃/","the dog","n.m.","🐶"],
-    ["l'eau","/lo/","the water","n.f.","💧"],
-    ["le pain","/lə pɛ̃/","the bread","n.m.","🍞"],
-    ["le temps","/lə tɑ̃/","the time / weather","n.m.","⏰"],
-    ["la vie","/la vi/","the life","n.f.","🌱"],
-    ["l'ami","/la.mi/","the friend","n.m.","🧑‍🤝‍🧑"],
-    ["le travail","/lə tʁa.vaj/","the work","n.m.","💼"],
-    ["la famille","/la fa.mij/","the family","n.f.","👨‍👩‍👧‍👦"],
-    ["le jour","/lə ʒuʁ/","the day","n.m.","☀️"],
-    ["la nuit","/la nɥi/","the night","n.f.","🌙"],
-    ["l'école","/le.kɔl/","the school","n.f.","🏫"],
-    ["la voiture","/la vwa.tyʁ/","the car","n.f.","🚗"],
-    ["la ville","/la vil/","the city","n.f.","🏙️"],
-    ["le livre","/lə livʁ/","the book","n.m.","📖"],
-    ["la table","/la tabl/","the table","n.f.","🪑"],
-    ["la fenêtre","/la fə.nɛtʁ/","the window","n.f.","🪟"],
-    ["la porte","/la pɔʁt/","the door","n.f.","🚪"],
-    ["le café","/lə ka.fe/","the coffee","n.m.","☕"],
-    ["un","/œ̃/","one","num.","1️⃣"],
-    ["deux","/dø/","two","num.","2️⃣"],
-    ["trois","/tʁwa/","three","num.","3️⃣"],
-    ["quatre","/katʁ/","four","num.","4️⃣"],
-    ["cinq","/sɛ̃k/","five","num.","5️⃣"],
-    ["six","/sis/","six","num.","6️⃣"],
-    ["sept","/sɛt/","seven","num.","7️⃣"],
-    ["huit","/ɥit/","eight","num.","8️⃣"],
-    ["neuf","/nœf/","nine","num.","9️⃣"],
-    ["dix","/dis/","ten","num.","🔟"],
-    ["rouge","/ʁuʒ/","red","adj.","🔴"],
-    ["bleu","/blø/","blue","adj.","🔵"],
-    ["vert","/vɛʁ/","green","adj.","🟢"],
-    ["jaune","/ʒon/","yellow","adj.","🟡"],
-    ["noir","/nwaʁ/","black","adj.","⚫"],
-    ["blanc","/blɑ̃/","white","adj.","⚪"],
-    ["gris","/gʁi/","grey","adj.","🩶"],
-    ["orange","/ɔ.ʁɑ̃ʒ/","orange","adj.","🟠"],
-    ["être","/ɛtʁ/","to be","v.","🧍"],
-    ["avoir","/a.vwaʁ/","to have","v.","🤲"],
-    ["aller","/a.le/","to go","v.","🚶"],
-    ["faire","/fɛʁ/","to do / make","v.","🛠️"],
-    ["voir","/vwaʁ/","to see","v.","👀"],
-    ["savoir","/sa.vwaʁ/","to know","v.","🧠"],
-    ["pouvoir","/pu.vwaʁ/","to be able to","v.","💪"],
-    ["vouloir","/vu.lwaʁ/","to want","v.","🎯"],
-    ["venir","/və.niʁ/","to come","v.","🏃"],
-    ["prendre","/pʁɑ̃dʁ/","to take","v.","✋"],
-    ["parler","/paʁ.le/","to speak","v.","🗣️"],
-    ["manger","/mɑ̃.ʒe/","to eat","v.","🍽️"],
-    ["boire","/bwaʁ/","to drink","v.","🥤"],
-    ["dormir","/dɔʁ.miʁ/","to sleep","v.","😴"],
-    ["aimer","/ɛ.me/","to love / like","v.","❤️"],
-    ["grand","/gʁɑ̃/","big / tall","adj.","📏"],
-    ["petit","/pə.ti/","small","adj.","🐭"],
-    ["beau","/bo/","beautiful","adj.","🌟"],
-    ["joli","/ʒɔ.li/","pretty","adj.","🌸"],
-    ["bon","/bɔ̃/","good","adj.","👍"],
-    ["mauvais","/mo.vɛ/","bad","adj.","👎"],
-    ["heureux","/œ.ʁø/","happy","adj.","😊"],
-    ["triste","/tʁist/","sad","adj.","😢"],
-    ["facile","/fa.sil/","easy","adj.","😌"],
-    ["difficile","/di.fi.sil/","difficult","adj.","😖"],
-    ["nouveau","/nu.vo/","new","adj.","✨"],
-    ["vieux","/vjø/","old","adj.","🕰️"],
-    ["aujourd'hui","/o.ʒuʁ.dɥi/","today","adv.","📅"],
-    ["demain","/də.mɛ̃/","tomorrow","adv.","🌅"],
-    ["hier","/jɛʁ/","yesterday","adv.","🌇"],
-    ["maintenant","/mɛ̃t.nɑ̃/","now","adv.","⏱️"],
-    ["le matin","/lə ma.tɛ̃/","the morning","n.m.","🌄"],
-    ["le soir","/lə swaʁ/","the evening","n.m.","🌆"],
-    ["la semaine","/la sə.mɛn/","the week","n.f.","🗓️"],
-    ["le mois","/lə mwa/","the month","n.m.","📆"],
-    ["l'année","/la.ne/","the year","n.f.","🎊"],
-    ["le soleil","/lə sɔ.lɛj/","the sun","n.m.","☀️"],
-    ["le fromage","/lə fʁɔ.maʒ/","the cheese","n.m.","🧀"],
-    ["le vin","/lə vɛ̃/","the wine","n.m.","🍷"],
-    ["la viande","/la vjɑ̃d/","the meat","n.f.","🥩"],
-    ["le légume","/lə le.gym/","the vegetable","n.m.","🥦"],
-    ["le fruit","/lə fʁɥi/","the fruit","n.m.","🍎"],
-    ["le poisson","/lə pwa.sɔ̃/","the fish","n.m.","🐟"],
-    ["le sucre","/lə sykʁ/","the sugar","n.m.","🍬"],
-    ["le sel","/lə sɛl/","the salt","n.m.","🧂"],
-    ["le gâteau","/lə gɑ.to/","the cake","n.m.","🎂"],
-    ["la soupe","/la sup/","the soup","n.f.","🍲"],
-    ["l'argent","/laʁ.ʒɑ̃/","the money","n.m.","💰"],
-    ["l'amour","/la.muʁ/","the love","n.m.","❤️"],
-    ["la musique","/la my.zik/","the music","n.f.","🎵"],
-    ["la montagne","/la mɔ̃.taɲ/","the mountain","n.f.","⛰️"],
-    ["la mer","/la mɛʁ/","the sea","n.f.","🌊"]
+    ["こんにちは","konnichiwa","hello / good day","interj.","👋"],
+    ["ありがとう","arigatou","thank you","interj.","🙏"],
+    ["お願いします","onegaishimasu","please","phrase","🤲"],
+    ["さようなら","sayounara","goodbye","phrase","👋"],
+    ["はい","hai","yes","adv.","✅"],
+    ["いいえ","iie","no","adv.","❌"],
+    ["すみません","sumimasen","sorry / excuse me","interj.","🙇"],
+    ["ようこそ","youkoso","welcome","interj.","🎉"],
+    ["やあ","yaa","hi (informal)","interj.","🙋"],
+    ["またね","mata ne","see you soon","phrase","⏳"],
+    ["家","ie","the house","n.","🏠"],
+    ["猫","neko","the cat","n.","🐱"],
+    ["犬","inu","the dog","n.","🐶"],
+    ["水","mizu","the water","n.","💧"],
+    ["パン","pan","the bread","n.","🍞"],
+    ["時間","jikan","the time","n.","⏰"],
+    ["人生","jinsei","the life","n.","🌱"],
+    ["友達","tomodachi","the friend","n.","🧑‍🤝‍🧑"],
+    ["仕事","shigoto","the work","n.","💼"],
+    ["家族","kazoku","the family","n.","👨‍👩‍👧‍👦"],
+    ["日","hi","the day","n.","☀️"],
+    ["夜","yoru","the night","n.","🌙"],
+    ["学校","gakkou","the school","n.","🏫"],
+    ["車","kuruma","the car","n.","🚗"],
+    ["街","machi","the city / town","n.","🏙️"],
+    ["本","hon","the book","n.","📖"],
+    ["机","tsukue","the table / desk","n.","🪑"],
+    ["窓","mado","the window","n.","🪟"],
+    ["ドア","doa","the door","n.","🚪"],
+    ["コーヒー","koohii","the coffee","n.","☕"],
+    ["一","ichi","one","num.","1️⃣"],
+    ["二","ni","two","num.","2️⃣"],
+    ["三","san","three","num.","3️⃣"],
+    ["四","yon","four","num.","4️⃣"],
+    ["五","go","five","num.","5️⃣"],
+    ["六","roku","six","num.","6️⃣"],
+    ["七","nana","seven","num.","7️⃣"],
+    ["八","hachi","eight","num.","8️⃣"],
+    ["九","kyuu","nine","num.","9️⃣"],
+    ["十","juu","ten","num.","🔟"],
+    ["赤い","akai","red","adj.","🔴"],
+    ["青い","aoi","blue","adj.","🔵"],
+    ["緑","midori","green","n.","🟢"],
+    ["黄色い","kiiroi","yellow","adj.","🟡"],
+    ["黒い","kuroi","black","adj.","⚫"],
+    ["白い","shiroi","white","adj.","⚪"],
+    ["灰色","haiiro","grey","n.","🩶"],
+    ["オレンジ色","orenji-iro","orange","n.","🟠"],
+    ["です","desu","to be","cop.","🧍"],
+    ["持つ","motsu","to have","v.","🤲"],
+    ["行く","iku","to go","v.","🚶"],
+    ["する","suru","to do / make","v.","🛠️"],
+    ["見る","miru","to see","v.","👀"],
+    ["知る","shiru","to know","v.","🧠"],
+    ["できる","dekiru","to be able to","v.","💪"],
+    ["欲しい","hoshii","to want","adj.","🎯"],
+    ["来る","kuru","to come","v.","🏃"],
+    ["取る","toru","to take","v.","✋"],
+    ["話す","hanasu","to speak","v.","🗣️"],
+    ["食べる","taberu","to eat","v.","🍽️"],
+    ["飲む","nomu","to drink","v.","🥤"],
+    ["寝る","neru","to sleep","v.","😴"],
+    ["好き","suki","to like / love","adj.","❤️"],
+    ["大きい","ookii","big / tall","adj.","📏"],
+    ["小さい","chiisai","small","adj.","🐭"],
+    ["美しい","utsukushii","beautiful","adj.","🌟"],
+    ["かわいい","kawaii","pretty / cute","adj.","🌸"],
+    ["良い","yoi","good","adj.","👍"],
+    ["悪い","warui","bad","adj.","👎"],
+    ["幸せ","shiawase","happy","n.","😊"],
+    ["悲しい","kanashii","sad","adj.","😢"],
+    ["簡単","kantan","easy","n.","😌"],
+    ["難しい","muzukashii","difficult","adj.","😖"],
+    ["新しい","atarashii","new","adj.","✨"],
+    ["古い","furui","old","adj.","🕰️"],
+    ["今日","kyou","today","adv.","📅"],
+    ["明日","ashita","tomorrow","adv.","🌅"],
+    ["昨日","kinou","yesterday","adv.","🌇"],
+    ["今","ima","now","adv.","⏱️"],
+    ["朝","asa","the morning","n.","🌄"],
+    ["晩","ban","the evening","n.","🌆"],
+    ["週","shuu","the week","n.","🗓️"],
+    ["月","tsuki","the month / moon","n.","📆"],
+    ["年","toshi","the year","n.","🎊"],
+    ["太陽","taiyou","the sun","n.","☀️"],
+    ["チーズ","chiizu","the cheese","n.","🧀"],
+    ["ワイン","wain","the wine","n.","🍷"],
+    ["肉","niku","the meat","n.","🥩"],
+    ["野菜","yasai","the vegetable","n.","🥦"],
+    ["果物","kudamono","the fruit","n.","🍎"],
+    ["魚","sakana","the fish","n.","🐟"],
+    ["砂糖","satou","the sugar","n.","🍬"],
+    ["塩","shio","the salt","n.","🧂"],
+    ["ケーキ","keeki","the cake","n.","🎂"],
+    ["スープ","suupu","the soup","n.","🍲"],
+    ["お金","okane","the money","n.","💰"],
+    ["愛","ai","the love","n.","❤️"],
+    ["音楽","ongaku","the music","n.","🎵"],
+    ["山","yama","the mountain","n.","⛰️"],
+    ["海","umi","the sea","n.","🌊"]
   ];
 
   var WORD_MAP = {};
@@ -281,26 +282,26 @@
   // the list above), so the two practice sentences below can be hand-written
   // to actually use those words together, instead of generated on the fly.
   var PHRASE_GROUPS = [
-    [["Bonjour ! Un café, s'il vous plaît.","Hello! A coffee, please."],["Oui, merci beaucoup, au revoir !","Yes, thank you very much, goodbye!"]],
-    [["Salut ! Bienvenue chez nous.","Hi! Welcome to our home."],["Pardon, non merci, à bientôt !","Excuse me, no thank you, see you soon!"]],
-    [["Le chat et le chien jouent dans la maison.","The cat and the dog are playing in the house."],["Je bois de l'eau et je mange du pain.","I'm drinking water and eating bread."]],
-    [["Le temps passe vite quand on est avec sa famille.","Time passes quickly when you're with your family."],["Mon ami aime son travail et sa vie à Paris.","My friend loves his job and his life in Paris."]],
-    [["Le jour, les enfants vont à l'école en voiture.","During the day, the kids go to school by car."],["La nuit, cette ville est très calme.","At night, this city is very quiet."]],
-    [["Le livre est sur la table, près de la fenêtre.","The book is on the table, near the window."],["Ferme la porte et prends un café.","Close the door and grab a coffee."]],
-    [["Un, deux, trois, quatre, cinq — j'apprends à compter !","One, two, three, four, five — I'm learning to count!"],["Il y a quatre chaises et une table pour cinq personnes.","There are four chairs and one table for five people."]],
-    [["Six, sept, huit, neuf, dix — et on continue à compter !","Six, seven, eight, nine, ten — and we keep counting!"],["Le magasin ouvre à huit heures et ferme à dix heures.","The shop opens at eight and closes at ten."]],
-    [["Le ciel est bleu, l'herbe est verte et le soleil est jaune.","The sky is blue, the grass is green and the sun is yellow."],["Elle porte une robe rouge et des chaussures noires.","She's wearing a red dress and black shoes."]],
-    [["Le ciel est gris, mais j'ai une orange pour le petit-déjeuner.","The sky is grey, but I have an orange for breakfast."],["Mon chat est blanc et il est très mignon.","My cat is white and it's very cute."]],
-    [["Je vais faire les courses cet après-midi.","I'm going to run errands this afternoon."],["Je ne sais pas si je peux venir te voir.","I don't know if I can come see you."]],
-    [["Tu veux venir manger avec nous ?","Do you want to come eat with us?"],["Elle aime prendre le temps de parler avec ses amis.","She likes taking the time to talk with her friends."]],
-    [["J'aime boire un café le matin.","I like drinking a coffee in the morning."],["Le grand chien dort à côté du petit chat.","The big dog sleeps next to the small cat."]],
-    [["Quel beau temps ! Je suis très heureux.","What beautiful weather! I'm very happy."],["Ce joli gâteau a un bon goût, pas mauvais du tout !","This pretty cake tastes good, not bad at all!"]],
-    [["Ce n'est pas facile de dire au revoir à un vieux ami.","It's not easy to say goodbye to an old friend."],["Elle est un peu triste, mais son nouveau travail n'est pas difficile.","She's a bit sad, but her new job isn't difficult."]],
-    [["Hier, il a plu ; aujourd'hui, il fait beau.","Yesterday it rained; today the weather's nice."],["Je dois partir maintenant, mais je reviens demain matin.","I have to leave now, but I'll be back tomorrow morning."]],
-    [["Le soleil brille tous les soirs cette semaine.","The sun shines every evening this week."],["Ce mois-ci passe vite ; l'année aussi.","This month is going by fast; so is the year."]],
-    [["On mange du fromage, de la viande et des légumes.","We're eating cheese, meat and vegetables."],["Le vin rouge se marie bien avec un fruit sucré.","Red wine pairs well with a sweet fruit."]],
-    [["Le poisson a besoin d'un peu de sel.","The fish needs a bit of salt."],["Ce gâteau a trop de sucre, mais la soupe est parfaite.","This cake has too much sugar, but the soup is perfect."]],
-    [["L'argent ne fait pas le bonheur, mais l'amour et la musique, si.","Money doesn't buy happiness, but love and music do."],["Nous allons à la montagne ou à la mer cet été ?","Are we going to the mountains or the sea this summer?"]]
+    [["こんにちは。コーヒーをお願いします。","Hello. A coffee, please."],["はい、ありがとう。さようなら。","Yes, thank you. Goodbye."]],
+    [["やあ!私たちの家にようこそ。","Hi! Welcome to our house."],["すみません、いいえ、結構です。またね。","Excuse me, no, that's alright. See you soon."]],
+    [["猫と犬が家で遊びます。","The cat and the dog play in the house."],["水を飲んでパンを食べます。","I drink water and eat bread."]],
+    [["家族と一緒にいると時間が早く過ぎます。","Time passes quickly when I'm with family."],["友達は仕事と人生を楽しんでいます。","My friend enjoys his job and his life."]],
+    [["日中、子供たちは車で学校に行きます。","During the day, the kids go to school by car."],["夜、この街はとても静かです。","At night, this city is very quiet."]],
+    [["本は窓の近くの机の上にあります。","The book is on the table, near the window."],["ドアを閉めてコーヒーを飲んでください。","Close the door and have a coffee."]],
+    [["一、二、三、四、五 — 数え方を習っています。","One, two, three, four, five — I'm learning to count!"],["椅子が四つと五人用の机があります。","There are four chairs and one table for five people."]],
+    [["六、七、八、九、十 — まだ数え続けます!","Six, seven, eight, nine, ten — and we keep counting!"],["お店は八時に開いて、十時に閉まります。","The shop opens at eight and closes at ten."]],
+    [["空は青くて、草は緑で、太陽は黄色いです。","The sky is blue, the grass is green and the sun is yellow."],["彼女は赤いドレスと黒い靴を履いています。","She's wearing a red dress and black shoes."]],
+    [["空は灰色ですが、私の帽子はオレンジ色です。","The sky is grey, but my hat is orange."],["私の猫は白くて、いつもおもちゃを持っています。","My cat is white and always carries a toy."]],
+    [["今日の午後、買い物をしに行くつもりです。","I'm going to go do some shopping this afternoon."],["映画を見ることができるかどうか知りません。","I don't know if I can watch a movie."]],
+    [["コーヒーが欲しいです。一緒に来て食べませんか?","I'd like a coffee. Won't you come eat with us?"],["彼女は友達と話しながらコーヒーを取るのが好きです。","She likes talking and getting a coffee with friends."]],
+    [["朝、コーヒーを飲むのが好きです。","I like drinking a coffee in the morning."],["大きい犬が小さい猫の隣で寝ています。","The big dog sleeps next to the small cat."]],
+    [["なんて美しい天気でしょう!とても幸せです。","What beautiful weather! I'm very happy."],["このかわいいケーキは良い味で、全然悪くないです!","This cute cake tastes good, not bad at all!"]],
+    [["古い友達にさようならを言うのは簡単ではありません。","It's not easy to say goodbye to an old friend."],["彼女は少し悲しいですが、新しい仕事は難しくないです。","She's a bit sad, but her new job isn't difficult."]],
+    [["昨日は雨でしたが、今日はいい天気です。","Yesterday it rained; today the weather's nice."],["今、出かけなければなりませんが、明日の朝戻ります。","I have to leave now, but I'll be back tomorrow morning."]],
+    [["今週は毎晩、太陽が輝いています。","The sun shines every evening this week."],["今月はあっという間に過ぎます。今年も同じです。","This month is going by fast; so is the year."]],
+    [["チーズと肉と野菜を食べます。","We're eating cheese, meat and vegetables."],["赤ワインは甘い果物とよく合います。","Red wine pairs well with a sweet fruit."]],
+    [["魚には少し塩が必要です。","The fish needs a bit of salt."],["このケーキは砂糖が多すぎますが、スープは完璧です。","This cake has too much sugar, but the soup is perfect."]],
+    [["お金は幸せをもたらしませんが、愛と音楽はもたらします。","Money doesn't buy happiness, but love and music do."],["今年の夏は山に行きますか、それとも海に行きますか?","Are we going to the mountains or the sea this summer?"]]
   ];
 
   function dayIndexFor(date) {
@@ -319,11 +320,11 @@
   }
 
   // ── speech ──
-  var frVoice = null;
+  var jaVoice = null;
   function loadVoice() {
     if (!('speechSynthesis' in window)) return;
     var voices = speechSynthesis.getVoices();
-    frVoice = voices.find(function (v) { return v.lang && v.lang.toLowerCase().indexOf('fr') === 0; }) || null;
+    jaVoice = voices.find(function (v) { return v.lang && v.lang.toLowerCase().indexOf('ja') === 0; }) || null;
   }
   if ('speechSynthesis' in window) {
     loadVoice();
@@ -334,9 +335,9 @@
     if (!('speechSynthesis' in window)) return;
     speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);
-    u.lang = 'fr-FR';
+    u.lang = 'ja-JP';
     u.rate = 0.85;
-    if (frVoice) u.voice = frVoice;
+    if (jaVoice) u.voice = jaVoice;
     if (btn) {
       btn.classList.add('playing');
       u.onend = function () { btn.classList.remove('playing'); };
@@ -346,7 +347,7 @@
   }
 
   // ── learned dots (per-day, stored locally) ──
-  var todayKey = 'motsDuJour:' + new Date().toISOString().slice(0, 10);
+  var todayKey = 'tangoNoHi:' + new Date().toISOString().slice(0, 10);
   function getLearned() {
     try { return JSON.parse(localStorage.getItem(todayKey) || '[]'); } catch (e) { return []; }
   }
@@ -359,7 +360,7 @@
   }
 
   // ── spaced repetition review pool (persists since day one) ──
-  var SRS_KEY = 'motsDuJour:srs';
+  var SRS_KEY = 'tangoNoHi:srs';
 
   function todayISO() { return new Date().toISOString().slice(0, 10); }
 
@@ -517,14 +518,14 @@
   function updateStreak() {
     try {
       var todayStr = new Date().toISOString().slice(0, 10);
-      var last = localStorage.getItem('motsDuJour:lastPracticed');
-      var streak = parseInt(localStorage.getItem('motsDuJour:streak') || '0', 10);
+      var last = localStorage.getItem('tangoNoHi:lastPracticed');
+      var streak = parseInt(localStorage.getItem('tangoNoHi:streak') || '0', 10);
       var learnedToday = getLearned().length > 0;
       if (learnedToday && last !== todayStr) {
         var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
         streak = (last === yesterday) ? streak + 1 : 1;
-        localStorage.setItem('motsDuJour:streak', String(streak));
-        localStorage.setItem('motsDuJour:lastPracticed', todayStr);
+        localStorage.setItem('tangoNoHi:streak', String(streak));
+        localStorage.setItem('tangoNoHi:lastPracticed', todayStr);
       }
       var el = document.getElementById('streakLine');
       if (streak > 0) {

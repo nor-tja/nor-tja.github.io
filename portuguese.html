@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Katja Norstad — Mots du jour</title>
+  <title>Katja Norstad — Palavras do dia</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjVmMmVkIi8+CiAgPHRleHQgeD0iMTYiIHk9IjIzIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjQwMCIgCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2M0NTAxYSIgbGV0dGVyLXNwYWNpbmc9IjEiPktOPC90ZXh0Pgo8L3N2Zz4=" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -137,8 +137,8 @@
 
   <header>
     <p class="eyebrow">A little daily practice</p>
-    <h1>Five <em>French</em> words a day</h1>
-    <p class="intro">A fresh set of five common French words, chosen automatically for today, each with a small picture cue. Tap the circle to hear each one pronounced — come back tomorrow for five new ones.</p>
+    <h1>Five <em>Portuguese</em> words a day</h1>
+    <p class="intro">A fresh set of five common European Portuguese words, chosen automatically for today, each with a small picture cue. Tap the circle to hear each one pronounced — come back tomorrow for five new ones.</p>
     <p class="date-line" id="dateLine"></p>
     <p class="streak" id="streakLine"></p>
   </header>
@@ -155,8 +155,8 @@
       <span class="settings-chevron">›</span>
     </summary>
     <div class="settings-body">
-      <p>The five words are picked automatically from a list of 100 common French words, grouped into 20 fixed sets of 5, based on today's date — no server, no schedule, it just recalculates whenever the page loads. The same 20 sets repeat in order every 20 days.</p>
-      <p>Pronunciation uses your browser's built-in French voice (Web Speech API), so quality depends on your browser and OS. Chrome and Safari on Mac/iOS generally have good French voices built in.</p>
+      <p>The five words are picked automatically from a list of 100 common European Portuguese words, grouped into 20 fixed sets of 5, based on today's date — no server, no schedule, it just recalculates whenever the page loads. The same 20 sets repeat in order every 20 days.</p>
+      <p>Pronunciation uses your browser's built-in Portuguese voice (Web Speech API), so quality depends on your browser and OS — it prefers a European Portuguese voice when one is available, and falls back to any Portuguese voice otherwise.</p>
       <p>Tap the small dot next to a word to mark it as practiced today — that's saved locally in your browser, not shared anywhere.</p>
       <p>Below the words, two short sentences combine most of that day's words together, using common everyday phrasing, so you can hear them used in context rather than in isolation.</p>
       <p>The Review section uses spaced repetition: every word you've ever marked with the dot goes into your personal review pool. New words come back the next day; after that, saying "Got it" pushes the next review further out (1 day, then 6, then longer each time), while "Still learning" brings it back tomorrow. Everything is stored locally in your browser, going all the way back to the first word you marked.</p>
@@ -169,106 +169,106 @@
 <script>
 (function () {
   var WORDS = [
-    ["bonjour","/bɔ̃.ʒuʁ/","hello / good day","interj.","👋"],
-    ["merci","/mɛʁ.si/","thank you","interj.","🙏"],
-    ["s'il vous plaît","/sil vu plɛ/","please","phrase","🤲"],
-    ["au revoir","/o ʁə.vwaʁ/","goodbye","phrase","👋"],
-    ["oui","/wi/","yes","adv.","✅"],
-    ["non","/nɔ̃/","no","adv.","❌"],
-    ["pardon","/paʁ.dɔ̃/","sorry / excuse me","interj.","🙇"],
-    ["bienvenue","/bjɛ̃.və.ny/","welcome","n.f.","🎉"],
-    ["salut","/sa.ly/","hi / bye (informal)","interj.","🙋"],
-    ["à bientôt","/a bjɛ̃.to/","see you soon","phrase","⏳"],
-    ["la maison","/la mɛ.zɔ̃/","the house","n.f.","🏠"],
-    ["le chat","/lə ʃa/","the cat","n.m.","🐱"],
-    ["le chien","/lə ʃjɛ̃/","the dog","n.m.","🐶"],
-    ["l'eau","/lo/","the water","n.f.","💧"],
-    ["le pain","/lə pɛ̃/","the bread","n.m.","🍞"],
-    ["le temps","/lə tɑ̃/","the time / weather","n.m.","⏰"],
-    ["la vie","/la vi/","the life","n.f.","🌱"],
-    ["l'ami","/la.mi/","the friend","n.m.","🧑‍🤝‍🧑"],
-    ["le travail","/lə tʁa.vaj/","the work","n.m.","💼"],
-    ["la famille","/la fa.mij/","the family","n.f.","👨‍👩‍👧‍👦"],
-    ["le jour","/lə ʒuʁ/","the day","n.m.","☀️"],
-    ["la nuit","/la nɥi/","the night","n.f.","🌙"],
-    ["l'école","/le.kɔl/","the school","n.f.","🏫"],
-    ["la voiture","/la vwa.tyʁ/","the car","n.f.","🚗"],
-    ["la ville","/la vil/","the city","n.f.","🏙️"],
-    ["le livre","/lə livʁ/","the book","n.m.","📖"],
-    ["la table","/la tabl/","the table","n.f.","🪑"],
-    ["la fenêtre","/la fə.nɛtʁ/","the window","n.f.","🪟"],
-    ["la porte","/la pɔʁt/","the door","n.f.","🚪"],
-    ["le café","/lə ka.fe/","the coffee","n.m.","☕"],
-    ["un","/œ̃/","one","num.","1️⃣"],
-    ["deux","/dø/","two","num.","2️⃣"],
-    ["trois","/tʁwa/","three","num.","3️⃣"],
-    ["quatre","/katʁ/","four","num.","4️⃣"],
-    ["cinq","/sɛ̃k/","five","num.","5️⃣"],
-    ["six","/sis/","six","num.","6️⃣"],
-    ["sept","/sɛt/","seven","num.","7️⃣"],
-    ["huit","/ɥit/","eight","num.","8️⃣"],
-    ["neuf","/nœf/","nine","num.","9️⃣"],
-    ["dix","/dis/","ten","num.","🔟"],
-    ["rouge","/ʁuʒ/","red","adj.","🔴"],
-    ["bleu","/blø/","blue","adj.","🔵"],
-    ["vert","/vɛʁ/","green","adj.","🟢"],
-    ["jaune","/ʒon/","yellow","adj.","🟡"],
-    ["noir","/nwaʁ/","black","adj.","⚫"],
-    ["blanc","/blɑ̃/","white","adj.","⚪"],
-    ["gris","/gʁi/","grey","adj.","🩶"],
-    ["orange","/ɔ.ʁɑ̃ʒ/","orange","adj.","🟠"],
-    ["être","/ɛtʁ/","to be","v.","🧍"],
-    ["avoir","/a.vwaʁ/","to have","v.","🤲"],
-    ["aller","/a.le/","to go","v.","🚶"],
-    ["faire","/fɛʁ/","to do / make","v.","🛠️"],
-    ["voir","/vwaʁ/","to see","v.","👀"],
-    ["savoir","/sa.vwaʁ/","to know","v.","🧠"],
-    ["pouvoir","/pu.vwaʁ/","to be able to","v.","💪"],
-    ["vouloir","/vu.lwaʁ/","to want","v.","🎯"],
-    ["venir","/və.niʁ/","to come","v.","🏃"],
-    ["prendre","/pʁɑ̃dʁ/","to take","v.","✋"],
-    ["parler","/paʁ.le/","to speak","v.","🗣️"],
-    ["manger","/mɑ̃.ʒe/","to eat","v.","🍽️"],
-    ["boire","/bwaʁ/","to drink","v.","🥤"],
-    ["dormir","/dɔʁ.miʁ/","to sleep","v.","😴"],
-    ["aimer","/ɛ.me/","to love / like","v.","❤️"],
-    ["grand","/gʁɑ̃/","big / tall","adj.","📏"],
-    ["petit","/pə.ti/","small","adj.","🐭"],
-    ["beau","/bo/","beautiful","adj.","🌟"],
-    ["joli","/ʒɔ.li/","pretty","adj.","🌸"],
-    ["bon","/bɔ̃/","good","adj.","👍"],
-    ["mauvais","/mo.vɛ/","bad","adj.","👎"],
-    ["heureux","/œ.ʁø/","happy","adj.","😊"],
-    ["triste","/tʁist/","sad","adj.","😢"],
-    ["facile","/fa.sil/","easy","adj.","😌"],
-    ["difficile","/di.fi.sil/","difficult","adj.","😖"],
-    ["nouveau","/nu.vo/","new","adj.","✨"],
-    ["vieux","/vjø/","old","adj.","🕰️"],
-    ["aujourd'hui","/o.ʒuʁ.dɥi/","today","adv.","📅"],
-    ["demain","/də.mɛ̃/","tomorrow","adv.","🌅"],
-    ["hier","/jɛʁ/","yesterday","adv.","🌇"],
-    ["maintenant","/mɛ̃t.nɑ̃/","now","adv.","⏱️"],
-    ["le matin","/lə ma.tɛ̃/","the morning","n.m.","🌄"],
-    ["le soir","/lə swaʁ/","the evening","n.m.","🌆"],
-    ["la semaine","/la sə.mɛn/","the week","n.f.","🗓️"],
-    ["le mois","/lə mwa/","the month","n.m.","📆"],
-    ["l'année","/la.ne/","the year","n.f.","🎊"],
-    ["le soleil","/lə sɔ.lɛj/","the sun","n.m.","☀️"],
-    ["le fromage","/lə fʁɔ.maʒ/","the cheese","n.m.","🧀"],
-    ["le vin","/lə vɛ̃/","the wine","n.m.","🍷"],
-    ["la viande","/la vjɑ̃d/","the meat","n.f.","🥩"],
-    ["le légume","/lə le.gym/","the vegetable","n.m.","🥦"],
-    ["le fruit","/lə fʁɥi/","the fruit","n.m.","🍎"],
-    ["le poisson","/lə pwa.sɔ̃/","the fish","n.m.","🐟"],
-    ["le sucre","/lə sykʁ/","the sugar","n.m.","🍬"],
-    ["le sel","/lə sɛl/","the salt","n.m.","🧂"],
-    ["le gâteau","/lə gɑ.to/","the cake","n.m.","🎂"],
-    ["la soupe","/la sup/","the soup","n.f.","🍲"],
-    ["l'argent","/laʁ.ʒɑ̃/","the money","n.m.","💰"],
-    ["l'amour","/la.muʁ/","the love","n.m.","❤️"],
-    ["la musique","/la my.zik/","the music","n.f.","🎵"],
-    ["la montagne","/la mɔ̃.taɲ/","the mountain","n.f.","⛰️"],
-    ["la mer","/la mɛʁ/","the sea","n.f.","🌊"]
+    ["olá","/ɔˈla/","hello / good day","interj.","👋"],
+    ["obrigado","/o.bɾiˈɡa.du/","thank you","interj.","🙏"],
+    ["por favor","/puɾ fɐˈvoɾ/","please","phrase","🤲"],
+    ["adeus","/ɐˈdewʃ/","goodbye","phrase","👋"],
+    ["sim","/sĩ/","yes","adv.","✅"],
+    ["não","/nɐ̃w̃/","no","adv.","❌"],
+    ["desculpe","/dɨʃˈkul.pɨ/","sorry / excuse me","interj.","🙇"],
+    ["bem-vindo","/bɐ̃jˈvĩ.du/","welcome","interj.","🎉"],
+    ["tchau","/tʃaw/","bye (informal)","interj.","🙋"],
+    ["até logo","/aˈtɛ ˈlo.gu/","see you soon","phrase","⏳"],
+    ["a casa","/ɐ ˈka.zɐ/","the house","n.f.","🏠"],
+    ["o gato","/u ˈɡa.tu/","the cat","n.m.","🐱"],
+    ["o cão","/u kɐ̃w̃/","the dog","n.m.","🐶"],
+    ["a água","/ɐ ˈa.ɡwɐ/","the water","n.f.","💧"],
+    ["o pão","/u pɐ̃w̃/","the bread","n.m.","🍞"],
+    ["o tempo","/u ˈtẽ.pu/","the time / weather","n.m.","⏰"],
+    ["a vida","/ɐ ˈvi.dɐ/","the life","n.f.","🌱"],
+    ["o amigo","/u ɐˈmi.gu/","the friend","n.m.","🧑‍🤝‍🧑"],
+    ["o trabalho","/u tɾɐˈba.ʎu/","the work","n.m.","💼"],
+    ["a família","/ɐ fɐˈmi.liɐ/","the family","n.f.","👨‍👩‍👧‍👦"],
+    ["o dia","/u ˈdi.ɐ/","the day","n.m.","☀️"],
+    ["a noite","/ɐ ˈnoj.tɨ/","the night","n.f.","🌙"],
+    ["a escola","/ɐ ɨʃˈkɔ.lɐ/","the school","n.f.","🏫"],
+    ["o carro","/u ˈka.ʁu/","the car","n.m.","🚗"],
+    ["a cidade","/ɐ siˈda.dɨ/","the city","n.f.","🏙️"],
+    ["o livro","/u ˈli.vɾu/","the book","n.m.","📖"],
+    ["a mesa","/ɐ ˈme.zɐ/","the table","n.f.","🪑"],
+    ["a janela","/ɐ ʒɐˈnɛ.lɐ/","the window","n.f.","🪟"],
+    ["a porta","/ɐ ˈpɔɾ.tɐ/","the door","n.f.","🚪"],
+    ["o café","/u kɐˈfɛ/","the coffee","n.m.","☕"],
+    ["um","/ũ/","one","num.","1️⃣"],
+    ["dois","/dojʃ/","two","num.","2️⃣"],
+    ["três","/tɾeʃ/","three","num.","3️⃣"],
+    ["quatro","/ˈkwa.tɾu/","four","num.","4️⃣"],
+    ["cinco","/ˈsĩ.ku/","five","num.","5️⃣"],
+    ["seis","/sejʃ/","six","num.","6️⃣"],
+    ["sete","/ˈsɛ.tɨ/","seven","num.","7️⃣"],
+    ["oito","/ˈoj.tu/","eight","num.","8️⃣"],
+    ["nove","/ˈnɔ.vɨ/","nine","num.","9️⃣"],
+    ["dez","/dɛʃ/","ten","num.","🔟"],
+    ["vermelho","/vɨɾˈme.ʎu/","red","adj.","🔴"],
+    ["azul","/ɐˈzul/","blue","adj.","🔵"],
+    ["verde","/ˈveɾ.dɨ/","green","adj.","🟢"],
+    ["amarelo","/ɐ.mɐˈɾɛ.lu/","yellow","adj.","🟡"],
+    ["preto","/ˈpɾe.tu/","black","adj.","⚫"],
+    ["branco","/ˈbɾɐ̃.ku/","white","adj.","⚪"],
+    ["cinzento","/sĩˈzẽ.tu/","grey","adj.","🩶"],
+    ["laranja","/lɐˈɾɐ̃.ʒɐ/","orange","adj.","🟠"],
+    ["ser","/seɾ/","to be","v.","🧍"],
+    ["ter","/teɾ/","to have","v.","🤲"],
+    ["ir","/iɾ/","to go","v.","🚶"],
+    ["fazer","/fɐˈzeɾ/","to do / make","v.","🛠️"],
+    ["ver","/veɾ/","to see","v.","👀"],
+    ["saber","/sɐˈbeɾ/","to know","v.","🧠"],
+    ["poder","/puˈdeɾ/","to be able to","v.","💪"],
+    ["querer","/kɨˈɾeɾ/","to want","v.","🎯"],
+    ["vir","/viɾ/","to come","v.","🏃"],
+    ["tomar","/tuˈmaɾ/","to take","v.","✋"],
+    ["falar","/fɐˈlaɾ/","to speak","v.","🗣️"],
+    ["comer","/kuˈmeɾ/","to eat","v.","🍽️"],
+    ["beber","/bɨˈbeɾ/","to drink","v.","🥤"],
+    ["dormir","/duɾˈmiɾ/","to sleep","v.","😴"],
+    ["gostar","/guʃˈtaɾ/","to like / love","v.","❤️"],
+    ["grande","/ˈɡɾɐ̃.dɨ/","big / tall","adj.","📏"],
+    ["pequeno","/pɨˈke.nu/","small","adj.","🐭"],
+    ["bonito","/buˈni.tu/","beautiful","adj.","🌟"],
+    ["lindo","/ˈlĩ.du/","pretty","adj.","🌸"],
+    ["bom","/bõ/","good","adj.","👍"],
+    ["mau","/maw/","bad","adj.","👎"],
+    ["feliz","/fɨˈliʃ/","happy","adj.","😊"],
+    ["triste","/ˈtɾiʃ.tɨ/","sad","adj.","😢"],
+    ["fácil","/ˈfa.sil/","easy","adj.","😌"],
+    ["difícil","/diˈfi.sil/","difficult","adj.","😖"],
+    ["novo","/ˈno.vu/","new","adj.","✨"],
+    ["velho","/ˈve.ʎu/","old","adj.","🕰️"],
+    ["hoje","/ˈɔ.ʒɨ/","today","adv.","📅"],
+    ["amanhã","/ɐ.mɐˈɲɐ̃/","tomorrow","adv.","🌅"],
+    ["ontem","/ˈõ.tɐ̃j̃/","yesterday","adv.","🌇"],
+    ["agora","/ɐˈgɔ.ɾɐ/","now","adv.","⏱️"],
+    ["a manhã","/ɐ mɐˈɲɐ̃/","the morning","n.f.","🌄"],
+    ["o entardecer","/u ẽ.tɐɾ.dɨˈseɾ/","the evening","n.m.","🌆"],
+    ["a semana","/ɐ sɨˈmɐ.nɐ/","the week","n.f.","🗓️"],
+    ["o mês","/u meʃ/","the month","n.m.","📆"],
+    ["o ano","/u ˈɐ.nu/","the year","n.m.","🎊"],
+    ["o sol","/u sɔl/","the sun","n.m.","☀️"],
+    ["o queijo","/u ˈkej.ʒu/","the cheese","n.m.","🧀"],
+    ["o vinho","/u ˈvi.ɲu/","the wine","n.m.","🍷"],
+    ["a carne","/ɐ ˈkaɾ.nɨ/","the meat","n.f.","🥩"],
+    ["o legume","/u lɨˈɡu.mɨ/","the vegetable","n.m.","🥦"],
+    ["a fruta","/ɐ ˈfɾu.tɐ/","the fruit","n.f.","🍎"],
+    ["o peixe","/u ˈpej.ʃɨ/","the fish","n.m.","🐟"],
+    ["o açúcar","/u ɐˈsu.kɐɾ/","the sugar","n.m.","🍬"],
+    ["o sal","/u sal/","the salt","n.m.","🧂"],
+    ["o bolo","/u ˈbo.lu/","the cake","n.m.","🎂"],
+    ["a sopa","/ɐ ˈso.pɐ/","the soup","n.f.","🍲"],
+    ["o dinheiro","/u diˈɲej.ɾu/","the money","n.m.","💰"],
+    ["o amor","/u ɐˈmoɾ/","the love","n.m.","❤️"],
+    ["a música","/ɐ ˈmu.zi.kɐ/","the music","n.f.","🎵"],
+    ["a montanha","/ɐ mõˈtɐ.ɲɐ/","the mountain","n.f.","⛰️"],
+    ["o mar","/u maɾ/","the sea","n.m.","🌊"]
   ];
 
   var WORD_MAP = {};
@@ -281,26 +281,26 @@
   // the list above), so the two practice sentences below can be hand-written
   // to actually use those words together, instead of generated on the fly.
   var PHRASE_GROUPS = [
-    [["Bonjour ! Un café, s'il vous plaît.","Hello! A coffee, please."],["Oui, merci beaucoup, au revoir !","Yes, thank you very much, goodbye!"]],
-    [["Salut ! Bienvenue chez nous.","Hi! Welcome to our home."],["Pardon, non merci, à bientôt !","Excuse me, no thank you, see you soon!"]],
-    [["Le chat et le chien jouent dans la maison.","The cat and the dog are playing in the house."],["Je bois de l'eau et je mange du pain.","I'm drinking water and eating bread."]],
-    [["Le temps passe vite quand on est avec sa famille.","Time passes quickly when you're with your family."],["Mon ami aime son travail et sa vie à Paris.","My friend loves his job and his life in Paris."]],
-    [["Le jour, les enfants vont à l'école en voiture.","During the day, the kids go to school by car."],["La nuit, cette ville est très calme.","At night, this city is very quiet."]],
-    [["Le livre est sur la table, près de la fenêtre.","The book is on the table, near the window."],["Ferme la porte et prends un café.","Close the door and grab a coffee."]],
-    [["Un, deux, trois, quatre, cinq — j'apprends à compter !","One, two, three, four, five — I'm learning to count!"],["Il y a quatre chaises et une table pour cinq personnes.","There are four chairs and one table for five people."]],
-    [["Six, sept, huit, neuf, dix — et on continue à compter !","Six, seven, eight, nine, ten — and we keep counting!"],["Le magasin ouvre à huit heures et ferme à dix heures.","The shop opens at eight and closes at ten."]],
-    [["Le ciel est bleu, l'herbe est verte et le soleil est jaune.","The sky is blue, the grass is green and the sun is yellow."],["Elle porte une robe rouge et des chaussures noires.","She's wearing a red dress and black shoes."]],
-    [["Le ciel est gris, mais j'ai une orange pour le petit-déjeuner.","The sky is grey, but I have an orange for breakfast."],["Mon chat est blanc et il est très mignon.","My cat is white and it's very cute."]],
-    [["Je vais faire les courses cet après-midi.","I'm going to run errands this afternoon."],["Je ne sais pas si je peux venir te voir.","I don't know if I can come see you."]],
-    [["Tu veux venir manger avec nous ?","Do you want to come eat with us?"],["Elle aime prendre le temps de parler avec ses amis.","She likes taking the time to talk with her friends."]],
-    [["J'aime boire un café le matin.","I like drinking a coffee in the morning."],["Le grand chien dort à côté du petit chat.","The big dog sleeps next to the small cat."]],
-    [["Quel beau temps ! Je suis très heureux.","What beautiful weather! I'm very happy."],["Ce joli gâteau a un bon goût, pas mauvais du tout !","This pretty cake tastes good, not bad at all!"]],
-    [["Ce n'est pas facile de dire au revoir à un vieux ami.","It's not easy to say goodbye to an old friend."],["Elle est un peu triste, mais son nouveau travail n'est pas difficile.","She's a bit sad, but her new job isn't difficult."]],
-    [["Hier, il a plu ; aujourd'hui, il fait beau.","Yesterday it rained; today the weather's nice."],["Je dois partir maintenant, mais je reviens demain matin.","I have to leave now, but I'll be back tomorrow morning."]],
-    [["Le soleil brille tous les soirs cette semaine.","The sun shines every evening this week."],["Ce mois-ci passe vite ; l'année aussi.","This month is going by fast; so is the year."]],
-    [["On mange du fromage, de la viande et des légumes.","We're eating cheese, meat and vegetables."],["Le vin rouge se marie bien avec un fruit sucré.","Red wine pairs well with a sweet fruit."]],
-    [["Le poisson a besoin d'un peu de sel.","The fish needs a bit of salt."],["Ce gâteau a trop de sucre, mais la soupe est parfaite.","This cake has too much sugar, but the soup is perfect."]],
-    [["L'argent ne fait pas le bonheur, mais l'amour et la musique, si.","Money doesn't buy happiness, but love and music do."],["Nous allons à la montagne ou à la mer cet été ?","Are we going to the mountains or the sea this summer?"]]
+    [["Olá! Um café, por favor.","Hello! A coffee, please."],["Sim, obrigado, adeus!","Yes, thank you, goodbye!"]],
+    [["Tchau! Bem-vindo à nossa casa.","Bye! Welcome to our house."],["Desculpe, não, obrigado, até logo!","Excuse me, no thank you, see you soon!"]],
+    [["O gato e o cão brincam na casa.","The cat and the dog play in the house."],["Eu bebo água e como pão.","I drink water and eat bread."]],
+    [["O tempo passa depressa quando estamos com a família.","Time passes quickly when we're with family."],["O meu amigo gosta do trabalho e da vida em Lisboa.","My friend likes his job and his life in Lisbon."]],
+    [["De dia, as crianças vão à escola de carro.","During the day, the kids go to school by car."],["À noite, esta cidade é muito calma.","At night, this city is very quiet."]],
+    [["O livro está na mesa, perto da janela.","The book is on the table, near the window."],["Fecha a porta e toma um café.","Close the door and have a coffee."]],
+    [["Um, dois, três, quatro, cinco — estou a aprender a contar!","One, two, three, four, five — I'm learning to count!"],["Há quatro cadeiras e uma mesa para cinco pessoas.","There are four chairs and one table for five people."]],
+    [["Seis, sete, oito, nove, dez — e continuamos a contar!","Six, seven, eight, nine, ten — and we keep counting!"],["A loja abre às oito horas e fecha às dez horas.","The shop opens at eight and closes at ten."]],
+    [["O céu é azul, a relva é verde e o sol é amarelo.","The sky is blue, the grass is green and the sun is yellow."],["Ela usa um vestido vermelho e sapatos pretos.","She's wearing a red dress and black shoes."]],
+    [["O céu está cinzento, mas tenho uma laranja para o pequeno-almoço.","The sky is grey, but I have an orange for breakfast."],["O meu gato é branco e é muito querido.","My cat is white and it's very sweet."]],
+    [["Vou fazer compras esta tarde.","I'm going to do some shopping this afternoon."],["Não sei se posso ir ver-te.","I don't know if I can go see you."]],
+    [["Queres vir comer connosco?","Do you want to come eat with us?"],["Ela gosta de falar e tomar um café com os amigos.","She likes talking and having a coffee with friends."]],
+    [["Gosto de beber um café de manhã.","I like drinking a coffee in the morning."],["O cão grande dorme ao lado do gato pequeno.","The big dog sleeps next to the small cat."]],
+    [["Que tempo tão bonito! Estou muito feliz.","What beautiful weather! I'm very happy."],["Este bolo lindo tem um bom sabor, nada mau!","This pretty cake tastes good, not bad at all!"]],
+    [["Não é fácil dizer adeus a um velho amigo.","It's not easy to say goodbye to an old friend."],["Ela está um pouco triste, mas o novo trabalho não é difícil.","She's a bit sad, but the new job isn't difficult."]],
+    [["Ontem choveu; hoje está bom tempo.","Yesterday it rained; today the weather's nice."],["Tenho de sair agora, mas volto amanhã de manhã.","I have to leave now, but I'll be back tomorrow morning."]],
+    [["O sol brilha todos os entardeceres esta semana.","The sun shines every evening this week."],["Este mês passa depressa; o ano também.","This month is going by fast; so is the year."]],
+    [["Comemos queijo, carne e legumes.","We're eating cheese, meat and vegetables."],["O vinho tinto combina bem com uma fruta doce.","Red wine pairs well with a sweet fruit."]],
+    [["O peixe precisa de um pouco de sal.","The fish needs a bit of salt."],["Este bolo tem açúcar a mais, mas a sopa está perfeita.","This cake has too much sugar, but the soup is perfect."]],
+    [["O dinheiro não traz felicidade, mas o amor e a música, sim.","Money doesn't buy happiness, but love and music do."],["Vamos à montanha ou ao mar este verão?","Are we going to the mountains or the sea this summer?"]]
   ];
 
   function dayIndexFor(date) {
@@ -318,12 +318,14 @@
     return WORDS.slice(g * PER_DAY, g * PER_DAY + PER_DAY);
   }
 
-  // ── speech ──
-  var frVoice = null;
+  // ── speech — prefers a European Portuguese voice, falls back to any Portuguese voice ──
+  var ptVoice = null;
   function loadVoice() {
     if (!('speechSynthesis' in window)) return;
     var voices = speechSynthesis.getVoices();
-    frVoice = voices.find(function (v) { return v.lang && v.lang.toLowerCase().indexOf('fr') === 0; }) || null;
+    ptVoice = voices.find(function (v) { return v.lang && v.lang.toLowerCase() === 'pt-pt'; })
+      || voices.find(function (v) { return v.lang && v.lang.toLowerCase().indexOf('pt') === 0; })
+      || null;
   }
   if ('speechSynthesis' in window) {
     loadVoice();
@@ -334,9 +336,9 @@
     if (!('speechSynthesis' in window)) return;
     speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);
-    u.lang = 'fr-FR';
+    u.lang = 'pt-PT';
     u.rate = 0.85;
-    if (frVoice) u.voice = frVoice;
+    if (ptVoice) u.voice = ptVoice;
     if (btn) {
       btn.classList.add('playing');
       u.onend = function () { btn.classList.remove('playing'); };
@@ -346,7 +348,7 @@
   }
 
   // ── learned dots (per-day, stored locally) ──
-  var todayKey = 'motsDuJour:' + new Date().toISOString().slice(0, 10);
+  var todayKey = 'palavrasDoDia:' + new Date().toISOString().slice(0, 10);
   function getLearned() {
     try { return JSON.parse(localStorage.getItem(todayKey) || '[]'); } catch (e) { return []; }
   }
@@ -359,7 +361,7 @@
   }
 
   // ── spaced repetition review pool (persists since day one) ──
-  var SRS_KEY = 'motsDuJour:srs';
+  var SRS_KEY = 'palavrasDoDia:srs';
 
   function todayISO() { return new Date().toISOString().slice(0, 10); }
 
@@ -517,14 +519,14 @@
   function updateStreak() {
     try {
       var todayStr = new Date().toISOString().slice(0, 10);
-      var last = localStorage.getItem('motsDuJour:lastPracticed');
-      var streak = parseInt(localStorage.getItem('motsDuJour:streak') || '0', 10);
+      var last = localStorage.getItem('palavrasDoDia:lastPracticed');
+      var streak = parseInt(localStorage.getItem('palavrasDoDia:streak') || '0', 10);
       var learnedToday = getLearned().length > 0;
       if (learnedToday && last !== todayStr) {
         var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
         streak = (last === yesterday) ? streak + 1 : 1;
-        localStorage.setItem('motsDuJour:streak', String(streak));
-        localStorage.setItem('motsDuJour:lastPracticed', todayStr);
+        localStorage.setItem('palavrasDoDia:streak', String(streak));
+        localStorage.setItem('palavrasDoDia:lastPracticed', todayStr);
       }
       var el = document.getElementById('streakLine');
       if (streak > 0) {
