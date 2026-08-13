@@ -47,7 +47,7 @@
 
     .glass-stage {
       width: 200px;
-      height: 419px;
+      height: 495px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -143,7 +143,7 @@
       .wrap { padding:0 1.2rem 3rem; }
       header { padding:2rem 0 1.5rem; }
       .time-display { font-size:1.3rem; }
-      .glass-stage { width:145px; height:304px; }
+      .glass-stage { width:145px; height:359px; }
       .settings-body { grid-template-columns:1fr; }
     }
   </style>
@@ -161,7 +161,7 @@
   <div class="glass-section">
     <div class="glass-stage">
       <div class="glass-rotor" id="rotor">
-        <svg id="hourglass-svg" viewBox="0 0 210 440" xmlns="http://www.w3.org/2000/svg">
+        <svg id="hourglass-svg" viewBox="0 0 210 520" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="amberGlass" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="#f7d99a"/>
@@ -182,44 +182,44 @@
               <stop offset="100%" stop-color="#c3dbe6"/>
             </linearGradient>
             <clipPath id="topClip">
-              <path d="M95,210 C35,175 25,135 25,97 C25,57 50,15 105,15 C160,15 185,57 185,97 C185,135 175,175 115,210 L95,210 Z"/>
+              <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z"/>
             </clipPath>
             <clipPath id="bottomClip">
-              <path d="M95,230 C35,265 25,305 25,343 C25,383 50,425 105,425 C160,425 185,383 185,343 C185,305 175,265 115,230 L95,230 Z"/>
+              <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z"/>
             </clipPath>
           </defs>
 
           <!-- top bulb glass -->
-          <path d="M95,210 C35,175 25,135 25,97 C25,57 50,15 105,15 C160,15 185,57 185,97 C185,135 175,175 115,210 L95,210 Z" fill="url(#amberGlass)" opacity="0.34"/>
+          <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z" fill="url(#amberGlass)" opacity="0.34"/>
           <!-- top sand fill -->
           <g clip-path="url(#topClip)">
-            <rect id="sandTop" x="20" y="15" width="170" height="195" fill="url(#sandAmber)"/>
+            <rect id="sandTop" x="20" y="15" width="170" height="235" fill="url(#sandAmber)"/>
           </g>
-          <path d="M95,210 C35,175 25,135 25,97 C25,57 50,15 105,15 C160,15 185,57 185,97 C185,135 175,175 115,210 L95,210 Z" fill="none" stroke="url(#amberGlass)" stroke-width="3" opacity="0.85"/>
+          <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z" fill="none" stroke="url(#amberGlass)" stroke-width="3" opacity="0.85"/>
 
           <!-- bottom bulb glass -->
-          <path d="M95,230 C35,265 25,305 25,343 C25,383 50,425 105,425 C160,425 185,383 185,343 C185,305 175,265 115,230 L95,230 Z" fill="url(#blueGlass)" opacity="0.34"/>
+          <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z" fill="url(#blueGlass)" opacity="0.34"/>
           <!-- bottom sand fill -->
           <g clip-path="url(#bottomClip)">
-            <rect id="sandBottom" x="20" y="425" width="170" height="0" fill="url(#sandBlue)"/>
+            <rect id="sandBottom" x="20" y="505" width="170" height="0" fill="url(#sandBlue)"/>
           </g>
-          <path d="M95,230 C35,265 25,305 25,343 C25,383 50,425 105,425 C160,425 185,383 185,343 C185,305 175,265 115,230 L95,230 Z" fill="none" stroke="url(#blueGlass)" stroke-width="3" opacity="0.85"/>
+          <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z" fill="none" stroke="url(#blueGlass)" stroke-width="3" opacity="0.85"/>
 
           <!-- neck -->
-          <rect x="95" y="210" width="20" height="20" rx="3" fill="#e8e2d6" opacity="0.9"/>
+          <rect x="95" y="250" width="20" height="20" rx="3" fill="#e8e2d6" opacity="0.9"/>
 
           <!-- falling grains -->
           <g id="stream">
-            <circle class="grain" cx="103" cy="220" r="1.8" fill="#eecb8e" style="animation-delay:0s"/>
-            <circle class="grain" cx="107" cy="220" r="1.6" fill="#eecb8e" style="animation-delay:.13s"/>
-            <circle class="grain" cx="105" cy="220" r="1.7" fill="#eecb8e" style="animation-delay:.26s"/>
-            <circle class="grain" cx="104" cy="220" r="1.5" fill="#eecb8e" style="animation-delay:.39s"/>
-            <circle class="grain" cx="106" cy="220" r="1.7" fill="#eecb8e" style="animation-delay:.42s"/>
+            <circle class="grain" cx="103" cy="260" r="1.8" fill="#eecb8e" style="animation-delay:0s"/>
+            <circle class="grain" cx="107" cy="260" r="1.6" fill="#eecb8e" style="animation-delay:.13s"/>
+            <circle class="grain" cx="105" cy="260" r="1.7" fill="#eecb8e" style="animation-delay:.26s"/>
+            <circle class="grain" cx="104" cy="260" r="1.5" fill="#eecb8e" style="animation-delay:.39s"/>
+            <circle class="grain" cx="106" cy="260" r="1.7" fill="#eecb8e" style="animation-delay:.42s"/>
           </g>
 
           <!-- glass highlights -->
-          <path d="M72,35 C58,70 53,104 65,141" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.35"/>
-          <path d="M72,405 C58,370 53,336 65,299" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.3"/>
+          <path d="M72,39 C58,81 53,122 65,167" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.35"/>
+          <path d="M72,481 C58,439 53,398 65,353" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.3"/>
         </svg>
       </div>
     </div>
@@ -284,8 +284,8 @@
   const longBreakInput = $('longBreakInput');
   const cyclesInput = $('cyclesInput');
 
-  const TOP_TOP = 15, TOP_BOTTOM = 210;     // vertical span of top bulb
-  const BOT_TOP = 230, BOT_BOTTOM = 425;    // vertical span of bottom bulb
+  const TOP_TOP = 15, TOP_BOTTOM = 250;     // vertical span of top bulb
+  const BOT_TOP = 270, BOT_BOTTOM = 505;    // vertical span of bottom bulb
 
   let mode = 'focus';           // 'focus' | 'short' | 'long'
   let durationSec = focusInput.value * 60;
