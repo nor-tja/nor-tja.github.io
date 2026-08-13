@@ -46,12 +46,14 @@
     .glass-section { padding:2.6rem 0 1rem; display:flex; flex-direction:column; align-items:center; opacity:0; animation:rise .9s ease forwards .25s; }
 
     .glass-stage {
-      width: 200px;
-      height: 495px;
+      --glass-scale: 1;
+      width: calc(200px * var(--glass-scale));
+      height: calc(495px * var(--glass-scale));
       display: flex;
       align-items: center;
       justify-content: center;
       perspective: 800px;
+      transition: width .5s ease, height .5s ease;
     }
     .glass-rotor {
       width: 100%;
@@ -151,7 +153,7 @@
       .wrap { padding:0 1.2rem 3rem; }
       header { padding:2rem 0 1.5rem; }
       .time-display { font-size:1.3rem; }
-      .glass-stage { width:145px; height:359px; }
+      .glass-stage { width:calc(145px * var(--glass-scale)); height:calc(359px * var(--glass-scale)); }
       .settings-body { grid-template-columns:1fr; }
     }
   </style>
@@ -298,6 +300,7 @@
   const cyclesInput = $('cyclesInput');
   const dailyHourglasses = $('dailyHourglasses');
   const dailyText = $('dailyText');
+  const glassStage = document.querySelector('.glass-stage');
 
   const TOP_TOP = 15, TOP_BOTTOM = 250;     // vertical span of top bulb
   const BOT_TOP = 270, BOT_BOTTOM = 505;    // vertical span of bottom bulb
@@ -378,6 +381,21 @@
     daily.minutes += minutes;
     saveDaily(daily);
     renderDaily();
+  }
+
+  // ── hourglass size follows the focus length, clamped so it never gets
+  // too big or too small (matters most on small phone screens) ──
+  const GLASS_SCALE_MIN = 0.82;
+  const GLASS_SCALE_MAX = 1.18;
+  const GLASS_DURATION_MIN = 5;   // minutes — anything shorter still renders at min scale
+  const GLASS_DURATION_MAX = 90;  // minutes — anything longer still renders at max scale
+
+  function updateGlassScale() {
+    const minutes = Math.max(1, parseInt(focusInput.value, 10) || 25);
+    const clamped = Math.min(GLASS_DURATION_MAX, Math.max(GLASS_DURATION_MIN, minutes));
+    const t = (clamped - GLASS_DURATION_MIN) / (GLASS_DURATION_MAX - GLASS_DURATION_MIN);
+    const scale = GLASS_SCALE_MIN + (GLASS_SCALE_MAX - GLASS_SCALE_MIN) * t;
+    glassStage.style.setProperty('--glass-scale', scale.toFixed(3));
   }
 
   function fmt(sec) {
@@ -531,6 +549,7 @@
       }
     });
   });
+  focusInput.addEventListener('change', updateGlassScale);
   cyclesInput.addEventListener('change', buildDots);
 
   // ── fireplace ambience — real recording, self-hosted ──
@@ -564,6 +583,7 @@
 
   buildDots();
   renderDaily();
+  updateGlassScale();
   startSession('focus', true);
 })();
 </script>
