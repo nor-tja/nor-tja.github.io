@@ -313,6 +313,7 @@
   let timerId = null;
   let completedFocusSessions = 0;
   let audioCtx = null;
+  let endTime = null;           // wall-clock ms timestamp the current session ends at (only meaningful while running)
 
   function totalCycles() {
     return Math.max(1, parseInt(cyclesInput.value, 10) || 4);
@@ -480,6 +481,9 @@
     updateModeLabel();
     if (resetProgress) setSand(0);
     timeDisplay.textContent = fmt(remainingSec);
+    // if the timer is already running (e.g. auto-advancing focus -> break),
+    // re-anchor the wall-clock end time so the new session counts down correctly
+    if (isRunning) endTime = Date.now() + remainingSec * 1000;
   }
 
   function nextMode() {
@@ -494,7 +498,15 @@
   }
 
   function tick() {
-    remainingSec--;
+    // derive remaining time from a fixed wall-clock end time rather than
+    // decrementing a counter — browsers throttle setInterval when a tab or
+    // window is minimized/backgrounded, so a simple "--" per tick would run
+    // slow (or need to "catch up") once the page is visible again.
+    if (endTime !== null) {
+      remainingSec = Math.max(0, Math.round((endTime - Date.now()) / 1000));
+    } else {
+      remainingSec--;
+    }
     const progress = 1 - remainingSec / durationSec;
     setSand(Math.min(1, Math.max(0, progress)));
     timeDisplay.textContent = fmt(Math.max(0, remainingSec));
@@ -515,13 +527,21 @@
     if (isRunning) return;
     unlockAudio();
     isRunning = true;
+    endTime = Date.now() + remainingSec * 1000;
     startPauseBtn.textContent = 'Pause';
     document.getElementById('hourglass-svg').classList.add('flowing');
-    timerId = setInterval(tick, 1000);
+    // interval runs faster than 1s so that once the browser un-throttles a
+    // minimized/background tab, the display snaps to the correct time
+    // quickly rather than waiting up to a full second
+    timerId = setInterval(tick, 250);
   }
 
   function pause() {
+    if (endTime !== null) {
+      remainingSec = Math.max(0, Math.round((endTime - Date.now()) / 1000));
+    }
     isRunning = false;
+    endTime = null;
     startPauseBtn.textContent = 'Start';
     document.getElementById('hourglass-svg').classList.remove('flowing');
     clearInterval(timerId);
@@ -551,6 +571,16 @@
   });
   focusInput.addEventListener('change', updateGlassScale);
   cyclesInput.addEventListener('change', buildDots);
+
+  // when the window/tab is minimized, the browser throttles setInterval to
+  // save power — re-sync the display the moment it's visible/focused again
+  // instead of waiting for the next (possibly delayed) tick
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && isRunning) tick();
+  });
+  window.addEventListener('focus', () => {
+    if (isRunning) tick();
+  });
 
   // ── fireplace ambience — real recording, self-hosted ──
   (function () {
