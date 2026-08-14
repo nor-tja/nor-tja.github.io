@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Katja Norstad — Palabras del día</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjVmMmVkIi8+CiAgPHRleHQgeD0iMTYiIHk9IjIzIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjQwMCIgCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2M0NTAxYSIgbGV0dGVyLXNwYWNpbmc9IjEiPktOPC90ZXh0Pgo8L3N2Zz4=" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#c4501a; --line:#d8d3cc; }
+    body { background:var(--bg); color:var(--ink); font-family:'Cormorant Garamond',serif; font-weight:300; font-size:18px; line-height:1.7; min-height:100vh; }
+    .wrap { max-width:640px; margin:0 auto; padding:0 2rem 4rem; }
+
+    .back { display:inline-flex; align-items:center; gap:.4rem; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:1.8rem 0 0; transition:color .2s; }
+    .back:hover { color:var(--accent); }
+
+    header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
+    .eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
+    h1 { font-size:clamp(2rem,6vw,3.2rem); font-weight:300; line-height:1.1; }
+    h1 em { font-style:italic; color:var(--accent); }
+    .intro { margin-top:1rem; color:var(--muted); font-size:1rem; max-width:480px; }
+    .date-line { margin-top:.9rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+
+    .streak { margin-top:1.2rem; display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); opacity:0; transition:opacity .3s; }
+    .streak.visible { opacity:1; }
+
+    .voice-picker { margin-top:.9rem; display:none; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+    .voice-picker select { font-family:'Cormorant Garamond',serif; font-size:.85rem; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:.3rem .5rem; max-width:230px; }
+
+    .words { padding:2.2rem 0; display:flex; flex-direction:column; }
+    .word-card {
+      display:flex; align-items:center; gap:1.1rem;
+      padding:1.5rem 0; border-bottom:1px solid var(--line);
+      opacity:0; animation:rise .8s ease forwards;
+    }
+    .word-card:nth-of-type(1){ animation-delay:.25s; }
+    .word-card:nth-of-type(2){ animation-delay:.35s; }
+    .word-card:nth-of-type(3){ animation-delay:.45s; }
+    .word-card:nth-of-type(4){ animation-delay:.55s; }
+    .word-card:nth-of-type(5){ animation-delay:.65s; }
+
+    .word-icon {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:30px; height:30px; border-radius:7px; align-self:center;
+      background:#eee7da; font-size:1.05rem; line-height:1;
+    }
+
+    .play-btn {
+      flex-shrink:0; width:44px; height:44px; border-radius:50%;
+      border:1px solid var(--line); background:transparent; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      color:var(--accent); font-size:1.1rem; transition:all .2s;
+    }
+    .play-btn:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
+    .play-btn:active { transform:scale(.94); }
+    .play-btn.playing { background:var(--accent); color:#fdf9f2; }
+
+    .word-body { flex:1; min-width:0; }
+    .word-top { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
+    .word-fr { font-size:1.5rem; font-weight:400; }
+    .word-pos { font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:.15rem .4rem; }
+    .word-ipa { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--accent); margin-top:.25rem; }
+    .word-en { font-style:italic; color:var(--muted); font-size:.98rem; margin-top:.15rem; }
+
+    .learned-dot {
+      flex-shrink:0; width:9px; height:9px; border-radius:50%;
+      border:1px solid var(--line); cursor:pointer; transition:background .25s,border-color .25s;
+    }
+    .learned-dot.on { background:var(--accent); border-color:var(--accent); }
+
+    .no-speech { font-size:.85rem; color:var(--muted); font-style:italic; padding:1rem 0; }
+
+    .review-section { padding:.4rem 0 1.6rem; }
+    .review-label { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
+    .review-stats { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-bottom:1.1rem; line-height:1.6; }
+    .review-empty { font-size:.9rem; color:var(--muted); font-style:italic; padding:.6rem 0 1.2rem; }
+    .review-card { display:flex; align-items:center; gap:.8rem; padding:1rem 0; border-bottom:1px solid var(--line); }
+    .review-card:last-child { border-bottom:none; }
+    .review-play { flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:.95rem; transition:all .2s; }
+    .review-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
+    .review-play.playing { background:var(--accent); color:#fdf9f2; }
+    .review-body { flex:1; min-width:0; }
+    .review-fr { font-size:1.15rem; }
+    .review-answer { margin-top:.3rem; display:none; }
+    .review-answer.shown { display:block; }
+    .review-fr-answer { font-style:italic; font-size:1.15rem; }
+    .review-ipa { font-family:'DM Mono',monospace; font-size:.78rem; color:var(--accent); margin-left:.5rem; }
+    .review-actions { flex-shrink:0; display:flex; gap:.5rem; }
+    .review-btn {
+      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase;
+      padding:.5rem .75rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
+      background:transparent; color:var(--ink); transition:all .2s; white-space:nowrap;
+    }
+    .review-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .review-btn.again:hover { border-color:#a8430f; color:#a8430f; }
+
+    .phrases { padding:.4rem 0 1.6rem; }
+    .phrases-label { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.2rem; }
+    .phrase-item { display:flex; align-items:flex-start; gap:.9rem; padding:1rem 0; border-bottom:1px solid var(--line); }
+    .phrase-item:last-child { border-bottom:none; }
+    .phrase-play { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:.9rem; transition:all .2s; margin-top:.1rem; }
+    .phrase-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
+    .phrase-play.playing { background:var(--accent); color:#fdf9f2; }
+    .phrase-fr { font-size:1.08rem; }
+    .phrase-en { font-style:italic; color:var(--muted); font-size:.85rem; margin-top:.2rem; }
+
+    .settings { margin-top:1rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .8s; }
+    .settings-trigger {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:1.1rem 0; cursor:pointer; list-style:none; user-select:none;
+      font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+    }
+    .settings-trigger::-webkit-details-marker { display:none; }
+    .settings-chevron { color:var(--muted); transition:transform .25s; }
+    details[open] .settings-chevron { transform:rotate(90deg); }
+    .settings-body { padding:.2rem 0 2rem; font-size:.85rem; color:var(--muted); line-height:1.6; }
+    .settings-body p + p { margin-top:.6rem; }
+
+    footer { padding:1rem 0 1rem; text-align:center; }
+    footer p { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; color:var(--muted); }
+
+    @keyframes rise { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    @media (max-width:520px) {
+      .wrap { padding:0 1.2rem 3rem; }
+      .word-fr { font-size:1.3rem; }
+      .word-icon { width:26px; height:26px; font-size:.9rem; border-radius:6px; }
+      .play-btn { width:38px; height:38px; }
+      .review-card { flex-wrap:wrap; }
+      .review-play { width:32px; height:32px; }
+      .review-actions { width:100%; margin-top:.6rem; flex-wrap:wrap; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="languages.html" class="back">← Back</a>
+
+  <header>
+    <p class="eyebrow">A little daily practice</p>
+    <h1>Five <em>Spanish</em> words a day</h1>
+    <p class="intro">A fresh set of five common Castilian Spanish words, chosen automatically for today, each with a small picture cue. Tap the circle to hear each one pronounced — come back tomorrow for five new ones.</p>
+    <p class="date-line" id="dateLine"></p>
+    <p class="streak" id="streakLine"></p>
+    <div class="voice-picker" id="voicePicker">
+      <label for="voiceSelect">Voice</label>
+      <select id="voiceSelect"></select>
+    </div>
+  </header>
+
+  <div class="words" id="words"></div>
+
+  <div class="phrases" id="phrases"></div>
+
+  <div class="review-section" id="reviewSection"></div>
+
+  <details class="settings">
+    <summary class="settings-trigger">
+      <span>How this works</span>
+      <span class="settings-chevron">›</span>
+    </summary>
+    <div class="settings-body">
+      <p>The five words are picked automatically from a list of 100 common Castilian Spanish words, grouped into 20 fixed sets of 5, based on today's date — no server, no schedule, it just recalculates whenever the page loads. The same 20 sets repeat in order every 20 days.</p>
+      <p>Pronunciation uses your browser's built-in Spanish voice (Web Speech API), so quality depends on your browser and OS. The words themselves are Castilian Spanish; the voice your browser picks may lean Spain or Latin American depending on what's installed. If more than one Spanish voice is available, a picker appears above the words so you can choose whichever sounds best — your choice is remembered. On a Mac, System Settings → Accessibility → Spoken Content → Voices lets you download higher-quality "Premium" voices.</p>
+      <p>Tap the small dot next to a word to mark it as practiced today — that's saved locally in your browser, not shared anywhere.</p>
+      <p>Below the words, two short sentences combine most of that day's words together, using common everyday phrasing, so you can hear them used in context rather than in isolation.</p>
+      <p>The Review section uses spaced repetition: every word you've ever marked with the dot goes into your personal review pool. New words come back the next day; after that, saying "Got it" pushes the next review further out (1 day, then 6, then longer each time), while "Still learning" brings it back tomorrow. Everything is stored locally in your browser, going all the way back to the first word you marked.</p>
+    </div>
+  </details>
+
+  <footer><p>© 2026 Katja Norstad</p></footer>
+</div>
+
+<script>
+(function () {
+  var WORDS = [
+    ["hola","/ˈo.la/","hello / good day","interj.","👋"],
+    ["gracias","/ˈgɾa.θjas/","thank you","interj.","🙏"],
+    ["por favor","/poɾ faˈboɾ/","please","phrase","🤲"],
+    ["adiós","/aˈdjos/","goodbye","phrase","👋"],
+    ["sí","/si/","yes","adv.","✅"],
+    ["no","/no/","no","adv.","❌"],
+    ["perdón","/peɾˈdon/","sorry / excuse me","interj.","🙇"],
+    ["bienvenido","/bjem.beˈni.do/","welcome","interj.","🎉"],
+    ["chao","/ˈtʃa.o/","bye (informal)","interj.","🙋"],
+    ["hasta luego","/ˈas.ta ˈlwe.go/","see you soon","phrase","⏳"],
+    ["la casa","/la ˈka.sa/","the house","n.f.","🏠"],
+    ["el gato","/el ˈga.to/","the cat","n.m.","🐱"],
+    ["el perro","/el ˈpe.ro/","the dog","n.m.","🐶"],
+    ["el agua","/el ˈa.gwa/","the water","n.f.","💧"],
+    ["el pan","/el pan/","the bread","n.m.","🍞"],
+    ["el tiempo","/el ˈtjem.po/","the time / weather","n.m.","⏰"],
+    ["la vida","/la ˈbi.da/","the life","n.f.","🌱"],
+    ["el amigo","/el aˈmi.go/","the friend","n.m.","🧑‍🤝‍🧑"],
+    ["el trabajo","/el tɾaˈba.xo/","the work","n.m.","💼"],
+    ["la familia","/la faˈmi.lja/","the family","n.f.","👨‍👩‍👧‍👦"],
+    ["el día","/el ˈdi.a/","the day","n.m.","☀️"],
+    ["la noche","/la ˈno.tʃe/","the night","n.f.","🌙"],
+    ["la escuela","/la esˈkwe.la/","the school","n.f.","🏫"],
+    ["el coche","/el ˈko.tʃe/","the car","n.m.","🚗"],
+    ["la ciudad","/la θjuˈdad/","the city","n.f.","🏙️"],
+    ["el libro","/el ˈli.bɾo/","the book","n.m.","📖"],
+    ["la mesa","/la ˈme.sa/","the table","n.f.","🪑"],
+    ["la ventana","/la benˈta.na/","the window","n.f.","🪟"],
+    ["la puerta","/la ˈpweɾ.ta/","the door","n.f.","🚪"],
+    ["el café","/el kaˈfe/","the coffee","n.m.","☕"],
+    ["uno","/ˈu.no/","one","num.","1️⃣"],
+    ["dos","/dos/","two","num.","2️⃣"],
+    ["tres","/tɾes/","three","num.","3️⃣"],
+    ["cuatro","/ˈkwa.tɾo/","four","num.","4️⃣"],
+    ["cinco","/ˈθiŋ.ko/","five","num.","5️⃣"],
+    ["seis","/sejs/","six","num.","6️⃣"],
+    ["siete","/ˈsje.te/","seven","num.","7️⃣"],
+    ["ocho","/ˈo.tʃo/","eight","num.","8️⃣"],
+    ["nueve","/ˈnwe.be/","nine","num.","9️⃣"],
+    ["diez","/djeθ/","ten","num.","🔟"],
+    ["rojo","/ˈro.xo/","red","adj.","🔴"],
+    ["azul","/aˈθul/","blue","adj.","🔵"],
+    ["verde","/ˈbeɾ.de/","green","adj.","🟢"],
+    ["amarillo","/a.maˈɾi.ʝo/","yellow","adj.","🟡"],
+    ["negro","/ˈne.gɾo/","black","adj.","⚫"],
+    ["blanco","/ˈblaŋ.ko/","white","adj.","⚪"],
+    ["gris","/gɾis/","grey","adj.","🩶"],
+    ["naranja","/naˈɾaŋ.xa/","orange","adj.","🟠"],
+    ["ser","/seɾ/","to be","v.","🧍"],
+    ["tener","/teˈneɾ/","to have","v.","🤲"],
+    ["ir","/iɾ/","to go","v.","🚶"],
+    ["hacer","/aˈθeɾ/","to do / make","v.","🛠️"],
+    ["ver","/beɾ/","to see","v.","👀"],
+    ["saber","/saˈbeɾ/","to know","v.","🧠"],
+    ["poder","/poˈdeɾ/","to be able to","v.","💪"],
+    ["querer","/keˈɾeɾ/","to want","v.","🎯"],
+    ["venir","/beˈniɾ/","to come","v.","🏃"],
+    ["tomar","/toˈmaɾ/","to take","v.","✋"],
+    ["hablar","/aˈblaɾ/","to speak","v.","🗣️"],
+    ["comer","/koˈmeɾ/","to eat","v.","🍽️"],
+    ["beber","/beˈbeɾ/","to drink","v.","🥤"],
+    ["dormir","/doɾˈmiɾ/","to sleep","v.","😴"],
+    ["gustar","/gusˈtaɾ/","to like / love","v.","❤️"],
+    ["grande","/ˈgɾan.de/","big / tall","adj.","📏"],
+    ["pequeño","/peˈke.ɲo/","small","adj.","🐭"],
+    ["bonito","/boˈni.to/","beautiful","adj.","🌟"],
+    ["precioso","/pɾeˈθjo.so/","pretty / lovely","adj.","🌸"],
+    ["bueno","/ˈbwe.no/","good","adj.","👍"],
+    ["malo","/ˈma.lo/","bad","adj.","👎"],
+    ["feliz","/feˈliθ/","happy","adj.","😊"],
+    ["triste","/ˈtɾis.te/","sad","adj.","😢"],
+    ["fácil","/ˈfa.θil/","easy","adj.","😌"],
+    ["difícil","/diˈfi.θil/","difficult","adj.","😖"],
+    ["nuevo","/ˈnwe.bo/","new","adj.","✨"],
+    ["viejo","/ˈbje.xo/","old","adj.","🕰️"],
+    ["hoy","/oj/","today","adv.","📅"],
+    ["mañana","/maˈɲa.na/","tomorrow","adv.","🌅"],
+    ["ayer","/aˈʝeɾ/","yesterday","adv.","🌇"],
+    ["ahora","/aˈo.ɾa/","now","adv.","⏱️"],
+    ["la mañana","/la maˈɲa.na/","the morning","n.f.","🌄"],
+    ["la tarde","/la ˈtaɾ.de/","the evening","n.f.","🌆"],
+    ["la semana","/la seˈma.na/","the week","n.f.","🗓️"],
+    ["el mes","/el mes/","the month","n.m.","📆"],
+    ["el año","/el ˈa.ɲo/","the year","n.m.","🎊"],
+    ["el sol","/el sol/","the sun","n.m.","☀️"],
+    ["el queso","/el ˈke.so/","the cheese","n.m.","🧀"],
+    ["el vino","/el ˈbi.no/","the wine","n.m.","🍷"],
+    ["la carne","/la ˈkaɾ.ne/","the meat","n.f.","🥩"],
+    ["la verdura","/la beɾˈdu.ɾa/","the vegetable","n.f.","🥦"],
+    ["la fruta","/la ˈfɾu.ta/","the fruit","n.f.","🍎"],
+    ["el pescado","/el pesˈka.do/","the fish","n.m.","🐟"],
+    ["el azúcar","/el aˈθu.kaɾ/","the sugar","n.m.","🍬"],
+    ["la sal","/la sal/","the salt","n.f.","🧂"],
+    ["el pastel","/el pasˈtel/","the cake","n.m.","🎂"],
+    ["la sopa","/la ˈso.pa/","the soup","n.f.","🍲"],
+    ["el dinero","/el diˈne.ɾo/","the money","n.m.","💰"],
+    ["el amor","/el aˈmoɾ/","the love","n.m.","❤️"],
+    ["la música","/la ˈmu.si.ka/","the music","n.f.","🎵"],
+    ["la montaña","/la monˈta.ɲa/","the mountain","n.f.","⛰️"],
+    ["el mar","/el maɾ/","the sea","n.m.","🌊"]
+  ];
+
+  var WORD_MAP = {};
+  WORDS.forEach(function (w) { WORD_MAP[w[0]] = w; });
+
+  var PER_DAY = 5;
+  var CYCLE_LEN = Math.ceil(WORDS.length / PER_DAY);
+
+  // Each day's 5 words are always the same fixed group (grouped by theme in
+  // the list above), so the two practice sentences below can be hand-written
+  // to actually use those words together, instead of generated on the fly.
+  var PHRASE_GROUPS = [
+    [["¡Hola! Un café, por favor.","Hello! A coffee, please."],["Sí, gracias, adiós!","Yes, thank you, goodbye!"]],
+    [["¡Chao! Bienvenido a nuestra casa.","Bye! Welcome to our house."],["Perdón, no, gracias, hasta luego!","Excuse me, no thank you, see you later!"]],
+    [["El gato y el perro juegan en la casa.","The cat and the dog play in the house."],["Bebo agua y como pan.","I drink water and eat bread."]],
+    [["El tiempo pasa rápido cuando estamos con la familia.","Time passes quickly when we're with family."],["Mi amigo disfruta de su trabajo y de su vida en Madrid.","My friend enjoys his job and his life in Madrid."]],
+    [["De día, los niños van a la escuela en coche.","During the day, the kids go to school by car."],["De noche, esta ciudad está muy tranquila.","At night, this city is very quiet."]],
+    [["El libro está sobre la mesa, cerca de la ventana.","The book is on the table, near the window."],["Cierra la puerta y toma un café.","Close the door and have a coffee."]],
+    [["Uno, dos, tres, cuatro, cinco — ¡estoy aprendiendo a contar!","One, two, three, four, five — I'm learning to count!"],["Hay cuatro sillas y una mesa para cinco personas.","There are four chairs and one table for five people."]],
+    [["Seis, siete, ocho, nueve, diez — ¡y seguimos contando!","Six, seven, eight, nine, ten — and we keep counting!"],["La tienda abre a las ocho y cierra a las diez.","The shop opens at eight and closes at ten."]],
+    [["El cielo es azul, la hierba es verde y el sol es amarillo.","The sky is blue, the grass is green and the sun is yellow."],["Ella lleva un vestido rojo y zapatos negros.","She's wearing a red dress and black shoes."]],
+    [["El cielo está gris, pero tengo una naranja para el desayuno.","The sky is grey, but I have an orange for breakfast."],["Mi gato es blanco y es muy cariñoso.","My cat is white and it's very affectionate."]],
+    [["Voy a hacer la compra esta tarde.","I'm going to do the shopping this afternoon."],["No sé si puedo ir a verte.","I don't know if I can go see you."]],
+    [["¿Quieres venir a comer con nosotros?","Do you want to come eat with us?"],["A ella le gusta hablar y tomar un café con sus amigos.","She likes talking and having a coffee with her friends."]],
+    [["Me gusta beber un café por la mañana.","I like drinking a coffee in the morning."],["El perro grande duerme al lado del gato pequeño.","The big dog sleeps next to the small cat."]],
+    [["¡Qué tiempo tan bonito! Estoy muy feliz.","What lovely weather! I'm very happy."],["Este pastel precioso tiene un sabor bueno, ¡nada malo!","This lovely cake tastes good, not bad at all!"]],
+    [["No es fácil decir adiós a un viejo amigo.","It's not easy to say goodbye to an old friend."],["Ella está un poco triste, pero su nuevo trabajo no es difícil.","She's a bit sad, but her new job isn't difficult."]],
+    [["Ayer llovió; hoy hace buen tiempo.","Yesterday it rained; today the weather's nice."],["Tengo que irme ahora, pero vuelvo mañana por la mañana.","I have to leave now, but I'll be back tomorrow morning."]],
+    [["El sol brilla todas las tardes esta semana.","The sun shines every evening this week."],["Este mes pasa rápido; el año también.","This month is going by fast; so is the year."]],
+    [["Comemos queso, carne y verduras.","We're eating cheese, meat and vegetables."],["El vino tinto combina bien con una fruta dulce.","Red wine pairs well with a sweet fruit."]],
+    [["El pescado necesita un poco de sal.","The fish needs a bit of salt."],["Este pastel tiene demasiado azúcar, pero la sopa está perfecta.","This cake has too much sugar, but the soup is perfect."]],
+    [["El dinero no da la felicidad, pero el amor y la música, sí.","Money doesn't buy happiness, but love and music do."],["¿Vamos a la montaña o al mar este verano?","Are we going to the mountains or the sea this summer?"]]
+  ];
+
+  function dayIndexFor(date) {
+    // days since epoch, using local calendar date so it flips at local midnight
+    var utcMidnight = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    return Math.floor(utcMidnight / 86400000);
+  }
+
+  function groupIndexFor(date) {
+    return dayIndexFor(date) % CYCLE_LEN;
+  }
+
+  function todaysWords(date) {
+    var g = groupIndexFor(date);
+    return WORDS.slice(g * PER_DAY, g * PER_DAY + PER_DAY);
+  }
+
+  // ── speech — lets you pick which installed Spanish voice to use, since
+  // quality varies a lot between the system voices browsers ship with ──
+  var VOICE_KEY = 'palabrasDelDia:voice';
+  var matchingVoices = [];
+  var esVoice = null;
+  var voicePicker = document.getElementById('voicePicker');
+  var voiceSelect = document.getElementById('voiceSelect');
+
+  function loadVoice() {
+    if (!('speechSynthesis' in window)) return;
+    var voices = speechSynthesis.getVoices();
+    matchingVoices = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf('es') === 0; });
+    var googleVoices = matchingVoices.filter(function (v) { return /google/i.test(v.name); });
+    if (googleVoices.length > 0) matchingVoices = googleVoices;
+    if (matchingVoices.length === 0) { esVoice = null; return; }
+
+    var savedName = null;
+    try { savedName = localStorage.getItem(VOICE_KEY); } catch (e) {}
+    esVoice = matchingVoices.find(function (v) { return v.name === savedName; }) || matchingVoices[0];
+
+    if (voiceSelect && voiceSelect.options.length !== matchingVoices.length) {
+      voiceSelect.innerHTML = '';
+      matchingVoices.forEach(function (v) {
+        var opt = document.createElement('option');
+        opt.value = v.name;
+        opt.textContent = v.name + ' (' + v.lang + ')';
+        voiceSelect.appendChild(opt);
+      });
+    }
+    if (voiceSelect) voiceSelect.value = esVoice.name;
+    if (voicePicker && matchingVoices.length > 1) voicePicker.style.display = 'flex';
+  }
+  if (voiceSelect) {
+    voiceSelect.addEventListener('change', function () {
+      esVoice = matchingVoices.find(function (v) { return v.name === voiceSelect.value; }) || esVoice;
+      try { localStorage.setItem(VOICE_KEY, voiceSelect.value); } catch (e) {}
+    });
+  }
+  if ('speechSynthesis' in window) {
+    loadVoice();
+    speechSynthesis.onvoiceschanged = loadVoice;
+  }
+
+  function speak(text, btn) {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'es-ES';
+    u.rate = 0.85;
+    if (esVoice) u.voice = esVoice;
+    if (btn) {
+      btn.classList.add('playing');
+      u.onend = function () { btn.classList.remove('playing'); };
+      u.onerror = function () { btn.classList.remove('playing'); };
+    }
+    speechSynthesis.speak(u);
+  }
+
+  // ── learned dots (per-day, stored locally) ──
+  var todayKey = 'palabrasDelDia:' + new Date().toISOString().slice(0, 10);
+  function getLearned() {
+    try { return JSON.parse(localStorage.getItem(todayKey) || '[]'); } catch (e) { return []; }
+  }
+  function toggleLearned(word) {
+    var list = getLearned();
+    var idx = list.indexOf(word);
+    if (idx === -1) list.push(word); else list.splice(idx, 1);
+    try { localStorage.setItem(todayKey, JSON.stringify(list)); } catch (e) {}
+    return list;
+  }
+
+  // ── spaced repetition review pool (persists since day one) ──
+  var SRS_KEY = 'palabrasDelDia:srs';
+
+  function todayISO() { return new Date().toISOString().slice(0, 10); }
+
+  function addDays(dateStr, n) {
+    var d = new Date(dateStr + 'T00:00:00');
+    d.setDate(d.getDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function loadSRS() {
+    try { return JSON.parse(localStorage.getItem(SRS_KEY) || '{}'); } catch (e) { return {}; }
+  }
+
+  function saveSRS(srs) {
+    try { localStorage.setItem(SRS_KEY, JSON.stringify(srs)); } catch (e) { /* storage unavailable */ }
+  }
+
+  // Adds a word to the permanent review pool the first time it's marked —
+  // it's due for its first review immediately, so it shows up right away.
+  // Re-marking an already-tracked word never resets its existing progress.
+  function addToReview(fr) {
+    var srs = loadSRS();
+    if (!srs[fr]) {
+      srs[fr] = { interval: 0, repetitions: 0, ease: 2.5, due: todayISO(), added: todayISO() };
+      saveSRS(srs);
+    }
+  }
+
+  function getDueEntries(srs) {
+    srs = srs || loadSRS();
+    var today = todayISO();
+    var list = [];
+    Object.keys(srs).forEach(function (fr) {
+      if (srs[fr].due <= today && WORD_MAP[fr]) {
+        list.push({ fr: fr, word: WORD_MAP[fr], due: srs[fr].due });
+      }
+    });
+    list.sort(function (a, b) { return a.due < b.due ? -1 : (a.due > b.due ? 1 : 0); });
+    return list;
+  }
+
+  // A simplified SM-2 (the same scheduling idea behind apps like Anki):
+  // quality < 3 ("Still learning") resets the interval back to 1 day;
+  // quality >= 3 ("Got it") grows it — 1 day, then 6, then interval*ease,
+  // with the ease factor itself nudged up or down based on how it went.
+  function gradeReview(fr, quality) {
+    var srs = loadSRS();
+    var entry = srs[fr];
+    if (!entry) return;
+
+    if (quality < 3) {
+      entry.repetitions = 0;
+      entry.interval = 1;
+    } else {
+      if (entry.repetitions === 0) entry.interval = 1;
+      else if (entry.repetitions === 1) entry.interval = 6;
+      else entry.interval = Math.round(entry.interval * entry.ease);
+      entry.repetitions += 1;
+      entry.ease = Math.max(1.3, entry.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+    }
+    entry.due = addDays(todayISO(), entry.interval);
+    entry.lastReview = todayISO();
+    srs[fr] = entry;
+    saveSRS(srs);
+    renderReview();
+  }
+
+  function renderReview() {
+    var container = document.getElementById('reviewSection');
+    if (!container) return;
+    container.innerHTML = '';
+
+    var label = document.createElement('p');
+    label.className = 'review-label';
+    label.textContent = 'Review';
+    container.appendChild(label);
+
+    var srs = loadSRS();
+    var total = Object.keys(srs).length;
+    var due = getDueEntries(srs);
+
+    var stats = document.createElement('p');
+    stats.className = 'review-stats';
+    stats.textContent = total === 0
+      ? 'Words you mark with the dot above join your review pool and start coming back here for spaced review.'
+      : due.length + ' due today · ' + total + ' word' + (total === 1 ? '' : 's') + ' in your review pool';
+    container.appendChild(stats);
+
+    if (total === 0) return;
+
+    if (due.length === 0) {
+      var empty = document.createElement('p');
+      empty.className = 'review-empty';
+      empty.textContent = 'All caught up — nothing due today.';
+      container.appendChild(empty);
+      return;
+    }
+
+    due.forEach(function (item) {
+      var fr = item.fr, w = item.word;
+      var ipa = w[1], en = w[2];
+
+      var card = document.createElement('div');
+      card.className = 'review-card';
+
+      var body = document.createElement('div');
+      body.className = 'review-body';
+      var frEl = document.createElement('p');
+      frEl.className = 'review-fr';
+      frEl.textContent = en;
+      var answerEl = document.createElement('p');
+      answerEl.className = 'review-answer';
+      answerEl.innerHTML = '<span class="review-fr-answer">' + fr + '</span> <span class="review-ipa">' + ipa + '</span>';
+      body.appendChild(frEl);
+      body.appendChild(answerEl);
+
+      var actions = document.createElement('div');
+      actions.className = 'review-actions';
+
+      var revealBtn = document.createElement('button');
+      revealBtn.className = 'review-btn';
+      revealBtn.textContent = 'Show answer';
+      revealBtn.addEventListener('click', function () {
+        answerEl.classList.add('shown');
+        actions.innerHTML = '';
+
+        var pbtn = document.createElement('button');
+        pbtn.className = 'review-play';
+        pbtn.setAttribute('aria-label', 'Play pronunciation of ' + fr);
+        pbtn.innerHTML = '🔊';
+        pbtn.addEventListener('click', function () { speak(fr, pbtn); });
+
+        var againBtn = document.createElement('button');
+        againBtn.className = 'review-btn again';
+        againBtn.textContent = 'Still learning';
+        againBtn.addEventListener('click', function () { gradeReview(fr, 2); });
+
+        var goodBtn = document.createElement('button');
+        goodBtn.className = 'review-btn good';
+        goodBtn.textContent = 'Got it';
+        goodBtn.addEventListener('click', function () { gradeReview(fr, 4); });
+
+        actions.appendChild(pbtn);
+        actions.appendChild(againBtn);
+        actions.appendChild(goodBtn);
+      });
+      actions.appendChild(revealBtn);
+
+      card.appendChild(body);
+      card.appendChild(actions);
+      container.appendChild(card);
+    });
+  }
+
+  function updateStreak() {
+    try {
+      var todayStr = new Date().toISOString().slice(0, 10);
+      var last = localStorage.getItem('palabrasDelDia:lastPracticed');
+      var streak = parseInt(localStorage.getItem('palabrasDelDia:streak') || '0', 10);
+      var learnedToday = getLearned().length > 0;
+      if (learnedToday && last !== todayStr) {
+        var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        streak = (last === yesterday) ? streak + 1 : 1;
+        localStorage.setItem('palabrasDelDia:streak', String(streak));
+        localStorage.setItem('palabrasDelDia:lastPracticed', todayStr);
+      }
+      var el = document.getElementById('streakLine');
+      if (streak > 0) {
+        el.textContent = '🔥 ' + streak + '-day streak';
+        el.classList.add('visible');
+      }
+    } catch (e) { /* localStorage unavailable — skip streak */ }
+  }
+
+  function render() {
+    var now = new Date();
+    document.getElementById('dateLine').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    var words = todaysWords(now);
+    var learned = getLearned();
+    var container = document.getElementById('words');
+    container.innerHTML = '';
+
+    if (!('speechSynthesis' in window)) {
+      var notice = document.createElement('p');
+      notice.className = 'no-speech';
+      notice.textContent = "Your browser doesn't support spoken pronunciation — try Chrome or Safari for audio.";
+      container.appendChild(notice);
+    }
+
+    words.forEach(function (w) {
+      var fr = w[0], ipa = w[1], en = w[2], pos = w[3], icon = w[4];
+      var card = document.createElement('div');
+      card.className = 'word-card';
+
+      var btn = document.createElement('button');
+      btn.className = 'play-btn';
+      btn.setAttribute('aria-label', 'Play pronunciation of ' + fr);
+      btn.innerHTML = '🔊';
+      btn.addEventListener('click', function () { speak(fr, btn); });
+
+      var body = document.createElement('div');
+      body.className = 'word-body';
+      body.innerHTML =
+        '<div class="word-top"><span class="word-fr">' + fr + '</span><span class="word-icon" aria-hidden="true">' + (icon || '') + '</span><span class="word-pos">' + pos + '</span></div>' +
+        '<div class="word-ipa">' + ipa + '</div>' +
+        '<div class="word-en">' + en + '</div>';
+
+      var dot = document.createElement('span');
+      dot.className = 'learned-dot' + (learned.indexOf(fr) !== -1 ? ' on' : '');
+      dot.title = 'Mark as practiced today';
+      dot.addEventListener('click', function () {
+        var list = toggleLearned(fr);
+        var isOn = list.indexOf(fr) !== -1;
+        dot.classList.toggle('on', isOn);
+        if (isOn) {
+          addToReview(fr);
+          renderReview();
+        }
+        updateStreak();
+      });
+
+      card.appendChild(btn);
+      card.appendChild(body);
+      card.appendChild(dot);
+      container.appendChild(card);
+    });
+
+    var phrasesContainer = document.getElementById('phrases');
+    phrasesContainer.innerHTML = '';
+    var label = document.createElement('p');
+    label.className = 'phrases-label';
+    label.textContent = 'Try them in a sentence';
+    phrasesContainer.appendChild(label);
+
+    var sentences = PHRASE_GROUPS[groupIndexFor(now)] || [];
+    sentences.forEach(function (pair) {
+      var exampleFr = pair[0], exampleEn = pair[1];
+
+      var item = document.createElement('div');
+      item.className = 'phrase-item';
+
+      var pbtn = document.createElement('button');
+      pbtn.className = 'phrase-play';
+      pbtn.setAttribute('aria-label', 'Play pronunciation of: ' + exampleFr);
+      pbtn.innerHTML = '🔊';
+      pbtn.addEventListener('click', function () { speak(exampleFr, pbtn); });
+
+      var text = document.createElement('div');
+      text.innerHTML =
+        '<p class="phrase-fr">' + exampleFr + '</p>' +
+        '<p class="phrase-en">' + exampleEn + '</p>';
+
+      item.appendChild(pbtn);
+      item.appendChild(text);
+      phrasesContainer.appendChild(item);
+    });
+
+    renderReview();
+    updateStreak();
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
