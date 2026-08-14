@@ -156,7 +156,7 @@
     </summary>
     <div class="settings-body">
       <p>The five words are picked automatically from a list of 100 common European Portuguese words, grouped into 20 fixed sets of 5, based on today's date — no server, no schedule, it just recalculates whenever the page loads. The same 20 sets repeat in order every 20 days.</p>
-      <p>Pronunciation uses your browser's built-in Portuguese voice (Web Speech API), so quality depends on your browser and OS — it prefers a European Portuguese voice when one is available, and falls back to any Portuguese voice otherwise.</p>
+      <p>Pronunciation uses your browser's built-in Portuguese voice (Web Speech API), so quality depends on your browser and OS. The words themselves are European Portuguese; the voice your browser picks may lean European or Brazilian depending on what's installed.</p>
       <p>Tap the small dot next to a word to mark it as practiced today — that's saved locally in your browser, not shared anywhere.</p>
       <p>Below the words, two short sentences combine most of that day's words together, using common everyday phrasing, so you can hear them used in context rather than in isolation.</p>
       <p>The Review section uses spaced repetition: every word you've ever marked with the dot goes into your personal review pool. New words come back the next day; after that, saying "Got it" pushes the next review further out (1 day, then 6, then longer each time), while "Still learning" brings it back tomorrow. Everything is stored locally in your browser, going all the way back to the first word you marked.</p>
@@ -318,14 +318,12 @@
     return WORDS.slice(g * PER_DAY, g * PER_DAY + PER_DAY);
   }
 
-  // ── speech — prefers a European Portuguese voice, falls back to any Portuguese voice ──
+  // ── speech ──
   var ptVoice = null;
   function loadVoice() {
     if (!('speechSynthesis' in window)) return;
     var voices = speechSynthesis.getVoices();
-    ptVoice = voices.find(function (v) { return v.lang && v.lang.toLowerCase() === 'pt-pt'; })
-      || voices.find(function (v) { return v.lang && v.lang.toLowerCase().indexOf('pt') === 0; })
-      || null;
+    ptVoice = voices.find(function (v) { return v.lang && v.lang.toLowerCase().indexOf('pt') === 0; }) || null;
   }
   if ('speechSynthesis' in window) {
     loadVoice();
