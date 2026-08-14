@@ -26,6 +26,9 @@
     .streak { margin-top:1.2rem; display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); opacity:0; transition:opacity .3s; }
     .streak.visible { opacity:1; }
 
+    .voice-picker { margin-top:.9rem; display:none; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+    .voice-picker select { font-family:'Cormorant Garamond',serif; font-size:.85rem; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:.3rem .5rem; max-width:230px; }
+
     .words { padding:2.2rem 0; display:flex; flex-direction:column; }
     .word-card {
       display:flex; align-items:center; gap:1.1rem;
@@ -141,6 +144,10 @@
     <p class="intro">A fresh set of five common French words, chosen automatically for today, each with a small picture cue. Tap the circle to hear each one pronounced — come back tomorrow for five new ones.</p>
     <p class="date-line" id="dateLine"></p>
     <p class="streak" id="streakLine"></p>
+    <div class="voice-picker" id="voicePicker">
+      <label for="voiceSelect">Voice</label>
+      <select id="voiceSelect"></select>
+    </div>
   </header>
 
   <div class="words" id="words"></div>
@@ -156,7 +163,7 @@
     </summary>
     <div class="settings-body">
       <p>The five words are picked automatically from a list of 100 common French words, grouped into 20 fixed sets of 5, based on today's date — no server, no schedule, it just recalculates whenever the page loads. The same 20 sets repeat in order every 20 days.</p>
-      <p>Pronunciation uses your browser's built-in French voice (Web Speech API), so quality depends on your browser and OS. Chrome and Safari on Mac/iOS generally have good French voices built in.</p>
+      <p>Pronunciation uses your browser's built-in French voice (Web Speech API), so quality depends on your browser and OS. If more than one French voice is installed, a picker appears above the words so you can choose whichever sounds best — your choice is remembered. On a Mac, System Settings → Accessibility → Spoken Content → Voices lets you download higher-quality "Premium" voices, which usually sound noticeably more natural than the default one.</p>
       <p>Tap the small dot next to a word to mark it as practiced today — that's saved locally in your browser, not shared anywhere.</p>
       <p>Below the words, two short sentences combine most of that day's words together, using common everyday phrasing, so you can hear them used in context rather than in isolation.</p>
       <p>The Review section uses spaced repetition: every word you've ever marked with the dot goes into your personal review pool. New words come back the next day; after that, saying "Got it" pushes the next review further out (1 day, then 6, then longer each time), while "Still learning" brings it back tomorrow. Everything is stored locally in your browser, going all the way back to the first word you marked.</p>
@@ -318,12 +325,43 @@
     return WORDS.slice(g * PER_DAY, g * PER_DAY + PER_DAY);
   }
 
-  // ── speech ──
+  // ── speech — lets you pick which installed French voice to use, since
+  // quality varies a lot between the system voices browsers ship with ──
+  var VOICE_KEY = 'motsDuJour:voice';
+  var matchingVoices = [];
   var frVoice = null;
+  var voicePicker = document.getElementById('voicePicker');
+  var voiceSelect = document.getElementById('voiceSelect');
+
   function loadVoice() {
     if (!('speechSynthesis' in window)) return;
     var voices = speechSynthesis.getVoices();
-    frVoice = voices.find(function (v) { return v.lang && v.lang.toLowerCase().indexOf('fr') === 0; }) || null;
+    matchingVoices = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf('fr') === 0; });
+    var googleVoices = matchingVoices.filter(function (v) { return /google/i.test(v.name); });
+    if (googleVoices.length > 0) matchingVoices = googleVoices;
+    if (matchingVoices.length === 0) { frVoice = null; return; }
+
+    var savedName = null;
+    try { savedName = localStorage.getItem(VOICE_KEY); } catch (e) {}
+    frVoice = matchingVoices.find(function (v) { return v.name === savedName; }) || matchingVoices[0];
+
+    if (voiceSelect && voiceSelect.options.length !== matchingVoices.length) {
+      voiceSelect.innerHTML = '';
+      matchingVoices.forEach(function (v) {
+        var opt = document.createElement('option');
+        opt.value = v.name;
+        opt.textContent = v.name + ' (' + v.lang + ')';
+        voiceSelect.appendChild(opt);
+      });
+    }
+    if (voiceSelect) voiceSelect.value = frVoice.name;
+    if (voicePicker && matchingVoices.length > 1) voicePicker.style.display = 'flex';
+  }
+  if (voiceSelect) {
+    voiceSelect.addEventListener('change', function () {
+      frVoice = matchingVoices.find(function (v) { return v.name === voiceSelect.value; }) || frVoice;
+      try { localStorage.setItem(VOICE_KEY, voiceSelect.value); } catch (e) {}
+    });
   }
   if ('speechSynthesis' in window) {
     loadVoice();
