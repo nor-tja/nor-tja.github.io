@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Katja Norstad — Snake</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjVmMmVkIi8+CiAgPHRleHQgeD0iMTYiIHk9IjIzIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjQwMCIgCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2M0NTAxYSIgbGV0dGVyLXNwYWNpbmc9IjEiPktOPC90ZXh0Pgo8L3N2Zz4=" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#c4501a; --line:#d8d3cc; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 520px; margin: 0 auto; padding: 0 2rem 3rem; }
+    .back {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted); text-decoration: none;
+      padding: 1.8rem 0 0; transition: color .2s;
+    }
+    .back:hover { color: var(--accent); }
+
+    header {
+      padding: 2rem 0 2.4rem;
+      opacity: 0; animation: rise .8s ease forwards .1s;
+    }
+    .eyebrow {
+      font-family: 'DM Mono', monospace; font-size: .7rem; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
+    }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 300; line-height: 1.15; }
+    h1 em { font-style: italic; color: var(--accent); }
+
+    .board-section {
+      opacity: 0; animation: rise .9s ease forwards .3s;
+    }
+    .board-frame {
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 14px;
+      background: #faf8f4;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      background: var(--bg);
+      image-rendering: pixelated;
+      border-radius: 2px;
+    }
+    .hud {
+      display: flex; justify-content: space-between;
+      font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted); margin-top: 12px;
+    }
+    .hud span.accent { color: var(--accent); }
+
+    .msg {
+      text-align: center;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--muted);
+      margin-top: 1.4rem;
+      min-height: 1.4rem;
+    }
+
+    .pad {
+      margin-top: 1.8rem;
+      display: grid;
+      grid-template-columns: repeat(3, 52px);
+      grid-template-rows: repeat(2, 44px);
+      gap: 8px;
+      justify-content: center;
+    }
+    .pad button {
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+    }
+    .pad button:hover { color: var(--accent); border-color: var(--accent); }
+    .pad button:active { transform: translateY(1px); }
+    #up { grid-column: 2; grid-row: 1; }
+    #left { grid-column: 1; grid-row: 2; }
+    #down { grid-column: 2; grid-row: 2; }
+    #right { grid-column: 3; grid-row: 2; }
+
+    .hint {
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-top: 1.4rem;
+      opacity: .8;
+    }
+
+    footer { padding: 3rem 0 0; text-align: center; }
+    footer p {
+      font-family: 'DM Mono', monospace; font-size: .62rem;
+      letter-spacing: .1em; color: var(--muted);
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="back">← Back</a>
+
+  <header>
+    <p class="eyebrow">A small diversion</p>
+    <h1>Snake, for <em>old time's sake</em></h1>
+  </header>
+
+  <section class="board-section">
+    <div class="board-frame">
+      <canvas id="game" width="220" height="220"></canvas>
+      <div class="hud">
+        <span>Score: <span id="score" class="accent">0</span></span>
+        <span>Best: <span id="best" class="accent">0</span></span>
+      </div>
+    </div>
+    <p class="msg" id="msg">Press an arrow key or tap a button to start</p>
+    <div class="pad">
+      <button id="up" aria-label="Up">↑</button>
+      <button id="left" aria-label="Left">←</button>
+      <button id="down" aria-label="Down">↓</button>
+      <button id="right" aria-label="Right">→</button>
+    </div>
+    <p class="hint">Arrow keys / WASD to play · Space to pause</p>
+  </section>
+
+  <footer><p>© 2026 Katja Norstad</p></footer>
+</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const cell = 10;
+  const cols = canvas.width / cell;
+  const rows = canvas.height / cell;
+
+  const ink = '#1a1814';
+  const accent = '#c4501a';
+  const bg = '#f5f2ed';
+
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best');
+  const msgEl = document.getElementById('msg');
+
+  let best = Number(localStorage.getItem('kn-snake-best') || 0);
+  bestEl.textContent = best;
+
+  let snake, dir, nextDir, food, score, running, paused, speed, timer;
+
+  function reset() {
+    snake = [
+      { x: 6, y: 11 },
+      { x: 5, y: 11 },
+      { x: 4, y: 11 }
+    ];
+    dir = { x: 1, y: 0 };
+    nextDir = dir;
+    score = 0;
+    speed = 140;
+    running = false;
+    paused = false;
+    placeFood();
+    scoreEl.textContent = '0';
+    msgEl.textContent = 'Press an arrow key or tap a button to start';
+    draw();
+  }
+
+  function placeFood() {
+    while (true) {
+      const f = { x: Math.floor(Math.random() * cols), y: Math.floor(Math.random() * rows) };
+      if (!snake.some(s => s.x === f.x && s.y === f.y)) {
+        food = f;
+        return;
+      }
+    }
+  }
+
+  function start() {
+    if (running) return;
+    running = true;
+    paused = false;
+    msgEl.textContent = '';
+    loop();
+  }
+
+  function loop() {
+    clearTimeout(timer);
+    if (!running || paused) return;
+    step();
+    draw();
+    timer = setTimeout(loop, speed);
+  }
+
+  function step() {
+    dir = nextDir;
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+    if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || snake.some(s => s.x === head.x && s.y === head.y)) {
+      return gameOver();
+    }
+
+    snake.unshift(head);
+
+    if (head.x === food.x && head.y === food.y) {
+      score += 10;
+      scoreEl.textContent = score;
+      if (speed > 70) speed -= 3;
+      placeFood();
+    } else {
+      snake.pop();
+    }
+  }
+
+  function gameOver() {
+    running = false;
+    clearTimeout(timer);
+    if (score > best) {
+      best = score;
+      localStorage.setItem('kn-snake-best', best);
+      bestEl.textContent = best;
+      msgEl.textContent = 'New best — press a key to retry';
+    } else {
+      msgEl.textContent = 'Game over — press a key to retry';
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = ink;
+    snake.forEach(s => {
+      ctx.fillRect(s.x * cell + 1, s.y * cell + 1, cell - 2, cell - 2);
+    });
+
+    ctx.fillStyle = accent;
+    ctx.fillRect(food.x * cell + 2, food.y * cell + 2, cell - 4, cell - 4);
+  }
+
+  function setDir(nx, ny) {
+    if (dir.x === -nx && dir.y === -ny) return;
+    nextDir = { x: nx, y: ny };
+    if (!running) {
+      if (score > 0 || snake.length !== 3) reset();
+      start();
+    } else if (paused) {
+      paused = false;
+      loop();
+    }
+  }
+
+  window.addEventListener('keydown', e => {
+    switch (e.key) {
+      case 'ArrowUp': case 'w': case 'W': setDir(0, -1); e.preventDefault(); break;
+      case 'ArrowDown': case 's': case 'S': setDir(0, 1); e.preventDefault(); break;
+      case 'ArrowLeft': case 'a': case 'A': setDir(-1, 0); e.preventDefault(); break;
+      case 'ArrowRight': case 'd': case 'D': setDir(1, 0); e.preventDefault(); break;
+      case ' ':
+        if (running) {
+          paused = !paused;
+          msgEl.textContent = paused ? 'Paused' : '';
+          if (!paused) loop();
+        }
+        e.preventDefault();
+        break;
+    }
+  });
+
+  document.getElementById('up').addEventListener('click', () => setDir(0, -1));
+  document.getElementById('down').addEventListener('click', () => setDir(0, 1));
+  document.getElementById('left').addEventListener('click', () => setDir(-1, 0));
+  document.getElementById('right').addEventListener('click', () => setDir(1, 0));
+
+  reset();
+})();
+</script>
+</body>
+</html>
