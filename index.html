@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Katja Norstad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f2ed;
+      --ink: #1a1814;
+      --muted: #7a7570;
+      --accent: #c4501a;
+      --line: #d8d3cc;
+    }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── coffee cup ── */
+    .coffee-scene {
+      position: fixed;
+      bottom: clamp(24px, 5vw, 56px);
+      right: clamp(18px, 4vw, 44px);
+      width: clamp(150px, 18vw, 260px);
+      height: clamp(150px, 18vw, 260px);
+      opacity: 0;
+      animation: fadeStain 2s ease forwards 1.2s;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .coffee-scene:hover .cup-link-text {
+      opacity: 1;
+    }
+    .coffee-mug-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: brightness(1.05) contrast(0.95) saturate(0.85);
+      mix-blend-mode: darken;
+      opacity: 0.9;
+    }
+    .cup-link-text {
+      position: absolute;
+      top: 43%;
+      left: 41%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      font-weight: 400;
+    }
+    @keyframes fadeStain {
+      to { opacity: 1; }
+    }
+
+    .center {
+      max-width: 520px;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .greeting {
+      font-size: clamp(1.5rem, 5vw, 2.1rem);
+      line-height: 1.55;
+      margin-bottom: 2.4rem;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.15s;
+    }
+    .greeting em { font-style: italic; color: var(--accent); }
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.4s;
+    }
+    .links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      transition: color 0.2s;
+    }
+    .links a::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--line);
+      transition: width 0.25s, background 0.2s;
+      flex-shrink: 0;
+    }
+    .links a:hover { color: var(--accent); }
+    .links a:hover::before { width: 40px; background: var(--accent); }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .coffee-scene {
+        width: clamp(110px, 30vw, 150px);
+        height: clamp(110px, 30vw, 150px);
+        bottom: 18px;
+        right: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Coffee cup scene -->
+  <a href="coffee.html" class="coffee-scene">
+    <img src="coffee_mug.png" alt="Coffee mug" class="coffee-mug-img">
+    <span class="cup-link-text">Coffee notes</span>
+  </a>
+
+  <div class="center">
+    <p class="greeting">
+      Hello, I am <em>Katja</em>. I am a data scientist who enjoys building
+      and organising things. Here are links to my CV, resources I appreciate, a coffee guide,
+      a pomodoro timer and a daily language practice page.
+    </p>
+    <nav class="links">
+      <a href="cv.html">CV</a>
+      <a href="resources.html">Resources</a>
+      <a href="pomodoro.html">Pomodoro Timer</a>
+      <a href="languages.html">Practise a language</a>
+      <a href="snake.html">Snake</a>
+    </nav>
+  </div>
+</body>
+</html>
