@@ -127,6 +127,36 @@
     .ambience-btn:hover { border-color:var(--accent); color:var(--accent); }
     .ambience-btn.playing { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
 
+    /* ── POST-IT ── */
+    .postit-wrap { display:flex; justify-content:center; margin-top:2.4rem; }
+    .postit {
+      position:relative;
+      width:210px;
+      min-height:190px;
+      padding:1.5rem 1.1rem 1.1rem;
+      background:#e5d6a3;
+      background-image: linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+      background-size: 100% 1.7em;
+      box-shadow: 3px 8px 18px rgba(26,24,20,0.2), 0 1px 0 rgba(255,255,255,0.4) inset;
+      transform: rotate(-2.5deg);
+      transition: transform .2s ease;
+    }
+    .postit:focus-within { transform: rotate(0deg); }
+    .postit::before {
+      content:'';
+      position:absolute; top:-11px; left:50%; transform:translateX(-50%) rotate(-2deg);
+      width:64px; height:24px;
+      background:rgba(255,255,255,0.5);
+      border:1px solid rgba(255,255,255,0.65);
+      box-shadow: 0 1px 3px rgba(26,24,20,0.15);
+    }
+    .postit textarea {
+      width:100%; height:155px; border:none; background:transparent; resize:none;
+      font-family:'Cormorant Garamond', serif; font-size:1.08rem; line-height:1.7;
+      color:#5c5133; outline:none;
+    }
+    .postit textarea::placeholder { color:#9c9270; font-style:italic; }
+
     /* ── SETTINGS ── */
     .settings { margin-top:2.6rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .4s; }
     .settings-trigger {
@@ -264,6 +294,12 @@
       <audio id="cafeAudio" loop preload="none" src="ambience-coffee.mp3"></audio>
       <audio id="forestAudio" loop preload="none" src="ambience-forest.mp3"></audio>
       <audio id="wavesAudio" loop preload="none" src="ambience-waves.mp3"></audio>
+    </div>
+
+    <div class="postit-wrap">
+      <div class="postit">
+        <textarea id="postitNote" placeholder="Jot something down…" maxlength="500" aria-label="Sticky note"></textarea>
+      </div>
     </div>
   </div>
 
@@ -749,6 +785,17 @@
         t.btn.textContent = 'Audio failed to load';
         t.btn.disabled = true;
       });
+    });
+  })();
+
+  // ── post-it note — plain text, saved locally as you type ──
+  (function () {
+    var NOTE_KEY = 'pomodoro:note';
+    var noteEl = $('postitNote');
+    if (!noteEl) return;
+    try { noteEl.value = localStorage.getItem(NOTE_KEY) || ''; } catch (e) {}
+    noteEl.addEventListener('input', function () {
+      try { localStorage.setItem(NOTE_KEY, noteEl.value); } catch (e) {}
     });
   })();
 
