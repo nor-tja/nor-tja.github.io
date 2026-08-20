@@ -445,6 +445,41 @@
       blue:  ['#c3dceb', '#7ab2d3', '#557d94'],
       sandAmber: ['#f0b8b3', '#df6960'],
       sandBlue:  ['#cce1eb', '#94c1db']
+    },
+    {
+      name: 'Wisteria & Indigo',
+      amber: ['#ded7e7', '#b5a6c9', '#827891'],
+      blue:  ['#c6ced6', '#1c3d5a', '#142c41'],
+      sandAmber: ['#e3ddeb', '#c3b7d4'],
+      sandBlue:  ['#cfd5dc', '#587085']
+    },
+    {
+      name: 'Celadon & Gold',
+      amber: ['#f4e5c4', '#eacb8a', '#98845a'],
+      blue:  ['#ccded6', '#8db6a5', '#6e9281'],
+      sandAmber: ['#f6e9cd', '#eed49e'],
+      sandBlue:  ['#d4e3dc', '#a3c4b6']
+    },
+    {
+      name: 'Royal Purple & Silver',
+      amber: ['#c3afcd', '#7a4e8f', '#624471'],
+      blue:  ['#d3d3d5', '#bcbcbe', '#6c6c6d'],
+      sandAmber: ['#ccbbd4', '#9470a5'],
+      sandBlue:  ['#dadadb', '#c4c4c6']
+    },
+    {
+      name: 'Madder Red & Evergreen',
+      amber: ['#dca7a7', '#b23b3b', '#7d2929'],
+      blue:  ['#aeb8b1', '#344e3d', '#24372b'],
+      sandAmber: ['#e1b4b4', '#c16161'],
+      sandBlue:  ['#bac3bd', '#5f7366']
+    },
+    {
+      name: 'Grass Yellow & Rikyū Grey',
+      amber: ['#ece2b6', '#dccb7a', '#968a53'],
+      blue:  ['#bdbfb3', '#878a74', '#585a4b'],
+      sandAmber: ['#efe6c1', '#e2d38f'],
+      sandBlue:  ['#c7c9be', '#9a9d8a']
     }
   ];
   const PALETTE_KEY = 'pomodoro:palette';
@@ -482,7 +517,12 @@
     paletteBtn.addEventListener('click', function () {
       let current = 0;
       try { current = parseInt(localStorage.getItem(PALETTE_KEY), 10) || 0; } catch (e) {}
-      applyPalette((current + 1) % PALETTES.length);
+      // pick a genuinely random palette, just never the one already showing
+      let next = current;
+      if (PALETTES.length > 1) {
+        while (next === current) next = Math.floor(Math.random() * PALETTES.length);
+      }
+      applyPalette(next);
     });
   }
 
