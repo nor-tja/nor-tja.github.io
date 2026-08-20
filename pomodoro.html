@@ -15,12 +15,12 @@
       --muted: #7a7570;
       --accent: #c4501a;
       --line: #d8d3cc;
-      --amber-1: #f7d99a;
-      --amber-2: #eea452;
-      --amber-3: #c4501a;
-      --blue-1: #dbe9f2;
-      --blue-2: #9bc0d6;
-      --blue-3: #4c7690;
+      --amber-1: #f8d9ae;
+      --amber-2: #f2a355;
+      --amber-3: #b8460f;
+      --blue-1: #dde4ee;
+      --blue-2: #6b83a8;
+      --blue-3: #1b2a4e;
     }
     body {
       background: var(--bg);
@@ -113,7 +113,12 @@
     .btn.primary:hover { background:#a8430f; border-color:#a8430f; color:#fdf9f2; }
     .btn:active { transform: translateY(1px); }
 
-    .ambience-row { margin-top:1.4rem; }
+    .palette-name {
+      margin-top:.7rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em;
+      text-transform:uppercase; color:var(--muted); text-align:center;
+    }
+
+    .ambience-row { margin-top:1.4rem; display:flex; flex-wrap:wrap; justify-content:center; gap:.7rem; max-width:420px; }
     .ambience-btn {
       font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
       padding:.7rem 1.3rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
@@ -174,22 +179,22 @@
         <svg id="hourglass-svg" viewBox="0 0 210 520" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="amberGlass" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#f7d99a"/>
-              <stop offset="55%" stop-color="#eea452"/>
-              <stop offset="100%" stop-color="#c4501a"/>
+              <stop id="stopAmber1" offset="0%" stop-color="#f8d9ae"/>
+              <stop id="stopAmber2" offset="55%" stop-color="#f2a355"/>
+              <stop id="stopAmber3" offset="100%" stop-color="#b8460f"/>
             </linearGradient>
             <linearGradient id="blueGlass" x1="0" y1="1" x2="1" y2="0">
-              <stop offset="0%" stop-color="#dbe9f2"/>
-              <stop offset="55%" stop-color="#9bc0d6"/>
-              <stop offset="100%" stop-color="#4c7690"/>
+              <stop id="stopBlue1" offset="0%" stop-color="#dde4ee"/>
+              <stop id="stopBlue2" offset="55%" stop-color="#6b83a8"/>
+              <stop id="stopBlue3" offset="100%" stop-color="#1b2a4e"/>
             </linearGradient>
             <linearGradient id="sandAmber" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#fbe9c6"/>
-              <stop offset="100%" stop-color="#eecb8e"/>
+              <stop id="stopSandAmber1" offset="0%" stop-color="#fbe6c4"/>
+              <stop id="stopSandAmber2" offset="100%" stop-color="#f0ab5a"/>
             </linearGradient>
             <linearGradient id="sandBlue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#e9f2f7"/>
-              <stop offset="100%" stop-color="#c3dbe6"/>
+              <stop id="stopSandBlue1" offset="0%" stop-color="#e3e8f2"/>
+              <stop id="stopSandBlue2" offset="100%" stop-color="#a9b7d3"/>
             </linearGradient>
             <clipPath id="topClip">
               <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z"/>
@@ -220,11 +225,11 @@
 
           <!-- falling grains -->
           <g id="stream">
-            <circle class="grain" cx="103" cy="260" r="1.8" fill="#eecb8e" style="animation-delay:0s"/>
-            <circle class="grain" cx="107" cy="260" r="1.6" fill="#eecb8e" style="animation-delay:.13s"/>
-            <circle class="grain" cx="105" cy="260" r="1.7" fill="#eecb8e" style="animation-delay:.26s"/>
-            <circle class="grain" cx="104" cy="260" r="1.5" fill="#eecb8e" style="animation-delay:.39s"/>
-            <circle class="grain" cx="106" cy="260" r="1.7" fill="#eecb8e" style="animation-delay:.42s"/>
+            <circle class="grain" cx="103" cy="260" r="1.8" fill="#f0ab5a" style="animation-delay:0s"/>
+            <circle class="grain" cx="107" cy="260" r="1.6" fill="#f0ab5a" style="animation-delay:.13s"/>
+            <circle class="grain" cx="105" cy="260" r="1.7" fill="#f0ab5a" style="animation-delay:.26s"/>
+            <circle class="grain" cx="104" cy="260" r="1.5" fill="#f0ab5a" style="animation-delay:.39s"/>
+            <circle class="grain" cx="106" cy="260" r="1.7" fill="#f0ab5a" style="animation-delay:.42s"/>
           </g>
 
           <!-- glass highlights -->
@@ -246,11 +251,19 @@
     <div class="controls">
       <button class="btn primary" id="startPauseBtn">Start</button>
       <button class="btn" id="resetBtn">Reset</button>
+      <button class="btn" id="paletteBtn" title="Try another color combination">🎨 Colors</button>
     </div>
+    <p class="palette-name" id="paletteName"></p>
 
     <div class="ambience-row">
       <button class="ambience-btn" id="fireBtn">🔥 Play fireplace sounds</button>
+      <button class="ambience-btn" id="cafeBtn">☕ Play café ambience</button>
+      <button class="ambience-btn" id="forestBtn">🌲 Play forest sounds</button>
+      <button class="ambience-btn" id="wavesBtn">🌊 Play ocean waves</button>
       <audio id="fireAudio" loop preload="none" src="fireplace.mp3"></audio>
+      <audio id="cafeAudio" loop preload="none" src="ambience-coffee.mp3"></audio>
+      <audio id="forestAudio" loop preload="none" src="ambience-forest.mp3"></audio>
+      <audio id="wavesAudio" loop preload="none" src="ambience-waves.mp3"></audio>
     </div>
   </div>
 
@@ -301,6 +314,8 @@
   const dailyHourglasses = $('dailyHourglasses');
   const dailyText = $('dailyText');
   const glassStage = document.querySelector('.glass-stage');
+  const paletteBtn = $('paletteBtn');
+  const paletteName = $('paletteName');
 
   const TOP_TOP = 15, TOP_BOTTOM = 250;     // vertical span of top bulb
   const BOT_TOP = 270, BOT_BOTTOM = 505;    // vertical span of bottom bulb
@@ -397,6 +412,78 @@
     const t = (clamped - GLASS_DURATION_MIN) / (GLASS_DURATION_MAX - GLASS_DURATION_MIN);
     const scale = GLASS_SCALE_MIN + (GLASS_SCALE_MAX - GLASS_SCALE_MIN) * t;
     glassStage.style.setProperty('--glass-scale', scale.toFixed(3));
+  }
+
+  // ── color combinations — drawn from Sanzo Wada's Dictionary of Color
+  // Combinations (colorcombinations.org), each one an authentic warm/cool
+  // pairing reworked into light/mid/dark stops for the glass ──
+  const PALETTES = [
+    {
+      name: 'Bitter Orange & Navy',
+      amber: ['#f8d9ae', '#f2a355', '#b8460f'],
+      blue:  ['#dde4ee', '#6b83a8', '#1b2a4e'],
+      sandAmber: ['#fbe6c4', '#f0ab5a'],
+      sandBlue:  ['#e3e8f2', '#a9b7d3']
+    },
+    {
+      name: 'Crimson & Navy',
+      amber: ['#d29f9f', '#9a2a2a', '#6c1d1d'],
+      blue:  ['#cdd0d8', '#1b2a4e', '#131d37'],
+      sandAmber: ['#d9adad', '#ae5353'],
+      sandBlue:  ['#d4d7de', '#59647e']
+    },
+    {
+      name: 'Pale Blue & Vermillion',
+      amber: ['#edaba6', '#d8453a', '#a43d36'],
+      blue:  ['#bcd2db', '#6b9bb0', '#587988'],
+      sandAmber: ['#f0b8b3', '#df6960'],
+      sandBlue:  ['#c6d9e0', '#87aebf']
+    },
+    {
+      name: 'Sky Blue & Vermillion',
+      amber: ['#edaba6', '#d8453a', '#973029'],
+      blue:  ['#c3dceb', '#7ab2d3', '#557d94'],
+      sandAmber: ['#f0b8b3', '#df6960'],
+      sandBlue:  ['#cce1eb', '#94c1db']
+    }
+  ];
+  const PALETTE_KEY = 'pomodoro:palette';
+
+  function applyPalette(index) {
+    const p = PALETTES[index];
+    if (!p) return;
+    document.documentElement.style.setProperty('--amber-1', p.amber[0]);
+    document.documentElement.style.setProperty('--amber-2', p.amber[1]);
+    document.documentElement.style.setProperty('--amber-3', p.amber[2]);
+    document.documentElement.style.setProperty('--blue-1', p.blue[0]);
+    document.documentElement.style.setProperty('--blue-2', p.blue[1]);
+    document.documentElement.style.setProperty('--blue-3', p.blue[2]);
+
+    $('stopAmber1').setAttribute('stop-color', p.amber[0]);
+    $('stopAmber2').setAttribute('stop-color', p.amber[1]);
+    $('stopAmber3').setAttribute('stop-color', p.amber[2]);
+    $('stopBlue1').setAttribute('stop-color', p.blue[0]);
+    $('stopBlue2').setAttribute('stop-color', p.blue[1]);
+    $('stopBlue3').setAttribute('stop-color', p.blue[2]);
+    $('stopSandAmber1').setAttribute('stop-color', p.sandAmber[0]);
+    $('stopSandAmber2').setAttribute('stop-color', p.sandAmber[1]);
+    $('stopSandBlue1').setAttribute('stop-color', p.sandBlue[0]);
+    $('stopSandBlue2').setAttribute('stop-color', p.sandBlue[1]);
+
+    document.querySelectorAll('.grain').forEach(function (g) {
+      g.setAttribute('fill', p.sandAmber[1]);
+    });
+
+    if (paletteName) paletteName.textContent = p.name;
+    try { localStorage.setItem(PALETTE_KEY, String(index)); } catch (e) {}
+  }
+
+  if (paletteBtn) {
+    paletteBtn.addEventListener('click', function () {
+      let current = 0;
+      try { current = parseInt(localStorage.getItem(PALETTE_KEY), 10) || 0; } catch (e) {}
+      applyPalette((current + 1) % PALETTES.length);
+    });
   }
 
   function fmt(sec) {
@@ -582,38 +669,57 @@
     if (isRunning) tick();
   });
 
-  // ── fireplace ambience — real recording, self-hosted ──
+  // ── ambience sounds — real recordings, self-hosted; only one plays at a
+  // time so they don't overlap into a mess ──
   (function () {
-    var fireBtn = document.getElementById('fireBtn');
-    var fireAudio = document.getElementById('fireAudio');
-    if (!fireBtn || !fireAudio) return;
+    var tracks = [
+      { btn: $('fireBtn'), audio: $('fireAudio'), label: '🔥 Play fireplace sounds', playing: '⏸ Pause fireplace sounds', volume: 0.55 },
+      { btn: $('cafeBtn'), audio: $('cafeAudio'), label: '☕ Play café ambience', playing: '⏸ Pause café ambience', volume: 0.55 },
+      { btn: $('forestBtn'), audio: $('forestAudio'), label: '🌲 Play forest sounds', playing: '⏸ Pause forest sounds', volume: 0.8 },
+      { btn: $('wavesBtn'), audio: $('wavesAudio'), label: '🌊 Play ocean waves', playing: '⏸ Pause ocean waves', volume: 0.35 }
+    ];
 
-    fireAudio.volume = 0.55;
+    tracks.forEach(function (t) {
+      if (!t.btn || !t.audio) return;
+      t.audio.volume = t.volume;
 
-    fireBtn.addEventListener('click', function () {
-      if (fireAudio.paused) {
-        fireAudio.play().then(function () {
-          fireBtn.textContent = '⏸ Pause fireplace sounds';
-          fireBtn.classList.add('playing');
-        }).catch(function () {
-          fireBtn.textContent = 'Could not play audio — try again';
-        });
-      } else {
-        fireAudio.pause();
-        fireBtn.textContent = '🔥 Play fireplace sounds';
-        fireBtn.classList.remove('playing');
-      }
-    });
+      t.btn.addEventListener('click', function () {
+        if (t.audio.paused) {
+          tracks.forEach(function (other) {
+            if (other !== t && other.audio && !other.audio.paused) {
+              other.audio.pause();
+              other.btn.textContent = other.label;
+              other.btn.classList.remove('playing');
+            }
+          });
+          t.audio.play().then(function () {
+            t.btn.textContent = t.playing;
+            t.btn.classList.add('playing');
+          }).catch(function () {
+            t.btn.textContent = 'Could not play audio — try again';
+          });
+        } else {
+          t.audio.pause();
+          t.btn.textContent = t.label;
+          t.btn.classList.remove('playing');
+        }
+      });
 
-    fireAudio.addEventListener('error', function () {
-      fireBtn.textContent = 'Audio failed to load';
-      fireBtn.disabled = true;
+      t.audio.addEventListener('error', function () {
+        t.btn.textContent = 'Audio failed to load';
+        t.btn.disabled = true;
+      });
     });
   })();
 
   buildDots();
   renderDaily();
   updateGlassScale();
+  (function () {
+    let saved = 0;
+    try { saved = parseInt(localStorage.getItem(PALETTE_KEY), 10) || 0; } catch (e) {}
+    applyPalette(saved % PALETTES.length);
+  })();
   startSession('focus', true);
 })();
 </script>
