@@ -94,6 +94,12 @@
     .dot.filled { background: var(--accent); border-color: var(--accent); }
 
     .daily-summary { margin-top:1.8rem; text-align:center; max-width:320px; }
+    .daily-reset {
+      margin-top:.5rem; font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em;
+      text-transform:uppercase; color:var(--muted); background:none; border:none; cursor:pointer;
+      text-decoration:underline; text-underline-offset:2px; padding:0; transition:color .2s;
+    }
+    .daily-reset:hover { color:var(--accent); }
     .daily-hourglasses { display:flex; flex-wrap:wrap; justify-content:center; gap:.25rem .3rem; margin-bottom:.55rem; }
     .daily-hourglasses span { font-size:.85rem; line-height:1; opacity:.9; }
     .daily-text {
@@ -276,6 +282,7 @@
     <div class="daily-summary">
       <div class="daily-hourglasses" id="dailyHourglasses" aria-hidden="true"></div>
       <p class="daily-text" id="dailyText"></p>
+      <button class="daily-reset" id="dailyResetBtn" type="button">Reset today</button>
     </div>
 
     <div class="controls">
@@ -432,6 +439,11 @@
     dailyText.textContent = daily.sessions === 0
       ? 'No focus sessions yet today'
       : daily.sessions + (daily.sessions === 1 ? ' session' : ' sessions') + ' · ' + formatDuration(daily.minutes) + ' focused today';
+  }
+
+  function resetDaily() {
+    saveDaily({ date: todayISO(), sessions: 0, minutes: 0 });
+    renderDaily();
   }
 
   function recordFocusCompleted(minutes) {
@@ -1049,6 +1061,12 @@
     isRunning ? pause() : start();
   });
   resetBtn.addEventListener('click', reset);
+  const dailyResetBtn = $('dailyResetBtn');
+  if (dailyResetBtn) {
+    dailyResetBtn.addEventListener('click', () => {
+      if (confirm("Clear today's session count and focused time?")) resetDaily();
+    });
+  }
 
   focusInput.addEventListener('input', () => {
     updateGlassScale();
