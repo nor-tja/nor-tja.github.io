@@ -391,7 +391,14 @@
   const DAILY_KEY = 'pomodoro:daily';
 
   function todayISO() {
-    return new Date().toISOString().slice(0, 10);
+    // the daily tally rolls over at 5am local time, not midnight — so a late
+    // pomodoro session still counts toward "today" until 5am
+    var d = new Date();
+    d.setHours(d.getHours() - 5);
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
   }
 
   function loadDaily() {
