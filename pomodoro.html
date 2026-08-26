@@ -916,24 +916,29 @@
     } catch (e) { /* audio unsupported — ignore */ }
   }
 
-  function pling() {
+  function pling(times) {
     if (!audioCtx) return;
+    times = times || 1;
     try {
       const t0 = audioCtx.currentTime;
-      // a clean bell-like "pling": fundamental + a faint octave overtone
-      [[1046.5, 0.24, 0], [2093, 0.07, 0.01]].forEach(([freq, peak, delay]) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        const start = t0 + delay;
-        gain.gain.setValueAtTime(0.0001, start);
-        gain.gain.exponentialRampToValueAtTime(peak, start + 0.012);
-        gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.9);
-        osc.connect(gain).connect(audioCtx.destination);
-        osc.start(start);
-        osc.stop(start + 0.95);
-      });
+      const GAP = 0.32; // seconds between repeats, when times > 1
+      for (let i = 0; i < times; i++) {
+        const base = t0 + i * GAP;
+        // a clean bell-like "pling": fundamental + a faint octave overtone
+        [[1046.5, 0.24, 0], [2093, 0.07, 0.01]].forEach(([freq, peak, delay]) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          const start = base + delay;
+          gain.gain.setValueAtTime(0.0001, start);
+          gain.gain.exponentialRampToValueAtTime(peak, start + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.9);
+          osc.connect(gain).connect(audioCtx.destination);
+          osc.start(start);
+          osc.stop(start + 0.95);
+        });
+      }
     } catch (e) { /* audio unsupported — ignore */ }
   }
 
@@ -982,7 +987,9 @@
     document.title = fmt(Math.max(0, remainingSec)) + ' · ' + (mode === 'focus' ? 'Focus' : 'Break');
 
     if (remainingSec <= 0) {
-      pling();
+      // focus ending (break about to begin) → one pling; break ending
+      // (focus about to resume) → two plings
+      pling(mode === 'focus' ? 1 : 2);
       flipped = !flipped;
       rotor.classList.toggle('flipped', flipped);
       const upcoming = nextMode();
@@ -1049,7 +1056,7 @@
     if (remainingSec <= 0) {
       // shortened below however much had already elapsed — finish this
       // session right now, same as the timer running out naturally
-      pling();
+      pling(mode === 'focus' ? 1 : 2);
       flipped = !flipped;
       rotor.classList.toggle('flipped', flipped);
       const upcoming = nextMode();
@@ -1086,8 +1093,8 @@
     if (isRunning) tick();
   });
 
-  // ── ambience sounds — real recordings, self-hosted; only one plays at a
-  // time so they don't overlap into a mess ──
+  // ── ambience sounds — real recordings, self-hosted; each toggles
+  // independently, so any combination can layer together at once ──
   (function () {
     var tracks = [
       { btn: $('fireBtn'), audio: $('fireAudio'), label: '🔥 Play fireplace sounds', playing: '⏸ Pause fireplace sounds', volume: 0.55 },
@@ -1117,15 +1124,10 @@
         }
       });
 
+      // each track toggles independently — any combination can play together,
+      // layered as an ambient mix
       t.btn.addEventListener('click', function () {
         if (t.audio.paused) {
-          tracks.forEach(function (other) {
-            if (other !== t && other.audio && !other.audio.paused) {
-              other.audio.pause();
-              other.btn.textContent = other.label;
-              other.btn.classList.remove('playing');
-            }
-          });
           t.audio.play().then(function () {
             t.btn.textContent = t.playing;
             t.btn.classList.add('playing');
