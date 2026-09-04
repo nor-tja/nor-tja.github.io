@@ -24,6 +24,9 @@
     .date-line { margin-top:.9rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
 
     .streak { margin-top:1.2rem; display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); opacity:0; transition:opacity .3s; }
+
+    .voice-tip { margin-top:.8rem; font-size:.8rem; font-style:italic; color:var(--muted); max-width:440px; line-height:1.5; }
+    .voice-tip strong { font-style:normal; color:var(--ink); font-weight:500; }
     .streak.visible { opacity:1; }
 
     .voice-picker { margin-top:.9rem; display:none; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
@@ -148,6 +151,7 @@
       <label for="voiceSelect">Voice</label>
       <select id="voiceSelect"></select>
     </div>
+    <p class="voice-tip">Sounds robotic? On Mac: <strong>Settings → Accessibility → Spoken Content → Manage Voices</strong>, then download an Enhanced or Premium Portuguese voice.</p>
   </header>
 
   <div class="words" id="words"></div>
