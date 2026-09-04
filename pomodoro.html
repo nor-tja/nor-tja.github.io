@@ -3,217 +3,113 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Katja Norstad — Pomodoro</title>
+  <title>Katja Norstad — Mots du jour</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjVmMmVkIi8+CiAgPHRleHQgeD0iMTYiIHk9IjIzIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjQwMCIgCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzlhMmEyYSIgbGV0dGVyLXNwYWNpbmc9IjEiPktOPC90ZXh0Pgo8L3N2Zz4=" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #f5f2ed;
-      --ink: #1a1814;
-      --muted: #7a7570;
-      --accent: #9a2a2a;
-      --line: #d8d3cc;
-      --amber-1: #f8d9ae;
-      --amber-2: #f2a355;
-      --amber-3: #b8460f;
-      --blue-1: #dde4ee;
-      --blue-2: #6b83a8;
-      --blue-3: #1b2a4e;
-    }
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: 18px;
-      line-height: 1.7;
-      min-height: 100vh;
-    }
-    .wrap { max-width: 640px; margin: 0 auto; padding: 0 2rem 4rem; }
+    :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#9a2a2a; --line:#d8d3cc; }
+    body { background:var(--bg); color:var(--ink); font-family:'Cormorant Garamond',serif; font-weight:300; font-size:18px; line-height:1.7; min-height:100vh; }
+    .wrap { max-width:640px; margin:0 auto; padding:0 2rem 4rem; }
 
     .back { display:inline-flex; align-items:center; gap:.4rem; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:1.8rem 0 0; transition:color .2s; }
     .back:hover { color:var(--accent); }
 
-    header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; text-align:center; }
+    header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
     .eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
     h1 { font-size:clamp(2rem,6vw,3.2rem); font-weight:300; line-height:1.1; }
     h1 em { font-style:italic; color:var(--accent); }
-    .intro { margin-top:1rem; color:var(--muted); font-size:1rem; max-width:440px; margin-left:auto; margin-right:auto; }
+    .intro { margin-top:1rem; color:var(--muted); font-size:1rem; max-width:480px; }
+    .date-line { margin-top:.9rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
 
-    /* ── HOURGLASS ── */
-    .glass-section { padding:2.6rem 0 1rem; display:flex; flex-direction:column; align-items:center; opacity:0; animation:rise .9s ease forwards .25s; }
+    .streak { margin-top:1.2rem; display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); opacity:0; transition:opacity .3s; }
 
-    .glass-stage {
-      --glass-scale: 1;
-      width: calc(200px * var(--glass-scale));
-      height: calc(495px * var(--glass-scale));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      perspective: 800px;
-      transition: width .5s ease, height .5s ease;
+    .voice-tip { margin-top:.8rem; font-size:.8rem; font-style:italic; color:var(--muted); max-width:440px; line-height:1.5; }
+    .voice-tip strong { font-style:normal; color:var(--ink); font-weight:500; }
+    .streak.visible { opacity:1; }
+
+    .voice-picker { margin-top:.9rem; display:none; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+    .voice-picker select { font-family:'Cormorant Garamond',serif; font-size:.85rem; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:.3rem .5rem; max-width:230px; }
+
+    .words { padding:2.2rem 0; display:flex; flex-direction:column; }
+    .word-card {
+      display:flex; align-items:center; gap:1.1rem;
+      padding:1.5rem 0; border-bottom:1px solid var(--line);
+      opacity:0; animation:rise .8s ease forwards;
     }
-    .glass-rotor {
-      width: 100%;
-      height: 100%;
-      transition: transform 1.1s cubic-bezier(.65,0,.35,1);
-      transform-style: preserve-3d;
-    }
-    .glass-rotor.flipped { transform: rotate(180deg); }
-    #hourglass-svg { width: 100%; height: 100%; display:block; filter: drop-shadow(0 10px 18px rgba(26,24,20,0.14)); }
+    .word-card:nth-of-type(1){ animation-delay:.25s; }
+    .word-card:nth-of-type(2){ animation-delay:.35s; }
+    .word-card:nth-of-type(3){ animation-delay:.45s; }
+    .word-card:nth-of-type(4){ animation-delay:.55s; }
+    .word-card:nth-of-type(5){ animation-delay:.65s; }
 
-    .sand-rect { transition: none; }
-    .grain { animation: fall 0.5s linear infinite; animation-play-state: paused; }
-    #hourglass-svg.flowing .grain { animation-play-state: running; }
-    @keyframes fall { from { transform: translateY(0); opacity:1; } to { transform: translateY(16px); opacity:0; } }
-
-    .time-display {
-      margin-top: 1.2rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 1.6rem;
-      font-weight: 400;
-      letter-spacing: .04em;
-      color: var(--ink);
-      font-variant-numeric: tabular-nums;
-    }
-    .mode-label {
-      margin-top: .4rem;
-      font-family: 'DM Mono', monospace;
-      font-size: .68rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      transition: color .3s;
-    }
-    .mode-label.is-break { color: var(--blue-3); }
-
-    .dots { display:flex; gap:.5rem; margin-top:1.2rem; }
-    .dot { width:7px; height:7px; border-radius:50%; border:1px solid var(--line); transition: background .3s, border-color .3s; }
-    .dot.filled { background: var(--accent); border-color: var(--accent); }
-
-    .daily-summary { margin-top:1.8rem; text-align:center; max-width:320px; }
-    .daily-reset {
-      margin-top:.5rem; font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em;
-      text-transform:uppercase; color:var(--muted); background:none; border:none; cursor:pointer;
-      text-decoration:underline; text-underline-offset:2px; padding:0; transition:color .2s;
-    }
-    .daily-reset:hover { color:var(--accent); }
-    .daily-hourglasses { display:flex; flex-wrap:wrap; justify-content:center; gap:.25rem .3rem; margin-bottom:.55rem; }
-    .daily-hourglasses span { font-size:.85rem; line-height:1; opacity:.9; }
-    .daily-text {
-      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase;
-      color:var(--muted);
+    .word-icon {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:30px; height:30px; border-radius:7px; align-self:center;
+      background:#eee7da; font-size:1.05rem; line-height:1;
     }
 
-    /* ── CONTROLS ── */
-    .controls { display:flex; gap:.9rem; margin-top:1.8rem; }
-    .btn {
-      font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
-      padding:.75rem 1.6rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
-      background:transparent; color:var(--ink); transition: all .2s;
+    .play-btn {
+      flex-shrink:0; width:44px; height:44px; border-radius:50%;
+      border:1px solid var(--line); background:transparent; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      color:var(--accent); font-size:1.1rem; transition:all .2s;
     }
-    .btn:hover { border-color:var(--accent); color:var(--accent); }
-    .btn.primary { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
-    .btn.primary:hover { background:#6f1e1e; border-color:#6f1e1e; color:#fdf9f2; }
-    .btn:active { transform: translateY(1px); }
+    .play-btn:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
+    .play-btn:active { transform:scale(.94); }
+    .play-btn.playing { background:var(--accent); color:#fdf9f2; }
 
-    .btn-chevron { display:inline-block; font-size:.68rem; margin-left:.3rem; transition:transform .25s; }
-    #paletteToggle.open .btn-chevron { transform:rotate(90deg); }
+    .word-body { flex:1; min-width:0; }
+    .word-top { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
+    .word-fr { font-size:1.5rem; font-weight:400; }
+    .word-pos { font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:.15rem .4rem; }
+    .word-ipa { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--accent); margin-top:.25rem; }
+    .word-en { font-style:italic; color:var(--muted); font-size:.98rem; margin-top:.15rem; }
 
-    .palette-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
-    .palette-swatch {
-      display:flex; flex-direction:column; align-items:center; gap:.5rem;
-      padding:.7rem .6rem; border-radius:10px; cursor:pointer; border:1px solid var(--line);
-      background:transparent; transition:all .2s;
+    .learned-dot {
+      flex-shrink:0; width:9px; height:9px; border-radius:50%;
+      border:1px solid var(--line); cursor:pointer; transition:background .25s,border-color .25s;
     }
-    .palette-swatch:hover { border-color:var(--accent); }
-    .swatch-dots { display:flex; gap:.35rem; }
-    .swatch-dot { width:16px; height:16px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.08); }
-    .swatch-label {
-      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.03em;
-      text-transform:uppercase; color:var(--muted); text-align:center; line-height:1.3;
-    }
-    .palette-swatch:hover .swatch-label { color:var(--accent); }
+    .learned-dot.on { background:var(--accent); border-color:var(--accent); }
 
-    .palette-shuffle {
-      display:block; margin:1rem auto 0; font-family:'DM Mono',monospace; font-size:.6rem;
-      letter-spacing:.08em; text-transform:uppercase; color:var(--muted); background:none; border:none;
-      cursor:pointer; text-decoration:underline; text-underline-offset:2px; transition:color .2s;
-    }
-    .palette-shuffle:hover { color:var(--accent); }
+    .no-speech { font-size:.85rem; color:var(--muted); font-style:italic; padding:1rem 0; }
 
-    @media (max-width:480px) {
-      .palette-grid { grid-template-columns:1fr; }
+    .review-section { padding:.4rem 0 1.6rem; }
+    .review-label { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
+    .review-stats { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-bottom:1.1rem; line-height:1.6; }
+    .review-empty { font-size:.9rem; color:var(--muted); font-style:italic; padding:.6rem 0 1.2rem; }
+    .review-card { display:flex; align-items:center; gap:.8rem; padding:1rem 0; border-bottom:1px solid var(--line); }
+    .review-card:last-child { border-bottom:none; }
+    .review-play { flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:.95rem; transition:all .2s; }
+    .review-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
+    .review-play.playing { background:var(--accent); color:#fdf9f2; }
+    .review-body { flex:1; min-width:0; }
+    .review-fr { font-size:1.15rem; }
+    .review-answer { margin-top:.3rem; display:none; }
+    .review-answer.shown { display:block; }
+    .review-fr-answer { font-style:italic; font-size:1.15rem; }
+    .review-ipa { font-family:'DM Mono',monospace; font-size:.78rem; color:var(--accent); margin-left:.5rem; }
+    .review-actions { flex-shrink:0; display:flex; gap:.5rem; }
+    .review-btn {
+      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase;
+      padding:.5rem .75rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
+      background:transparent; color:var(--ink); transition:all .2s; white-space:nowrap;
     }
+    .review-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .review-btn.again:hover { border-color:#6f1e1e; color:#6f1e1e; }
 
-    .ambience-toggle {
-      margin-top:1.5rem; display:inline-flex; align-items:center; gap:.55rem;
-      cursor:pointer; user-select:none; font-family:'DM Mono',monospace; font-size:.65rem;
-      letter-spacing:.12em; text-transform:uppercase; color:var(--muted); transition:color .2s;
-      background:none; border:none; padding:0;
-    }
-    .ambience-toggle-wrap { display:flex; justify-content:center; }
-    .ambience-toggle:hover, .ambience-toggle.open { color:var(--accent); }
-    .ambience-chevron { font-size:.7rem; transition:transform .25s; display:inline-block; }
-    .ambience-toggle.open .ambience-chevron { transform:rotate(90deg); }
+    .phrases { padding:.4rem 0 1.6rem; }
+    .phrases-label { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.2rem; }
+    .phrase-item { display:flex; align-items:flex-start; gap:.9rem; padding:1rem 0; border-bottom:1px solid var(--line); }
+    .phrase-item:last-child { border-bottom:none; }
+    .phrase-play { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:.9rem; transition:all .2s; margin-top:.1rem; }
+    .phrase-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
+    .phrase-play.playing { background:var(--accent); color:#fdf9f2; }
+    .phrase-fr { font-size:1.08rem; }
+    .phrase-en { font-style:italic; color:var(--muted); font-size:.85rem; margin-top:.2rem; }
 
-    .ambience-panel {
-      max-width:400px; margin:0 auto; overflow:hidden;
-      max-height:0; opacity:0; transition:max-height .4s ease, opacity .3s ease, margin-top .4s ease;
-    }
-    .ambience-panel.open { max-height:220px; opacity:1; margin-top:1.1rem; }
-
-    .ambience-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
-    .ambience-chip {
-      font-family:'DM Mono',monospace; font-size:.66rem; letter-spacing:.05em; text-transform:uppercase;
-      padding:.7rem .8rem; border-radius:999px; cursor:pointer; border:1px solid var(--line);
-      background:transparent; color:var(--ink); transition:all .2s; display:inline-flex; align-items:center;
-      justify-content:center; gap:.5rem;
-    }
-    .ambience-chip:hover { border-color:var(--accent); color:var(--accent); }
-    .ambience-chip.playing { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
-    .chip-icon { font-size:.9rem; }
-    .ambience-chip.playing .chip-icon { animation:chipPulse 1.7s ease-in-out infinite; }
-    @keyframes chipPulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
-
-    @media (max-width:480px) {
-      .ambience-grid { grid-template-columns:1fr; }
-    }
-
-    /* ── POST-IT ── */
-    .postit-wrap { display:flex; justify-content:center; margin-top:2.4rem; }
-    .postit {
-      position:relative;
-      width:210px;
-      min-height:190px;
-      padding:1.5rem 1.1rem 1.1rem;
-      background:#e5d6a3;
-      background-image: linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
-      background-size: 100% 1.7em;
-      box-shadow: 3px 8px 18px rgba(26,24,20,0.2), 0 1px 0 rgba(255,255,255,0.4) inset;
-      transform: rotate(-2.5deg);
-      transition: transform .2s ease;
-    }
-    .postit:focus-within { transform: rotate(0deg); }
-    .postit::before {
-      content:'';
-      position:absolute; top:-11px; left:50%; transform:translateX(-50%) rotate(-2deg);
-      width:64px; height:24px;
-      background:rgba(255,255,255,0.5);
-      border:1px solid rgba(255,255,255,0.65);
-      box-shadow: 0 1px 3px rgba(26,24,20,0.15);
-    }
-    .postit textarea {
-      width:100%; height:155px; border:none; background:transparent; resize:none;
-      font-family:'Cormorant Garamond', serif; font-size:1.08rem; line-height:1.7;
-      color:#5c5133; outline:none;
-    }
-    .postit textarea::placeholder { color:#9c9270; font-style:italic; }
-
-    /* ── SETTINGS ── */
-    .settings { margin-top:2.6rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .4s; }
+    .settings { margin-top:1rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .8s; }
     .settings-trigger {
       display:flex; align-items:center; justify-content:space-between;
       padding:1.1rem 0; cursor:pointer; list-style:none; user-select:none;
@@ -222,180 +118,59 @@
     .settings-trigger::-webkit-details-marker { display:none; }
     .settings-chevron { color:var(--muted); transition:transform .25s; }
     details[open] .settings-chevron { transform:rotate(90deg); }
+    .settings-body { padding:.2rem 0 2rem; font-size:.85rem; color:var(--muted); line-height:1.6; }
+    .settings-body p + p { margin-top:.6rem; }
 
-    .settings-body { padding:.3rem 0 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.4rem 1.6rem; }
-    .field { display:flex; flex-direction:column; gap:.5rem; }
-    .field label { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
-    .field input {
-      font-family:'DM Mono',monospace; font-size:.95rem; color:var(--ink);
-      background:transparent; border:1px solid var(--line); border-radius:2px;
-      padding:.55rem .7rem; width:100%; transition:border-color .2s;
-    }
-    .field input:focus { outline:none; border-color:var(--accent); }
-    .settings-note { grid-column:1 / -1; font-size:.78rem; color:var(--muted); font-style:italic; }
-
-    footer { padding:3rem 0 1rem; text-align:center; }
+    footer { padding:1rem 0 1rem; text-align:center; }
     footer p { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; color:var(--muted); }
 
     @keyframes rise { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
-    @media (max-width:600px) {
+    @media (max-width:520px) {
       .wrap { padding:0 1.2rem 3rem; }
-      header { padding:2rem 0 1.5rem; }
-      .time-display { font-size:1.3rem; }
-      .glass-stage { width:calc(145px * var(--glass-scale)); height:calc(359px * var(--glass-scale)); }
-      .settings-body { grid-template-columns:1fr; }
+      .word-fr { font-size:1.3rem; }
+      .word-icon { width:26px; height:26px; font-size:.9rem; border-radius:6px; }
+      .play-btn { width:38px; height:38px; }
+      .review-card { flex-wrap:wrap; }
+      .review-play { width:32px; height:32px; }
+      .review-actions { width:100%; margin-top:.6rem; flex-wrap:wrap; }
     }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <a href="index.html" class="back">← Back</a>
+  <a href="languages.html" class="back">← Back</a>
 
   <header>
-    <p class="eyebrow">A small focus ritual</p>
-    <h1>The <em>pomodoro</em> hourglass</h1>
-    <p class="intro">Set your focus and break lengths, then start the glass. It flips itself over when a session ends — just like the real thing.</p>
+    <p class="eyebrow">A little daily practice</p>
+    <h1>Five <em>French</em> words a day</h1>
+    <p class="intro">A fresh set of five common French words, chosen automatically for today, each with a small picture cue. Tap the circle to hear each one pronounced — come back tomorrow for five new ones.</p>
+    <p class="date-line" id="dateLine"></p>
+    <p class="streak" id="streakLine"></p>
+    <div class="voice-picker" id="voicePicker">
+      <label for="voiceSelect">Voice</label>
+      <select id="voiceSelect"></select>
+    </div>
+    <p class="voice-tip">Sounds robotic? On Mac: <strong>Settings → Accessibility → Spoken Content → Manage Voices</strong>, then download an Enhanced or Premium French voice.</p>
   </header>
 
-  <div class="glass-section">
-    <div class="glass-stage">
-      <div class="glass-rotor" id="rotor">
-        <svg id="hourglass-svg" viewBox="0 0 210 520" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="amberGlass" x1="0" y1="0" x2="1" y2="1">
-              <stop id="stopAmber1" offset="0%" stop-color="#f8d9ae"/>
-              <stop id="stopAmber2" offset="55%" stop-color="#f2a355"/>
-              <stop id="stopAmber3" offset="100%" stop-color="#b8460f"/>
-            </linearGradient>
-            <linearGradient id="blueGlass" x1="0" y1="1" x2="1" y2="0">
-              <stop id="stopBlue1" offset="0%" stop-color="#dde4ee"/>
-              <stop id="stopBlue2" offset="55%" stop-color="#6b83a8"/>
-              <stop id="stopBlue3" offset="100%" stop-color="#1b2a4e"/>
-            </linearGradient>
-            <linearGradient id="sandAmber" x1="0" y1="0" x2="0" y2="1">
-              <stop id="stopSandAmber1" offset="0%" stop-color="#fbe6c4"/>
-              <stop id="stopSandAmber2" offset="100%" stop-color="#f0ab5a"/>
-            </linearGradient>
-            <linearGradient id="sandBlue" x1="0" y1="0" x2="0" y2="1">
-              <stop id="stopSandBlue1" offset="0%" stop-color="#e3e8f2"/>
-              <stop id="stopSandBlue2" offset="100%" stop-color="#a9b7d3"/>
-            </linearGradient>
-            <clipPath id="topClip">
-              <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z"/>
-            </clipPath>
-            <clipPath id="bottomClip">
-              <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z"/>
-            </clipPath>
-          </defs>
+  <div class="words" id="words"></div>
 
-          <!-- top bulb glass -->
-          <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z" fill="url(#amberGlass)" opacity="0.34"/>
-          <!-- top sand fill -->
-          <g clip-path="url(#topClip)">
-            <rect id="sandTop" x="20" y="15" width="170" height="235" fill="url(#sandAmber)"/>
-          </g>
-          <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z" fill="none" stroke="url(#amberGlass)" stroke-width="3" opacity="0.85"/>
+  <div class="phrases" id="phrases"></div>
 
-          <!-- bottom bulb glass -->
-          <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z" fill="url(#blueGlass)" opacity="0.34"/>
-          <!-- bottom sand fill -->
-          <g clip-path="url(#bottomClip)">
-            <rect id="sandBottom" x="20" y="505" width="170" height="0" fill="url(#sandBlue)"/>
-          </g>
-          <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z" fill="none" stroke="url(#blueGlass)" stroke-width="3" opacity="0.85"/>
-
-          <!-- neck -->
-          <rect x="95" y="250" width="20" height="20" rx="3" fill="#e8e2d6" opacity="0.9"/>
-
-          <!-- falling grains -->
-          <g id="stream">
-            <circle class="grain" cx="103" cy="260" r="1.8" fill="#f0ab5a" style="animation-delay:0s"/>
-            <circle class="grain" cx="107" cy="260" r="1.6" fill="#f0ab5a" style="animation-delay:.13s"/>
-            <circle class="grain" cx="105" cy="260" r="1.7" fill="#f0ab5a" style="animation-delay:.26s"/>
-            <circle class="grain" cx="104" cy="260" r="1.5" fill="#f0ab5a" style="animation-delay:.39s"/>
-            <circle class="grain" cx="106" cy="260" r="1.7" fill="#f0ab5a" style="animation-delay:.42s"/>
-          </g>
-
-          <!-- glass highlights -->
-          <path d="M72,39 C58,81 53,122 65,167" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.35"/>
-          <path d="M72,481 C58,439 53,398 65,353" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.3"/>
-        </svg>
-      </div>
-    </div>
-
-    <div class="time-display" id="timeDisplay">25:00</div>
-    <div class="mode-label" id="modeLabel">Focus</div>
-    <div class="dots" id="dots"></div>
-
-    <div class="daily-summary">
-      <div class="daily-hourglasses" id="dailyHourglasses" aria-hidden="true"></div>
-      <p class="daily-text" id="dailyText"></p>
-      <button class="daily-reset" id="dailyResetBtn" type="button">Reset today</button>
-    </div>
-
-    <div class="controls">
-      <button class="btn primary" id="startPauseBtn">Start</button>
-      <button class="btn" id="resetBtn">Reset</button>
-      <button class="btn" id="paletteToggle" type="button" aria-expanded="false" aria-controls="palettePanel" title="Choose a color combination">
-        🎨 <span id="paletteToggleLabel">Change color</span><span class="btn-chevron">›</span>
-      </button>
-    </div>
-
-    <div class="ambience-panel" id="palettePanel">
-      <div class="palette-grid" id="paletteGrid"></div>
-      <button class="palette-shuffle" id="paletteShuffle" type="button">🔀 Show other combinations</button>
-    </div>
-
-    <div class="ambience-toggle-wrap">
-      <button class="ambience-toggle" id="ambienceToggle" type="button" aria-expanded="false" aria-controls="ambiencePanel">
-        <span class="ambience-toggle-label">🎧 Add background noise</span>
-        <span class="ambience-chevron">›</span>
-      </button>
-    </div>
-    <div class="ambience-panel" id="ambiencePanel">
-      <div class="ambience-grid">
-        <button class="ambience-chip" id="fireBtn"><span class="chip-icon">🔥</span><span class="chip-label">Fireplace</span></button>
-        <button class="ambience-chip" id="cafeBtn"><span class="chip-icon">☕</span><span class="chip-label">Café</span></button>
-        <button class="ambience-chip" id="forestBtn"><span class="chip-icon">🌲</span><span class="chip-label">Forest</span></button>
-        <button class="ambience-chip" id="wavesBtn"><span class="chip-icon">🌊</span><span class="chip-label">Ocean waves</span></button>
-      </div>
-      <audio id="fireAudio" loop preload="none" src="fireplace.mp3"></audio>
-      <audio id="cafeAudio" loop preload="none" src="ambience-coffee.mp3"></audio>
-      <audio id="forestAudio" loop preload="none" src="ambience-forest.mp3"></audio>
-      <audio id="wavesAudio" loop preload="none" src="ambience-waves.mp3"></audio>
-    </div>
-
-    <div class="postit-wrap">
-      <div class="postit">
-        <textarea id="postitNote" placeholder="Jot something down…" maxlength="500" aria-label="Sticky note"></textarea>
-      </div>
-    </div>
-  </div>
+  <div class="review-section" id="reviewSection"></div>
 
   <details class="settings">
     <summary class="settings-trigger">
-      <span>Customize timings</span>
+      <span>How this works</span>
       <span class="settings-chevron">›</span>
     </summary>
     <div class="settings-body">
-      <div class="field">
-        <label for="focusInput">Focus (minutes)</label>
-        <input type="number" id="focusInput" min="1" max="180" value="25">
-      </div>
-      <div class="field">
-        <label for="shortBreakInput">Short break (minutes)</label>
-        <input type="number" id="shortBreakInput" min="1" max="60" value="5">
-      </div>
-      <div class="field">
-        <label for="longBreakInput">Long break (minutes)</label>
-        <input type="number" id="longBreakInput" min="1" max="90" value="15">
-      </div>
-      <div class="field">
-        <label for="cyclesInput">Focus sessions before long break</label>
-        <input type="number" id="cyclesInput" min="1" max="12" value="4">
-      </div>
-      <p class="settings-note">Changes apply on the next session start, or immediately if the glass is paused and hasn't started yet.</p>
+      <p>The five words are picked automatically from a list of 100 common French words, grouped into 20 fixed sets of 5, based on today's date — no server, no schedule, it just recalculates whenever the page loads. The same 20 sets repeat in order every 20 days.</p>
+      <p>Pronunciation uses your browser's built-in French voice (Web Speech API), so quality depends on your browser and OS. If more than one French voice is installed, a picker appears above the words so you can choose whichever sounds best — your choice is remembered. On a Mac, System Settings → Accessibility → Spoken Content → Voices lets you download higher-quality "Premium" voices, which usually sound noticeably more natural than the default one.</p>
+      <p>Tap the small dot next to a word to mark it as practiced today — that's saved locally in your browser, not shared anywhere.</p>
+      <p>Below the words, two short sentences combine most of that day's words together, using common everyday phrasing, so you can hear them used in context rather than in isolation.</p>
+      <p>The Review section uses spaced repetition: every word you've ever marked with the dot goes into your personal review pool. New words come back the next day; after that, saying "Got it" pushes the next review further out (1 day, then 6, then longer each time), while "Still learning" brings it back tomorrow. Everything is stored locally in your browser, going all the way back to the first word you marked.</p>
     </div>
   </details>
 
@@ -404,907 +179,502 @@
 
 <script>
 (function () {
-  const $ = (id) => document.getElementById(id);
-  const rotor = $('rotor');
-  const sandTop = $('sandTop');
-  const sandBottom = $('sandBottom');
-  const timeDisplay = $('timeDisplay');
-  const modeLabel = $('modeLabel');
-  const dotsWrap = $('dots');
-  const startPauseBtn = $('startPauseBtn');
-  const resetBtn = $('resetBtn');
-  const focusInput = $('focusInput');
-  const shortBreakInput = $('shortBreakInput');
-  const longBreakInput = $('longBreakInput');
-  const cyclesInput = $('cyclesInput');
-  const dailyHourglasses = $('dailyHourglasses');
-  const dailyText = $('dailyText');
-  const glassStage = document.querySelector('.glass-stage');
-  const paletteToggle = $('paletteToggle');
-  const palettePanel = $('palettePanel');
-
-  const TOP_TOP = 15, TOP_BOTTOM = 250;     // vertical span of top bulb
-  const BOT_TOP = 270, BOT_BOTTOM = 505;    // vertical span of bottom bulb
-
-  let mode = 'focus';           // 'focus' | 'short' | 'long'
-  let durationSec = focusInput.value * 60;
-  let remainingSec = durationSec;
-  let isRunning = false;
-  let flipped = false;          // false = amber on top (focus), true = blue on top (break)
-  let timerId = null;
-  let completedFocusSessions = 0;
-  let audioCtx = null;
-  let endTime = null;           // wall-clock ms timestamp the current session ends at (only meaningful while running)
-
-  function totalCycles() {
-    return Math.max(1, parseInt(cyclesInput.value, 10) || 4);
-  }
-
-  function buildDots() {
-    dotsWrap.innerHTML = '';
-    const n = totalCycles();
-    for (let i = 0; i < n; i++) {
-      const d = document.createElement('div');
-      d.className = 'dot';
-      dotsWrap.appendChild(d);
-    }
-    updateDots();
-  }
-
-  function updateDots() {
-    const n = totalCycles();
-    const filled = completedFocusSessions % n;
-    [...dotsWrap.children].forEach((d, i) => d.classList.toggle('filled', i < filled));
-  }
-
-  // ── daily focus tally — persists across sessions, resets each new day ──
-  const DAILY_KEY = 'pomodoro:daily';
-
-  function todayISO() {
-    // the daily tally rolls over at 5am local time, not midnight — so a late
-    // pomodoro session still counts toward "today" until 5am
-    var d = new Date();
-    d.setHours(d.getHours() - 5);
-    var y = d.getFullYear();
-    var m = String(d.getMonth() + 1).padStart(2, '0');
-    var day = String(d.getDate()).padStart(2, '0');
-    return y + '-' + m + '-' + day;
-  }
-
-  function loadDaily() {
-    try {
-      const raw = JSON.parse(localStorage.getItem(DAILY_KEY) || 'null');
-      if (raw && raw.date === todayISO()) return raw;
-    } catch (e) { /* storage unavailable or corrupt — start fresh */ }
-    return { date: todayISO(), sessions: 0, minutes: 0 };
-  }
-
-  function saveDaily(daily) {
-    try { localStorage.setItem(DAILY_KEY, JSON.stringify(daily)); } catch (e) {}
-  }
-
-  function formatDuration(totalMinutes) {
-    const h = Math.floor(totalMinutes / 60);
-    const m = totalMinutes % 60;
-    if (h === 0) return m + 'm';
-    if (m === 0) return h + 'h';
-    return h + 'h ' + m + 'm';
-  }
-
-  function renderDaily() {
-    const daily = loadDaily();
-    dailyHourglasses.innerHTML = '';
-    for (let i = 0; i < daily.sessions; i++) {
-      const s = document.createElement('span');
-      s.textContent = '⏳';
-      dailyHourglasses.appendChild(s);
-    }
-    dailyText.textContent = daily.sessions === 0
-      ? 'No focus sessions yet today'
-      : daily.sessions + (daily.sessions === 1 ? ' session' : ' sessions') + ' · ' + formatDuration(daily.minutes) + ' focused today';
-  }
-
-  function resetDaily() {
-    saveDaily({ date: todayISO(), sessions: 0, minutes: 0 });
-    renderDaily();
-  }
-
-  function recordFocusCompleted(minutes) {
-    const daily = loadDaily();
-    daily.sessions += 1;
-    daily.minutes += minutes;
-    saveDaily(daily);
-    renderDaily();
-  }
-
-  // ── hourglass size follows the focus length, clamped so it never gets
-  // too big or too small (matters most on small phone screens) ──
-  const GLASS_SCALE_MIN = 0.82;
-  const GLASS_SCALE_MAX = 1.18;
-  const GLASS_DURATION_MIN = 5;   // minutes — anything shorter still renders at min scale
-  const GLASS_DURATION_MAX = 90;  // minutes — anything longer still renders at max scale
-
-  function updateGlassScale() {
-    const minutes = Math.max(1, parseInt(focusInput.value, 10) || 25);
-    const clamped = Math.min(GLASS_DURATION_MAX, Math.max(GLASS_DURATION_MIN, minutes));
-    const t = (clamped - GLASS_DURATION_MIN) / (GLASS_DURATION_MAX - GLASS_DURATION_MIN);
-    const scale = GLASS_SCALE_MIN + (GLASS_SCALE_MAX - GLASS_SCALE_MIN) * t;
-    glassStage.style.setProperty('--glass-scale', scale.toFixed(3));
-  }
-
-  // ── color combinations — drawn from Sanzo Wada's Dictionary of Color
-  // Combinations (colorcombinations.org), each one an authentic warm/cool
-  // pairing reworked into light/mid/dark stops for the glass ──
-  const PALETTES = [
-    {
-      name: 'Bitter Orange & Navy',
-      amber: ['#f8d9ae', '#f2a355', '#b8460f'],
-      blue:  ['#dde4ee', '#6b83a8', '#1b2a4e'],
-      sandAmber: ['#fbe6c4', '#f0ab5a'],
-      sandBlue:  ['#e3e8f2', '#a9b7d3']
-    },
-    {
-      name: 'Crimson & Navy',
-      amber: ['#d29f9f', '#9a2a2a', '#6c1d1d'],
-      blue:  ['#cdd0d8', '#1b2a4e', '#131d37'],
-      sandAmber: ['#d9adad', '#ae5353'],
-      sandBlue:  ['#d4d7de', '#59647e']
-    },
-    {
-      name: 'Pale Blue & Vermillion',
-      amber: ['#edaba6', '#d8453a', '#a43d36'],
-      blue:  ['#bcd2db', '#6b9bb0', '#587988'],
-      sandAmber: ['#f0b8b3', '#df6960'],
-      sandBlue:  ['#c6d9e0', '#87aebf']
-    },
-    {
-      name: 'Sky Blue & Vermillion',
-      amber: ['#edaba6', '#d8453a', '#973029'],
-      blue:  ['#c3dceb', '#7ab2d3', '#557d94'],
-      sandAmber: ['#f0b8b3', '#df6960'],
-      sandBlue:  ['#cce1eb', '#94c1db']
-    },
-    {
-      name: 'Wisteria & Indigo',
-      amber: ['#ded7e7', '#b5a6c9', '#827891'],
-      blue:  ['#c6ced6', '#1c3d5a', '#142c41'],
-      sandAmber: ['#e3ddeb', '#c3b7d4'],
-      sandBlue:  ['#cfd5dc', '#587085']
-    },
-    {
-      name: 'Celadon & Gold',
-      amber: ['#f4e5c4', '#eacb8a', '#98845a'],
-      blue:  ['#ccded6', '#8db6a5', '#6e9281'],
-      sandAmber: ['#f6e9cd', '#eed49e'],
-      sandBlue:  ['#d4e3dc', '#a3c4b6']
-    },
-    {
-      name: 'Royal Purple & Silver',
-      amber: ['#c3afcd', '#7a4e8f', '#624471'],
-      blue:  ['#d3d3d5', '#bcbcbe', '#6c6c6d'],
-      sandAmber: ['#ccbbd4', '#9470a5'],
-      sandBlue:  ['#dadadb', '#c4c4c6']
-    },
-    {
-      name: 'Madder Red & Evergreen',
-      amber: ['#dca7a7', '#b23b3b', '#7d2929'],
-      blue:  ['#aeb8b1', '#344e3d', '#24372b'],
-      sandAmber: ['#e1b4b4', '#c16161'],
-      sandBlue:  ['#bac3bd', '#5f7366']
-    },
-    {
-      name: 'Grass Yellow & Rikyū Grey',
-      amber: ['#ece2b6', '#dccb7a', '#968a53'],
-      blue:  ['#bdbfb3', '#878a74', '#585a4b'],
-      sandAmber: ['#efe6c1', '#e2d38f'],
-      sandBlue:  ['#c7c9be', '#9a9d8a']
-    },
-    {
-      name: 'Rust & Moss',
-      amber: ["#d4ac97", "#a9582d", "#773e20"],
-      blue:  ["#b3c3ad", "#527643", "#3c5631"],
-      sandAmber: ["#dab8a7", "#b87552"],
-      sandBlue:  ["#beccb9", "#749168"]
-    },
-    {
-      name: 'Copper & Orchid',
-      amber: ["#ddb797", "#ba6e2d", "#864f21"],
-      blue:  ["#d0bdcf", "#7b4577", "#593256"],
-      sandAmber: ["#e2c2a7", "#c68852"],
-      sandBlue:  ["#d7c7d6", "#996f96"]
-    },
-    {
-      name: 'Crimson & Cobalt',
-      amber: ["#cf949f", "#9c243b", "#6b1928"],
-      blue:  ["#b4becb", "#2c476c", "#1e3049"],
-      sandAmber: ["#d6a4ad", "#ae4b5e"],
-      sandBlue:  ["#bfc8d3", "#5c718d"]
-    },
-    {
-      name: 'Crimson & Cerulean',
-      amber: ["#e1a4b0", "#b5203d", "#85172d"],
-      blue:  ["#adbdc2", "#325a65", "#233e46"],
-      sandAmber: ["#e6b2bc", "#c44e65"],
-      sandBlue:  ["#b9c7cb", "#5d7d86"]
-    },
-    {
-      name: 'Garnet & Cobalt',
-      amber: ["#dca2b2", "#b02d52", "#791f38"],
-      blue:  ["#a8b7db", "#395bac", "#263d73"],
-      sandAmber: ["#e1b0be", "#bf5674"],
-      sandBlue:  ["#b5c2e0", "#607bbc"]
-    },
-    {
-      name: 'Ruby & Emerald',
-      amber: ["#dc9fa0", "#b73738", "#862829"],
-      blue:  ["#acc1b6", "#42725a", "#2c4c3c"],
-      sandAmber: ["#e1adae", "#c45b5c"],
-      sandBlue:  ["#b8cac1", "#678e7a"]
-    },
-    {
-      name: 'Garnet & Plum',
-      amber: ["#cf98a9", "#9b2a4e", "#6d1e37"],
-      blue:  ["#cbb6cc", "#6c326f", "#48214a"],
-      sandAmber: ["#d6a7b6", "#ad506e"],
-      sandBlue:  ["#d3c1d4", "#8d6090"]
-    },
-    {
-      name: 'Ruby & Orchid',
-      amber: ["#cea6ab", "#913541", "#64252d"],
-      blue:  ["#c2adbf", "#683562", "#4d2748"],
-      sandAmber: ["#d5b3b8", "#a65d66"],
-      sandBlue:  ["#cbb9c9", "#885f83"]
-    },
-    {
-      name: 'Crimson & Orchid',
-      amber: ["#dc96a8", "#b82a4f", "#7b1c35"],
-      blue:  ["#dcc0da", "#913989", "#5f2559"],
-      sandAmber: ["#e1a6b5", "#c5506e"],
-      sandBlue:  ["#e1c9e0", "#ab68a5"]
-    },
-    {
-      name: 'Crimson & Teal',
-      amber: ["#d9a2b0", "#a92f4e", "#7c2239"],
-      blue:  ["#c2dcda", "#509994", "#3a706c"],
-      sandAmber: ["#dfb0bc", "#ba5770"],
-      sandBlue:  ["#cbe1e0", "#78b0ac"]
-    },
-    {
-      name: 'Crimson & Indigo',
-      amber: ["#d5b2b9", "#913849", "#642733"],
-      blue:  ["#b8bed3", "#3e4e87", "#2d3962"],
-      sandAmber: ["#dbbec4", "#a96370"],
-      sandBlue:  ["#c3c8da", "#6975a2"]
-    },
-    {
-      name: 'Ruby & Cerulean',
-      amber: ["#d1aeae", "#8b3536", "#652727"],
-      blue:  ["#a4b6bd", "#335c6c", "#213b46"],
-      sandAmber: ["#d8baba", "#a45f60"],
-      sandBlue:  ["#b2c1c7", "#5b7c88"]
-    },
-    {
-      name: 'Amber & Iris',
-      amber: ["#ddc7a9", "#b27f3a", "#775527"],
-      blue:  ["#c2bad3", "#634e8d", "#473865"],
-      sandAmber: ["#e2cfb6", "#c19861"],
-      sandBlue:  ["#cbc4da", "#8474a6"]
-    },
-    {
-      name: 'Amber & Indigo',
-      amber: ["#e8ca9f", "#cb892a", "#895d1c"],
-      blue:  ["#abb0c0", "#364167", "#252d47"],
-      sandAmber: ["#ebd2ad", "#d5a053"],
-      sandBlue:  ["#b8bcc9", "#5f6886"]
-    },
-    {
-      name: 'Crimson & Pine',
-      amber: ["#eaa9b8", "#cd3456", "#8b233a"],
-      blue:  ["#a4cbac", "#2d8840", "#1e5c2b"],
-      sandAmber: ["#edb6c3", "#d75d78"],
-      sandBlue:  ["#b2d3b8", "#579f66"]
-    },
-    {
-      name: 'Citrine & Cerulean',
-      amber: ["#e3e3b6", "#b7b541", "#82802e"],
-      blue:  ["#b8ced5", "#457e91", "#2d515e"],
-      sandAmber: ["#e7e7c1", "#c6c56a"],
-      sandBlue:  ["#c3d5db", "#6d9aa9"]
-    },
-    {
-      name: 'Gold & Olive',
-      amber: ["#ded2a5", "#b1952d", "#7c6920"],
-      blue:  ["#d0dec5", "#5f8d36", "#456627"],
-      sandAmber: ["#e3d9b2", "#c1aa57"],
-      sandBlue:  ["#d7e3ce", "#87a968"]
-    },
-    {
-      name: 'Amber & Cerulean',
-      amber: ["#dec196", "#ba7c21", "#865918"],
-      blue:  ["#aec7db", "#3573a4", "#265275"],
-      sandAmber: ["#e3caa6", "#c7944a"],
-      sandBlue:  ["#bacfe0", "#5f90b7"]
-    },
-    {
-      name: 'Garnet & Violet',
-      amber: ["#dfb4c1", "#af4566", "#7a3047"],
-      blue:  ["#d3bfdf", "#713098", "#4a1f63"],
-      sandAmber: ["#e4bfca", "#c06c86"],
-      sandBlue:  ["#dac9e4", "#9362b1"]
-    },
-    {
-      name: 'Vermilion & Plum',
-      amber: ["#e1a297", "#c13e28", "#852b1c"],
-      blue:  ["#baa2c1", "#5e266e", "#451c51"],
-      sandAmber: ["#e6b0a7", "#cc614f"],
-      sandBlue:  ["#c4b0ca", "#7e518b"]
-    },
-    {
-      name: 'Crimson & Violet',
-      amber: ["#dbb1b9", "#a63f53", "#742c3a"],
-      blue:  ["#c0b8cb", "#4d366b", "#332447"],
-      sandAmber: ["#e0bdc4", "#b96777"],
-      sandBlue:  ["#c9c3d3", "#75648d"]
-    },
-    {
-      name: 'Citrine & Iris',
-      amber: ["#dfdeaa", "#b1af32", "#777521"],
-      blue:  ["#cbc9e3", "#4c45a0", "#363172"],
-      sandAmber: ["#e4e3b7", "#c1bf5c"],
-      sandBlue:  ["#d3d1e7", "#7873b7"]
-    },
-    {
-      name: 'Ruby & Moss',
-      amber: ["#d09fa0", "#a03c3e", "#6e292b"],
-      blue:  ["#c1cec0", "#3b6538", "#264224"],
-      sandAmber: ["#d7adae", "#b15f60"],
-      sandBlue:  ["#cad5c9", "#6a8a68"]
-    },
-    {
-      name: 'Ruby & Pine',
-      amber: ["#eda1aa", "#d82f43", "#97212f"],
-      blue:  ["#cee2cd", "#50984e", "#356433"],
-      sandAmber: ["#f0afb7", "#df5767"],
-      sandBlue:  ["#d5e6d4", "#7cb27a"]
-    },
-    {
-      name: 'Crimson & Jade',
-      amber: ["#d4a8b2", "#9b374e", "#6d2737"],
-      blue:  ["#9db9b1", "#246351", "#194639"],
-      sandAmber: ["#dab5be", "#af5f71"],
-      sandBlue:  ["#acc4bd", "#4e8173"]
-    },
-    {
-      name: 'Gold & Moss',
-      amber: ["#d8c396", "#ab7e1f", "#725415"],
-      blue:  ["#a7c1a2", "#2d6b22", "#1e4717"],
-      sandAmber: ["#decca6", "#bb9649"],
-      sandBlue:  ["#b4cab0", "#58894f"]
-    },
-    {
-      name: 'Ruby & Teal',
-      amber: ["#db9ea2", "#b22f37", "#782025"],
-      blue:  ["#a9c5c4", "#327473", "#214b4b"],
-      sandAmber: ["#e0adb0", "#c0565c"],
-      sandBlue:  ["#b6cecd", "#5c908f"]
-    },
-    {
-      name: 'Rust & Violet',
-      amber: ["#dfbbad", "#b76746", "#824932"],
-      blue:  ["#cbc0d6", "#6e4f8d", "#47335b"],
-      sandAmber: ["#e4c5b9", "#c5846a"],
-      sandBlue:  ["#d3c9dc", "#8f77a7"]
-    },
-    {
-      name: 'Rust & Orchid',
-      amber: ["#ddb19f", "#af481e", "#7a3215"],
-      blue:  ["#d3b6d2", "#954e93", "#683666"],
-      sandAmber: ["#e2bdad", "#bf6d4b"],
-      sandBlue:  ["#dac1d9", "#ab72a9"]
-    },
-    {
-      name: 'Gold & Orchid',
-      amber: ["#c9c0a6", "#846f35", "#5f5026"],
-      blue:  ["#ddb9d4", "#a3458c", "#6e2f5e"],
-      sandAmber: ["#d1c9b3", "#9c8b5d"],
-      sandBlue:  ["#e2c4da", "#b76ea5"]
-    },
-    {
-      name: 'Citrine & Moss',
-      amber: ["#d9dca8", "#a0a825", "#6b7119"],
-      blue:  ["#bec8ba", "#3e5c31", "#2c4123"],
-      sandAmber: ["#dfe1b5", "#b4ba53"],
-      sandBlue:  ["#c8d0c4", "#6b8261"]
-    },
-    {
-      name: 'Garnet & Pine',
-      amber: ["#d2afba", "#8a2e49", "#632134"],
-      blue:  ["#a5c0a9", "#35713d", "#234a28"],
-      sandAmber: ["#d9bbc4", "#a35b71"],
-      sandBlue:  ["#b2c9b6", "#5c8d63"]
-    },
-    {
-      name: 'Garnet & Teal',
-      amber: ["#d798ae", "#af315c", "#7e2342"],
-      blue:  ["#acc5c2", "#3f7973", "#2c5551"],
-      sandAmber: ["#dda7ba", "#bd5579"],
-      sandBlue:  ["#b8cecb", "#65948f"]
-    },
-    {
-      name: 'Garnet & Indigo',
-      amber: ["#e4b9ca", "#ba4c79", "#7e3352"],
-      blue:  ["#b3b7cd", "#253170", "#19214a"],
-      sandAmber: ["#e8c4d2", "#c97295"],
-      sandBlue:  ["#bec2d4", "#576091"]
-    },
-    {
-      name: 'Crimson & Iris',
-      amber: ["#d3a2ac", "#97243c", "#671929"],
-      blue:  ["#c8c1e4", "#4f38a8", "#39297a"],
-      sandAmber: ["#dab0b8", "#ac5063"],
-      sandBlue:  ["#d0cae8", "#7968bd"]
-    },
-    {
-      name: 'Amber & Violet',
-      amber: ["#e7c8a0", "#cc8a35", "#966627"],
-      blue:  ["#c1aad1", "#6f3794", "#4e2768"],
-      sandAmber: ["#ebd0ae", "#d5a05a"],
-      sandBlue:  ["#cab7d8", "#8c5fa9"]
-    },
-    {
-      name: 'Scarlet & Indigo',
-      amber: ["#e6b1ab", "#c03f2f", "#832b20"],
-      blue:  ["#b1b4c4", "#28315d", "#1b2240"],
-      sandAmber: ["#eabdb8", "#cd675a"],
-      sandBlue:  ["#bdbfcd", "#585f81"]
-    },
-    {
-      name: 'Garnet & Emerald',
-      amber: ["#d3aebc", "#94395d", "#62263e"],
-      blue:  ["#b1cbbb", "#297145", "#1d4f30"],
-      sandAmber: ["#dabac6", "#aa627e"],
-      sandBlue:  ["#bdd3c5", "#59906e"]
-    },
-    {
-      name: 'Copper & Indigo',
-      amber: ["#d5bea5", "#996125", "#6d451a"],
-      blue:  ["#b8bcc9", "#374167", "#29304c"],
-      sandAmber: ["#dbc8b2", "#ae8252"],
-      sandBlue:  ["#c3c6d1", "#646c89"]
-    },
-    {
-      name: 'Scarlet & Iris',
-      amber: ["#d8a39f", "#a83027", "#7b231c"],
-      blue:  ["#c5c3d9", "#3b357f", "#2a265b"],
-      sandAmber: ["#deb1ad", "#b95851"],
-      sandBlue:  ["#ceccdf", "#6b679e"]
-    },
-    {
-      name: 'Citrine & Emerald',
-      amber: ["#d2d5a8", "#9ca23f", "#686c2a"],
-      blue:  ["#c4e9d8", "#35b579", "#278559"],
-      sandAmber: ["#d9dbb5", "#afb464"],
-      sandBlue:  ["#cdecde", "#67c79a"]
-    }
+  var WORDS = [
+    ["bonjour","/bɔ̃.ʒuʁ/","hello / good day","interj.","👋"],
+    ["merci","/mɛʁ.si/","thank you","interj.","🙏"],
+    ["s'il vous plaît","/sil vu plɛ/","please","phrase","🤲"],
+    ["au revoir","/o ʁə.vwaʁ/","goodbye","phrase","👋"],
+    ["oui","/wi/","yes","adv.","✅"],
+    ["non","/nɔ̃/","no","adv.","❌"],
+    ["pardon","/paʁ.dɔ̃/","sorry / excuse me","interj.","🙇"],
+    ["bienvenue","/bjɛ̃.və.ny/","welcome","n.f.","🎉"],
+    ["salut","/sa.ly/","hi / bye (informal)","interj.","🙋"],
+    ["à bientôt","/a bjɛ̃.to/","see you soon","phrase","⏳"],
+    ["la maison","/la mɛ.zɔ̃/","the house","n.f.","🏠"],
+    ["le chat","/lə ʃa/","the cat","n.m.","🐱"],
+    ["le chien","/lə ʃjɛ̃/","the dog","n.m.","🐶"],
+    ["l'eau","/lo/","the water","n.f.","💧"],
+    ["le pain","/lə pɛ̃/","the bread","n.m.","🍞"],
+    ["le temps","/lə tɑ̃/","the time / weather","n.m.","⏰"],
+    ["la vie","/la vi/","the life","n.f.","🌱"],
+    ["l'ami","/la.mi/","the friend","n.m.","🧑‍🤝‍🧑"],
+    ["le travail","/lə tʁa.vaj/","the work","n.m.","💼"],
+    ["la famille","/la fa.mij/","the family","n.f.","👨‍👩‍👧‍👦"],
+    ["le jour","/lə ʒuʁ/","the day","n.m.","☀️"],
+    ["la nuit","/la nɥi/","the night","n.f.","🌙"],
+    ["l'école","/le.kɔl/","the school","n.f.","🏫"],
+    ["la voiture","/la vwa.tyʁ/","the car","n.f.","🚗"],
+    ["la ville","/la vil/","the city","n.f.","🏙️"],
+    ["le livre","/lə livʁ/","the book","n.m.","📖"],
+    ["la table","/la tabl/","the table","n.f.","🪑"],
+    ["la fenêtre","/la fə.nɛtʁ/","the window","n.f.","🪟"],
+    ["la porte","/la pɔʁt/","the door","n.f.","🚪"],
+    ["le café","/lə ka.fe/","the coffee","n.m.","☕"],
+    ["un","/œ̃/","one","num.","1️⃣"],
+    ["deux","/dø/","two","num.","2️⃣"],
+    ["trois","/tʁwa/","three","num.","3️⃣"],
+    ["quatre","/katʁ/","four","num.","4️⃣"],
+    ["cinq","/sɛ̃k/","five","num.","5️⃣"],
+    ["six","/sis/","six","num.","6️⃣"],
+    ["sept","/sɛt/","seven","num.","7️⃣"],
+    ["huit","/ɥit/","eight","num.","8️⃣"],
+    ["neuf","/nœf/","nine","num.","9️⃣"],
+    ["dix","/dis/","ten","num.","🔟"],
+    ["rouge","/ʁuʒ/","red","adj.","🔴"],
+    ["bleu","/blø/","blue","adj.","🔵"],
+    ["vert","/vɛʁ/","green","adj.","🟢"],
+    ["jaune","/ʒon/","yellow","adj.","🟡"],
+    ["noir","/nwaʁ/","black","adj.","⚫"],
+    ["blanc","/blɑ̃/","white","adj.","⚪"],
+    ["gris","/gʁi/","grey","adj.","🩶"],
+    ["orange","/ɔ.ʁɑ̃ʒ/","orange","adj.","🟠"],
+    ["être","/ɛtʁ/","to be","v.","🧍"],
+    ["avoir","/a.vwaʁ/","to have","v.","🤲"],
+    ["aller","/a.le/","to go","v.","🚶"],
+    ["faire","/fɛʁ/","to do / make","v.","🛠️"],
+    ["voir","/vwaʁ/","to see","v.","👀"],
+    ["savoir","/sa.vwaʁ/","to know","v.","🧠"],
+    ["pouvoir","/pu.vwaʁ/","to be able to","v.","💪"],
+    ["vouloir","/vu.lwaʁ/","to want","v.","🎯"],
+    ["venir","/və.niʁ/","to come","v.","🏃"],
+    ["prendre","/pʁɑ̃dʁ/","to take","v.","✋"],
+    ["parler","/paʁ.le/","to speak","v.","🗣️"],
+    ["manger","/mɑ̃.ʒe/","to eat","v.","🍽️"],
+    ["boire","/bwaʁ/","to drink","v.","🥤"],
+    ["dormir","/dɔʁ.miʁ/","to sleep","v.","😴"],
+    ["aimer","/ɛ.me/","to love / like","v.","❤️"],
+    ["grand","/gʁɑ̃/","big / tall","adj.","📏"],
+    ["petit","/pə.ti/","small","adj.","🐭"],
+    ["beau","/bo/","beautiful","adj.","🌟"],
+    ["joli","/ʒɔ.li/","pretty","adj.","🌸"],
+    ["bon","/bɔ̃/","good","adj.","👍"],
+    ["mauvais","/mo.vɛ/","bad","adj.","👎"],
+    ["heureux","/œ.ʁø/","happy","adj.","😊"],
+    ["triste","/tʁist/","sad","adj.","😢"],
+    ["facile","/fa.sil/","easy","adj.","😌"],
+    ["difficile","/di.fi.sil/","difficult","adj.","😖"],
+    ["nouveau","/nu.vo/","new","adj.","✨"],
+    ["vieux","/vjø/","old","adj.","🕰️"],
+    ["aujourd'hui","/o.ʒuʁ.dɥi/","today","adv.","📅"],
+    ["demain","/də.mɛ̃/","tomorrow","adv.","🌅"],
+    ["hier","/jɛʁ/","yesterday","adv.","🌇"],
+    ["maintenant","/mɛ̃t.nɑ̃/","now","adv.","⏱️"],
+    ["le matin","/lə ma.tɛ̃/","the morning","n.m.","🌄"],
+    ["le soir","/lə swaʁ/","the evening","n.m.","🌆"],
+    ["la semaine","/la sə.mɛn/","the week","n.f.","🗓️"],
+    ["le mois","/lə mwa/","the month","n.m.","📆"],
+    ["l'année","/la.ne/","the year","n.f.","🎊"],
+    ["le soleil","/lə sɔ.lɛj/","the sun","n.m.","☀️"],
+    ["le fromage","/lə fʁɔ.maʒ/","the cheese","n.m.","🧀"],
+    ["le vin","/lə vɛ̃/","the wine","n.m.","🍷"],
+    ["la viande","/la vjɑ̃d/","the meat","n.f.","🥩"],
+    ["le légume","/lə le.gym/","the vegetable","n.m.","🥦"],
+    ["le fruit","/lə fʁɥi/","the fruit","n.m.","🍎"],
+    ["le poisson","/lə pwa.sɔ̃/","the fish","n.m.","🐟"],
+    ["le sucre","/lə sykʁ/","the sugar","n.m.","🍬"],
+    ["le sel","/lə sɛl/","the salt","n.m.","🧂"],
+    ["le gâteau","/lə gɑ.to/","the cake","n.m.","🎂"],
+    ["la soupe","/la sup/","the soup","n.f.","🍲"],
+    ["l'argent","/laʁ.ʒɑ̃/","the money","n.m.","💰"],
+    ["l'amour","/la.muʁ/","the love","n.m.","❤️"],
+    ["la musique","/la my.zik/","the music","n.f.","🎵"],
+    ["la montagne","/la mɔ̃.taɲ/","the mountain","n.f.","⛰️"],
+    ["la mer","/la mɛʁ/","the sea","n.f.","🌊"]
   ];
-  const PALETTE_KEY = 'pomodoro:palette';
 
-  function applyPalette(index) {
-    const p = PALETTES[index];
-    if (!p) return;
-    document.documentElement.style.setProperty('--amber-1', p.amber[0]);
-    document.documentElement.style.setProperty('--amber-2', p.amber[1]);
-    document.documentElement.style.setProperty('--amber-3', p.amber[2]);
-    document.documentElement.style.setProperty('--blue-1', p.blue[0]);
-    document.documentElement.style.setProperty('--blue-2', p.blue[1]);
-    document.documentElement.style.setProperty('--blue-3', p.blue[2]);
+  var WORD_MAP = {};
+  WORDS.forEach(function (w) { WORD_MAP[w[0]] = w; });
 
-    $('stopAmber1').setAttribute('stop-color', p.amber[0]);
-    $('stopAmber2').setAttribute('stop-color', p.amber[1]);
-    $('stopAmber3').setAttribute('stop-color', p.amber[2]);
-    $('stopBlue1').setAttribute('stop-color', p.blue[0]);
-    $('stopBlue2').setAttribute('stop-color', p.blue[1]);
-    $('stopBlue3').setAttribute('stop-color', p.blue[2]);
-    $('stopSandAmber1').setAttribute('stop-color', p.sandAmber[0]);
-    $('stopSandAmber2').setAttribute('stop-color', p.sandAmber[1]);
-    $('stopSandBlue1').setAttribute('stop-color', p.sandBlue[0]);
-    $('stopSandBlue2').setAttribute('stop-color', p.sandBlue[1]);
+  var PER_DAY = 5;
+  var CYCLE_LEN = Math.ceil(WORDS.length / PER_DAY);
 
-    document.querySelectorAll('.grain').forEach(function (g) {
-      g.setAttribute('fill', p.sandAmber[1]);
-    });
+  // Each day's 5 words are always the same fixed group (grouped by theme in
+  // the list above), so the two practice sentences below can be hand-written
+  // to actually use those words together, instead of generated on the fly.
+  var PHRASE_GROUPS = [
+    [["Bonjour ! Un café, s'il vous plaît.","Hello! A coffee, please."],["Oui, merci beaucoup, au revoir !","Yes, thank you very much, goodbye!"]],
+    [["Salut ! Bienvenue chez nous.","Hi! Welcome to our home."],["Pardon, non merci, à bientôt !","Excuse me, no thank you, see you soon!"]],
+    [["Le chat et le chien jouent dans la maison.","The cat and the dog are playing in the house."],["Je bois de l'eau et je mange du pain.","I'm drinking water and eating bread."]],
+    [["Le temps passe vite quand on est avec sa famille.","Time passes quickly when you're with your family."],["Mon ami aime son travail et sa vie à Paris.","My friend loves his job and his life in Paris."]],
+    [["Le jour, les enfants vont à l'école en voiture.","During the day, the kids go to school by car."],["La nuit, cette ville est très calme.","At night, this city is very quiet."]],
+    [["Le livre est sur la table, près de la fenêtre.","The book is on the table, near the window."],["Ferme la porte et prends un café.","Close the door and grab a coffee."]],
+    [["Un, deux, trois, quatre, cinq — j'apprends à compter !","One, two, three, four, five — I'm learning to count!"],["Il y a quatre chaises et une table pour cinq personnes.","There are four chairs and one table for five people."]],
+    [["Six, sept, huit, neuf, dix — et on continue à compter !","Six, seven, eight, nine, ten — and we keep counting!"],["Le magasin ouvre à huit heures et ferme à dix heures.","The shop opens at eight and closes at ten."]],
+    [["Le ciel est bleu, l'herbe est verte et le soleil est jaune.","The sky is blue, the grass is green and the sun is yellow."],["Elle porte une robe rouge et des chaussures noires.","She's wearing a red dress and black shoes."]],
+    [["Le ciel est gris, mais j'ai une orange pour le petit-déjeuner.","The sky is grey, but I have an orange for breakfast."],["Mon chat est blanc et il est très mignon.","My cat is white and it's very cute."]],
+    [["Je vais faire les courses cet après-midi.","I'm going to run errands this afternoon."],["Je ne sais pas si je peux venir te voir.","I don't know if I can come see you."]],
+    [["Tu veux venir manger avec nous ?","Do you want to come eat with us?"],["Elle aime prendre le temps de parler avec ses amis.","She likes taking the time to talk with her friends."]],
+    [["J'aime boire un café le matin.","I like drinking a coffee in the morning."],["Le grand chien dort à côté du petit chat.","The big dog sleeps next to the small cat."]],
+    [["Quel beau temps ! Je suis très heureux.","What beautiful weather! I'm very happy."],["Ce joli gâteau a un bon goût, pas mauvais du tout !","This pretty cake tastes good, not bad at all!"]],
+    [["Ce n'est pas facile de dire au revoir à un vieux ami.","It's not easy to say goodbye to an old friend."],["Elle est un peu triste, mais son nouveau travail n'est pas difficile.","She's a bit sad, but her new job isn't difficult."]],
+    [["Hier, il a plu ; aujourd'hui, il fait beau.","Yesterday it rained; today the weather's nice."],["Je dois partir maintenant, mais je reviens demain matin.","I have to leave now, but I'll be back tomorrow morning."]],
+    [["Le soleil brille tous les soirs cette semaine.","The sun shines every evening this week."],["Ce mois-ci passe vite ; l'année aussi.","This month is going by fast; so is the year."]],
+    [["On mange du fromage, de la viande et des légumes.","We're eating cheese, meat and vegetables."],["Le vin rouge se marie bien avec un fruit sucré.","Red wine pairs well with a sweet fruit."]],
+    [["Le poisson a besoin d'un peu de sel.","The fish needs a bit of salt."],["Ce gâteau a trop de sucre, mais la soupe est parfaite.","This cake has too much sugar, but the soup is perfect."]],
+    [["L'argent ne fait pas le bonheur, mais l'amour et la musique, si.","Money doesn't buy happiness, but love and music do."],["Nous allons à la montagne ou à la mer cet été ?","Are we going to the mountains or the sea this summer?"]]
+  ];
 
-    try { localStorage.setItem(PALETTE_KEY, String(index)); } catch (e) {}
+  function dayIndexFor(date) {
+    // days since epoch, using local calendar date so it flips at local midnight
+    var utcMidnight = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    return Math.floor(utcMidnight / 86400000);
   }
 
-  // ── color picker — collapsed behind the Colors button; opens to four
-  // fresh, randomly-chosen combinations to pick from, with a shuffle for more ──
-  function pickRandomPalettes(excludeIndex, count) {
-    const pool = PALETTES.map(function (_, i) { return i; }).filter(function (i) { return i !== excludeIndex; });
-    const picks = [];
-    while (picks.length < count && pool.length) {
-      const idx = Math.floor(Math.random() * pool.length);
-      picks.push(pool.splice(idx, 1)[0]);
-    }
-    return picks;
+  function groupIndexFor(date) {
+    return dayIndexFor(date) % CYCLE_LEN;
   }
 
-  function renderPaletteGrid() {
-    const grid = $('paletteGrid');
-    if (!grid) return;
-    let current = 0;
-    try { current = parseInt(localStorage.getItem(PALETTE_KEY), 10) || 0; } catch (e) {}
-    const choices = pickRandomPalettes(current, 4);
-    grid.innerHTML = choices.map(function (i) {
-      const p = PALETTES[i];
-      return '<button class="palette-swatch" data-index="' + i + '" type="button">' +
-        '<span class="swatch-dots">' +
-          '<span class="swatch-dot" style="background:' + p.amber[1] + '"></span>' +
-          '<span class="swatch-dot" style="background:' + p.blue[1] + '"></span>' +
-        '</span>' +
-        '<span class="swatch-label">' + p.name + '</span>' +
-      '</button>';
-    }).join('');
-    grid.querySelectorAll('.palette-swatch').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        applyPalette(parseInt(btn.dataset.index, 10));
-        setPaletteOpen(false);
+  function todaysWords(date) {
+    var g = groupIndexFor(date);
+    return WORDS.slice(g * PER_DAY, g * PER_DAY + PER_DAY);
+  }
+
+  // ── speech — lets you pick which installed French voice to use, since
+  // quality varies a lot between the system voices browsers ship with ──
+  var VOICE_KEY = 'motsDuJour:voice';
+  var matchingVoices = [];
+  var frVoice = null;
+  var voicePicker = document.getElementById('voicePicker');
+  var voiceSelect = document.getElementById('voiceSelect');
+
+  // ranks voices so the least robotic one is picked by default — Google's
+  // network voices first, then OS-level "Enhanced"/"Premium"/"Neural"/"Natural"
+  // voices (macOS Spoken Content downloads, Windows/Edge natural voices),
+  // then whatever's left
+  function voiceRank(v) {
+    var name = v.name || '';
+    if (/google/i.test(name)) return 3;
+    if (/neural|natural/i.test(name)) return 2;
+    if (/enhanced|premium/i.test(name)) return 1;
+    return 0;
+  }
+  function loadVoice() {
+    if (!('speechSynthesis' in window)) return;
+    var voices = speechSynthesis.getVoices();
+    matchingVoices = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf('fr') === 0; });
+    matchingVoices.sort(function (a, b) { return voiceRank(b) - voiceRank(a); });
+    if (matchingVoices.length === 0) { frVoice = null; return; }
+
+    var savedName = null;
+    try { savedName = localStorage.getItem(VOICE_KEY); } catch (e) {}
+    frVoice = matchingVoices.find(function (v) { return v.name === savedName; }) || matchingVoices[0];
+
+    if (voiceSelect && voiceSelect.options.length !== matchingVoices.length) {
+      voiceSelect.innerHTML = '';
+      matchingVoices.forEach(function (v) {
+        var opt = document.createElement('option');
+        opt.value = v.name;
+        opt.textContent = v.name + ' (' + v.lang + ')';
+        voiceSelect.appendChild(opt);
       });
+    }
+    if (voiceSelect) voiceSelect.value = frVoice.name;
+    if (voicePicker && matchingVoices.length > 1) voicePicker.style.display = 'flex';
+  }
+  if (voiceSelect) {
+    voiceSelect.addEventListener('change', function () {
+      frVoice = matchingVoices.find(function (v) { return v.name === voiceSelect.value; }) || frVoice;
+      try { localStorage.setItem(VOICE_KEY, voiceSelect.value); } catch (e) {}
     });
   }
-
-  function setPaletteOpen(open) {
-    if (!paletteToggle || !palettePanel) return;
-    paletteToggle.classList.toggle('open', open);
-    palettePanel.classList.toggle('open', open);
-    paletteToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) renderPaletteGrid();
+  if ('speechSynthesis' in window) {
+    loadVoice();
+    speechSynthesis.onvoiceschanged = loadVoice;
   }
 
-  if (paletteToggle && palettePanel) {
-    paletteToggle.addEventListener('click', function () {
-      setPaletteOpen(!palettePanel.classList.contains('open'));
-    });
+  function speak(text, btn) {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'fr-FR';
+    u.rate = 0.85;
+    if (frVoice) u.voice = frVoice;
+    if (btn) {
+      btn.classList.add('playing');
+      u.onend = function () { btn.classList.remove('playing'); };
+      u.onerror = function () { btn.classList.remove('playing'); };
+    }
+    speechSynthesis.speak(u);
   }
 
-  const paletteShuffle = $('paletteShuffle');
-  if (paletteShuffle) {
-    paletteShuffle.addEventListener('click', function (e) {
-      e.stopPropagation();
-      renderPaletteGrid();
-    });
+  // ── learned dots (per-day, stored locally) ──
+  var todayKey = 'motsDuJour:' + new Date().toISOString().slice(0, 10);
+  function getLearned() {
+    try { return JSON.parse(localStorage.getItem(todayKey) || '[]'); } catch (e) { return []; }
+  }
+  function toggleLearned(word) {
+    var list = getLearned();
+    var idx = list.indexOf(word);
+    if (idx === -1) list.push(word); else list.splice(idx, 1);
+    try { localStorage.setItem(todayKey, JSON.stringify(list)); } catch (e) {}
+    return list;
   }
 
-  function fmt(sec) {
-    const m = Math.floor(sec / 60).toString().padStart(2, '0');
-    const s = Math.floor(sec % 60).toString().padStart(2, '0');
-    return m + ':' + s;
+  // ── spaced repetition review pool (persists since day one) ──
+  var SRS_KEY = 'motsDuJour:srs';
+
+  function todayISO() { return new Date().toISOString().slice(0, 10); }
+
+  function addDays(dateStr, n) {
+    var d = new Date(dateStr + 'T00:00:00');
+    d.setDate(d.getDate() + n);
+    return d.toISOString().slice(0, 10);
   }
 
-  function setSand(progress) {
-    // progress: 0 (session start) -> 1 (session end)
-    // "draining" bulb is whichever is physically on top before rotation:
-    // focus phases drain the amber(top) bulb & fill the blue(bottom) bulb;
-    // break phases do the reverse (glass is flipped, so visually the same).
-    const draining = (mode === 'focus') ? sandTop : sandBottom;
-    const filling = (mode === 'focus') ? sandBottom : sandTop;
+  function loadSRS() {
+    try { return JSON.parse(localStorage.getItem(SRS_KEY) || '{}'); } catch (e) { return {}; }
+  }
 
-    if (mode === 'focus') {
-      const surfaceY = TOP_TOP + (TOP_BOTTOM - TOP_TOP) * progress;
-      sandTop.setAttribute('y', surfaceY);
-      sandTop.setAttribute('height', TOP_BOTTOM - surfaceY);
+  function saveSRS(srs) {
+    try { localStorage.setItem(SRS_KEY, JSON.stringify(srs)); } catch (e) { /* storage unavailable */ }
+  }
 
-      const fillH = (BOT_BOTTOM - BOT_TOP) * progress;
-      sandBottom.setAttribute('y', BOT_BOTTOM - fillH);
-      sandBottom.setAttribute('height', fillH);
-    } else {
-      const surfaceY = BOT_TOP + (BOT_BOTTOM - BOT_TOP) * progress;
-      sandBottom.setAttribute('y', surfaceY);
-      sandBottom.setAttribute('height', BOT_BOTTOM - surfaceY);
-
-      const fillH = (TOP_BOTTOM - TOP_TOP) * progress;
-      sandTop.setAttribute('y', TOP_BOTTOM - fillH);
-      sandTop.setAttribute('height', fillH);
+  // Adds a word to the permanent review pool the first time it's marked —
+  // it's due for its first review immediately, so it shows up right away.
+  // Re-marking an already-tracked word never resets its existing progress.
+  function addToReview(fr) {
+    var srs = loadSRS();
+    if (!srs[fr]) {
+      srs[fr] = { interval: 0, repetitions: 0, ease: 2.5, due: todayISO(), added: todayISO() };
+      saveSRS(srs);
     }
   }
 
-  function updateModeLabel() {
-    const labels = { focus: 'Focus', short: 'Short break', long: 'Long break' };
-    modeLabel.textContent = labels[mode];
-    modeLabel.classList.toggle('is-break', mode !== 'focus');
-  }
-
-  function unlockAudio() {
-    // Must be created/resumed inside a real user gesture (the Start click) —
-    // otherwise browsers block playback later when the timer fires on its own.
-    try {
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-    } catch (e) { /* audio unsupported — ignore */ }
-  }
-
-  function pling(times) {
-    if (!audioCtx) return;
-    times = times || 1;
-    try {
-      const t0 = audioCtx.currentTime;
-      const GAP = 0.32; // seconds between repeats, when times > 1
-      for (let i = 0; i < times; i++) {
-        const base = t0 + i * GAP;
-        // a clean bell-like "pling": fundamental + a faint octave overtone
-        [[1046.5, 0.24, 0], [2093, 0.07, 0.01]].forEach(([freq, peak, delay]) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.frequency.value = freq;
-          const start = base + delay;
-          gain.gain.setValueAtTime(0.0001, start);
-          gain.gain.exponentialRampToValueAtTime(peak, start + 0.012);
-          gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.9);
-          osc.connect(gain).connect(audioCtx.destination);
-          osc.start(start);
-          osc.stop(start + 0.95);
-        });
+  function getDueEntries(srs) {
+    srs = srs || loadSRS();
+    var today = todayISO();
+    var list = [];
+    Object.keys(srs).forEach(function (fr) {
+      if (srs[fr].due <= today && WORD_MAP[fr]) {
+        list.push({ fr: fr, word: WORD_MAP[fr], due: srs[fr].due });
       }
-    } catch (e) { /* audio unsupported — ignore */ }
+    });
+    list.sort(function (a, b) { return a.due < b.due ? -1 : (a.due > b.due ? 1 : 0); });
+    return list;
   }
 
-  function minutesFor(m) {
-    if (m === 'focus') return Math.max(1, parseInt(focusInput.value, 10) || 25);
-    if (m === 'short') return Math.max(1, parseInt(shortBreakInput.value, 10) || 5);
-    return Math.max(1, parseInt(longBreakInput.value, 10) || 15);
-  }
+  // A simplified SM-2 (the same scheduling idea behind apps like Anki):
+  // quality < 3 ("Still learning") resets the interval back to 1 day;
+  // quality >= 3 ("Got it") grows it — 1 day, then 6, then interval*ease,
+  // with the ease factor itself nudged up or down based on how it went.
+  function gradeReview(fr, quality) {
+    var srs = loadSRS();
+    var entry = srs[fr];
+    if (!entry) return;
 
-  function startSession(newMode, resetProgress) {
-    mode = newMode;
-    durationSec = minutesFor(mode) * 60;
-    remainingSec = durationSec;
-    updateModeLabel();
-    if (resetProgress) setSand(0);
-    timeDisplay.textContent = fmt(remainingSec);
-    // if the timer is already running (e.g. auto-advancing focus -> break),
-    // re-anchor the wall-clock end time so the new session counts down correctly
-    if (isRunning) endTime = Date.now() + remainingSec * 1000;
-  }
-
-  function nextMode() {
-    if (mode === 'focus') {
-      completedFocusSessions++;
-      updateDots();
-      recordFocusCompleted(Math.round(durationSec / 60));
-      const isLong = completedFocusSessions % totalCycles() === 0;
-      return isLong ? 'long' : 'short';
-    }
-    return 'focus';
-  }
-
-  function tick() {
-    // derive remaining time from a fixed wall-clock end time rather than
-    // decrementing a counter — browsers throttle setInterval when a tab or
-    // window is minimized/backgrounded, so a simple "--" per tick would run
-    // slow (or need to "catch up") once the page is visible again.
-    if (endTime !== null) {
-      remainingSec = Math.max(0, Math.round((endTime - Date.now()) / 1000));
+    if (quality < 3) {
+      entry.repetitions = 0;
+      entry.interval = 1;
     } else {
-      remainingSec--;
+      if (entry.repetitions === 0) entry.interval = 1;
+      else if (entry.repetitions === 1) entry.interval = 6;
+      else entry.interval = Math.round(entry.interval * entry.ease);
+      entry.repetitions += 1;
+      entry.ease = Math.max(1.3, entry.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
     }
-    const progress = 1 - remainingSec / durationSec;
-    setSand(Math.min(1, Math.max(0, progress)));
-    timeDisplay.textContent = fmt(Math.max(0, remainingSec));
-    document.title = fmt(Math.max(0, remainingSec)) + ' · ' + (mode === 'focus' ? 'Focus' : 'Break');
+    entry.due = addDays(todayISO(), entry.interval);
+    entry.lastReview = todayISO();
+    srs[fr] = entry;
+    saveSRS(srs);
+    renderReview();
+  }
 
-    if (remainingSec <= 0) {
-      // focus ending (break about to begin) → one pling; break ending
-      // (focus about to resume) → two plings
-      pling(mode === 'focus' ? 1 : 2);
-      flipped = !flipped;
-      rotor.classList.toggle('flipped', flipped);
-      const upcoming = nextMode();
-      setTimeout(() => {
-        startSession(upcoming, true);
-      }, 550);
+  function renderReview() {
+    var container = document.getElementById('reviewSection');
+    if (!container) return;
+    container.innerHTML = '';
+
+    var label = document.createElement('p');
+    label.className = 'review-label';
+    label.textContent = 'Review';
+    container.appendChild(label);
+
+    var srs = loadSRS();
+    var total = Object.keys(srs).length;
+    var due = getDueEntries(srs);
+
+    var stats = document.createElement('p');
+    stats.className = 'review-stats';
+    stats.textContent = total === 0
+      ? 'Words you mark with the dot above join your review pool and start coming back here for spaced review.'
+      : due.length + ' due today · ' + total + ' word' + (total === 1 ? '' : 's') + ' in your review pool';
+    container.appendChild(stats);
+
+    if (total === 0) return;
+
+    if (due.length === 0) {
+      var empty = document.createElement('p');
+      empty.className = 'review-empty';
+      empty.textContent = 'All caught up — nothing due today.';
+      container.appendChild(empty);
+      return;
     }
-  }
 
-  function start() {
-    if (isRunning) return;
-    unlockAudio();
-    isRunning = true;
-    endTime = Date.now() + remainingSec * 1000;
-    startPauseBtn.textContent = 'Pause';
-    document.getElementById('hourglass-svg').classList.add('flowing');
-    // interval runs faster than 1s so that once the browser un-throttles a
-    // minimized/background tab, the display snaps to the correct time
-    // quickly rather than waiting up to a full second
-    timerId = setInterval(tick, 250);
-  }
+    due.forEach(function (item) {
+      var fr = item.fr, w = item.word;
+      var ipa = w[1], en = w[2];
 
-  function pause() {
-    if (endTime !== null) {
-      remainingSec = Math.max(0, Math.round((endTime - Date.now()) / 1000));
-    }
-    isRunning = false;
-    endTime = null;
-    startPauseBtn.textContent = 'Start';
-    document.getElementById('hourglass-svg').classList.remove('flowing');
-    clearInterval(timerId);
-  }
+      var card = document.createElement('div');
+      card.className = 'review-card';
 
-  function reset() {
-    pause();
-    flipped = false;
-    rotor.classList.remove('flipped');
-    completedFocusSessions = 0;
-    updateDots();
-    document.title = 'Katja Norstad — Pomodoro';
-    startSession('focus', true);
-  }
+      var body = document.createElement('div');
+      body.className = 'review-body';
+      var frEl = document.createElement('p');
+      frEl.className = 'review-fr';
+      frEl.textContent = en;
+      var answerEl = document.createElement('p');
+      answerEl.className = 'review-answer';
+      answerEl.innerHTML = '<span class="review-fr-answer">' + fr + '</span> <span class="review-ipa">' + ipa + '</span>';
+      body.appendChild(frEl);
+      body.appendChild(answerEl);
 
-  // when a timing field is edited, apply the new length to the session
-  // that's actively showing right away — whether it's running or paused —
-  // instead of waiting for the next Start/Reset. Elapsed time is preserved,
-  // so shortening/lengthening just adjusts what's left.
-  function syncActiveDuration(changedMode) {
-    if (mode !== changedMode) return;
-    const liveRemaining = (isRunning && endTime !== null)
-      ? Math.max(0, Math.round((endTime - Date.now()) / 1000))
-      : remainingSec;
-    const elapsed = durationSec - liveRemaining;
-    const newDuration = minutesFor(mode) * 60;
-    durationSec = newDuration;
-    remainingSec = Math.max(0, newDuration - elapsed);
-    if (isRunning) endTime = Date.now() + remainingSec * 1000;
+      var actions = document.createElement('div');
+      actions.className = 'review-actions';
 
-    const progress = 1 - remainingSec / durationSec;
-    setSand(Math.min(1, Math.max(0, progress)));
-    timeDisplay.textContent = fmt(Math.max(0, remainingSec));
-    document.title = fmt(Math.max(0, remainingSec)) + ' · ' + (mode === 'focus' ? 'Focus' : 'Break');
+      var revealBtn = document.createElement('button');
+      revealBtn.className = 'review-btn';
+      revealBtn.textContent = 'Show answer';
+      revealBtn.addEventListener('click', function () {
+        answerEl.classList.add('shown');
+        actions.innerHTML = '';
 
-    if (remainingSec <= 0) {
-      // shortened below however much had already elapsed — finish this
-      // session right now, same as the timer running out naturally
-      pling(mode === 'focus' ? 1 : 2);
-      flipped = !flipped;
-      rotor.classList.toggle('flipped', flipped);
-      const upcoming = nextMode();
-      setTimeout(() => { startSession(upcoming, true); }, 550);
-    }
-  }
+        var pbtn = document.createElement('button');
+        pbtn.className = 'review-play';
+        pbtn.setAttribute('aria-label', 'Play pronunciation of ' + fr);
+        pbtn.innerHTML = '🔊';
+        pbtn.addEventListener('click', function () { speak(fr, pbtn); });
 
-  startPauseBtn.addEventListener('click', () => {
-    isRunning ? pause() : start();
-  });
-  resetBtn.addEventListener('click', reset);
-  const dailyResetBtn = $('dailyResetBtn');
-  if (dailyResetBtn) {
-    dailyResetBtn.addEventListener('click', () => {
-      if (confirm("Clear today's session count and focused time?")) resetDaily();
+        var againBtn = document.createElement('button');
+        againBtn.className = 'review-btn again';
+        againBtn.textContent = 'Still learning';
+        againBtn.addEventListener('click', function () { gradeReview(fr, 2); });
+
+        var goodBtn = document.createElement('button');
+        goodBtn.className = 'review-btn good';
+        goodBtn.textContent = 'Got it';
+        goodBtn.addEventListener('click', function () { gradeReview(fr, 4); });
+
+        actions.appendChild(pbtn);
+        actions.appendChild(againBtn);
+        actions.appendChild(goodBtn);
+      });
+      actions.appendChild(revealBtn);
+
+      card.appendChild(body);
+      card.appendChild(actions);
+      container.appendChild(card);
     });
   }
 
-  focusInput.addEventListener('input', () => {
-    updateGlassScale();
-    syncActiveDuration('focus');
-  });
-  shortBreakInput.addEventListener('input', () => syncActiveDuration('short'));
-  longBreakInput.addEventListener('input', () => syncActiveDuration('long'));
-  cyclesInput.addEventListener('change', buildDots);
-
-  // when the window/tab is minimized, the browser throttles setInterval to
-  // save power — re-sync the display the moment it's visible/focused again
-  // instead of waiting for the next (possibly delayed) tick
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && isRunning) tick();
-  });
-  window.addEventListener('focus', () => {
-    if (isRunning) tick();
-  });
-
-  // ── ambience sounds — real recordings, self-hosted; each toggles
-  // independently, so any combination can layer together at once.
-  // Collapsed behind a single "add background noise" toggle by default. ──
-  (function () {
-    var toggle = $('ambienceToggle');
-    var panel = $('ambiencePanel');
-    var toggleLabel = toggle ? toggle.querySelector('.ambience-toggle-label') : null;
-
-    var tracks = [
-      { btn: $('fireBtn'), audio: $('fireAudio'), volume: 0.55 },
-      { btn: $('cafeBtn'), audio: $('cafeAudio'), volume: 0.55 },
-      { btn: $('forestBtn'), audio: $('forestAudio'), volume: 1 },
-      { btn: $('wavesBtn'), audio: $('wavesAudio'), volume: 0.35 }
-    ];
-
-    var FADE_SEC = 1.5; // fade window at each end of the loop, so the seam isn't an audible jump
-
-    function updateToggleLabel() {
-      if (!toggleLabel) return;
-      var playing = tracks.filter(function (t) { return t.audio && !t.audio.paused; }).length;
-      toggleLabel.textContent = playing > 0
-        ? '🎧 ' + playing + ' sound' + (playing === 1 ? '' : 's') + ' playing'
-        : '🎧 Add background noise';
-    }
-
-    if (toggle && panel) {
-      function setOpen(open) {
-        toggle.classList.toggle('open', open);
-        panel.classList.toggle('open', open);
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  function updateStreak() {
+    try {
+      var todayStr = new Date().toISOString().slice(0, 10);
+      var last = localStorage.getItem('motsDuJour:lastPracticed');
+      var streak = parseInt(localStorage.getItem('motsDuJour:streak') || '0', 10);
+      var learnedToday = getLearned().length > 0;
+      if (learnedToday && last !== todayStr) {
+        var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        streak = (last === yesterday) ? streak + 1 : 1;
+        localStorage.setItem('motsDuJour:streak', String(streak));
+        localStorage.setItem('motsDuJour:lastPracticed', todayStr);
       }
-      toggle.addEventListener('click', function () {
-        setOpen(!panel.classList.contains('open'));
-      });
+      var el = document.getElementById('streakLine');
+      if (streak > 0) {
+        el.textContent = '🔥 ' + streak + '-day streak';
+        el.classList.add('visible');
+      }
+    } catch (e) { /* localStorage unavailable — skip streak */ }
+  }
+
+  function render() {
+    var now = new Date();
+    document.getElementById('dateLine').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    var words = todaysWords(now);
+    var learned = getLearned();
+    var container = document.getElementById('words');
+    container.innerHTML = '';
+
+    if (!('speechSynthesis' in window)) {
+      var notice = document.createElement('p');
+      notice.className = 'no-speech';
+      notice.textContent = "Your browser doesn't support spoken pronunciation — try Chrome or Safari for audio.";
+      container.appendChild(notice);
     }
 
-    tracks.forEach(function (t) {
-      if (!t.btn || !t.audio) return;
-      t.audio.volume = t.volume;
+    words.forEach(function (w) {
+      var fr = w[0], ipa = w[1], en = w[2], pos = w[3], icon = w[4];
+      var card = document.createElement('div');
+      card.className = 'word-card';
 
-      // fade out just before the track loops, and fade back in right after —
-      // masks the loop point instead of a hard cut/pop
-      t.audio.addEventListener('timeupdate', function () {
-        var dur = t.audio.duration;
-        if (!dur || isNaN(dur) || t.audio.paused) return;
-        var remaining = dur - t.audio.currentTime;
-        if (remaining < FADE_SEC) {
-          t.audio.volume = Math.max(0, t.volume * (remaining / FADE_SEC));
-        } else if (t.audio.currentTime < FADE_SEC) {
-          t.audio.volume = Math.min(t.volume, t.volume * (t.audio.currentTime / FADE_SEC));
-        } else {
-          t.audio.volume = t.volume;
+      var btn = document.createElement('button');
+      btn.className = 'play-btn';
+      btn.setAttribute('aria-label', 'Play pronunciation of ' + fr);
+      btn.innerHTML = '🔊';
+      btn.addEventListener('click', function () { speak(fr, btn); });
+
+      var body = document.createElement('div');
+      body.className = 'word-body';
+      body.innerHTML =
+        '<div class="word-top"><span class="word-fr">' + fr + '</span><span class="word-icon" aria-hidden="true">' + (icon || '') + '</span><span class="word-pos">' + pos + '</span></div>' +
+        '<div class="word-ipa">' + ipa + '</div>' +
+        '<div class="word-en">' + en + '</div>';
+
+      var dot = document.createElement('span');
+      dot.className = 'learned-dot' + (learned.indexOf(fr) !== -1 ? ' on' : '');
+      dot.title = 'Mark as practiced today';
+      dot.addEventListener('click', function () {
+        var list = toggleLearned(fr);
+        var isOn = list.indexOf(fr) !== -1;
+        dot.classList.toggle('on', isOn);
+        if (isOn) {
+          addToReview(fr);
+          renderReview();
         }
+        updateStreak();
       });
 
-      // each track toggles independently — any combination can play together,
-      // layered as an ambient mix
-      t.btn.addEventListener('click', function () {
-        if (t.audio.paused) {
-          t.audio.play().then(function () {
-            t.btn.classList.add('playing');
-            updateToggleLabel();
-          }).catch(function () {
-            t.btn.classList.add('error');
-            t.btn.title = 'Could not play audio — try again';
-          });
-        } else {
-          t.audio.pause();
-          t.btn.classList.remove('playing');
-          updateToggleLabel();
-        }
-      });
-
-      t.audio.addEventListener('error', function () {
-        t.btn.disabled = true;
-        t.btn.title = 'Audio failed to load';
-      });
+      card.appendChild(btn);
+      card.appendChild(body);
+      card.appendChild(dot);
+      container.appendChild(card);
     });
-  })();
 
-  // ── post-it note — plain text, saved locally as you type ──
-  (function () {
-    var NOTE_KEY = 'pomodoro:note';
-    var noteEl = $('postitNote');
-    if (!noteEl) return;
-    try { noteEl.value = localStorage.getItem(NOTE_KEY) || ''; } catch (e) {}
-    noteEl.addEventListener('input', function () {
-      try { localStorage.setItem(NOTE_KEY, noteEl.value); } catch (e) {}
+    var phrasesContainer = document.getElementById('phrases');
+    phrasesContainer.innerHTML = '';
+    var label = document.createElement('p');
+    label.className = 'phrases-label';
+    label.textContent = 'Try them in a sentence';
+    phrasesContainer.appendChild(label);
+
+    var sentences = PHRASE_GROUPS[groupIndexFor(now)] || [];
+    sentences.forEach(function (pair) {
+      var exampleFr = pair[0], exampleEn = pair[1];
+
+      var item = document.createElement('div');
+      item.className = 'phrase-item';
+
+      var pbtn = document.createElement('button');
+      pbtn.className = 'phrase-play';
+      pbtn.setAttribute('aria-label', 'Play pronunciation of: ' + exampleFr);
+      pbtn.innerHTML = '🔊';
+      pbtn.addEventListener('click', function () { speak(exampleFr, pbtn); });
+
+      var text = document.createElement('div');
+      text.innerHTML =
+        '<p class="phrase-fr">' + exampleFr + '</p>' +
+        '<p class="phrase-en">' + exampleEn + '</p>';
+
+      item.appendChild(pbtn);
+      item.appendChild(text);
+      phrasesContainer.appendChild(item);
     });
-  })();
 
-  buildDots();
-  renderDaily();
-  updateGlassScale();
-  (function () {
-    let raw = null;
-    try { raw = localStorage.getItem(PALETTE_KEY); } catch (e) {}
-    // first-ever visit: no saved choice yet, so start on a random combination
-    // instead of always the same first one
-    const index = raw === null
-      ? Math.floor(Math.random() * PALETTES.length)
-      : (parseInt(raw, 10) || 0) % PALETTES.length;
-    applyPalette(index);
-  })();
-  startSession('focus', true);
+    renderReview();
+    updateStreak();
+  }
+
+  render();
 })();
 </script>
 </body>
