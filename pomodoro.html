@@ -119,19 +119,68 @@
     .btn.primary:hover { background:#6f1e1e; border-color:#6f1e1e; color:#fdf9f2; }
     .btn:active { transform: translateY(1px); }
 
-    .palette-name {
-      margin-top:.7rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em;
-      text-transform:uppercase; color:var(--muted); text-align:center;
+    .btn-chevron { display:inline-block; font-size:.68rem; margin-left:.3rem; transition:transform .25s; }
+    #paletteToggle.open .btn-chevron { transform:rotate(90deg); }
+
+    .palette-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+    .palette-swatch {
+      display:flex; flex-direction:column; align-items:center; gap:.5rem;
+      padding:.7rem .6rem; border-radius:10px; cursor:pointer; border:1px solid var(--line);
+      background:transparent; transition:all .2s;
+    }
+    .palette-swatch:hover { border-color:var(--accent); }
+    .swatch-dots { display:flex; gap:.35rem; }
+    .swatch-dot { width:16px; height:16px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.08); }
+    .swatch-label {
+      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.03em;
+      text-transform:uppercase; color:var(--muted); text-align:center; line-height:1.3;
+    }
+    .palette-swatch:hover .swatch-label { color:var(--accent); }
+
+    .palette-shuffle {
+      display:block; margin:1rem auto 0; font-family:'DM Mono',monospace; font-size:.6rem;
+      letter-spacing:.08em; text-transform:uppercase; color:var(--muted); background:none; border:none;
+      cursor:pointer; text-decoration:underline; text-underline-offset:2px; transition:color .2s;
+    }
+    .palette-shuffle:hover { color:var(--accent); }
+
+    @media (max-width:480px) {
+      .palette-grid { grid-template-columns:1fr; }
     }
 
-    .ambience-row { margin-top:1.4rem; display:flex; flex-wrap:wrap; justify-content:center; gap:.7rem; max-width:420px; }
-    .ambience-btn {
-      font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
-      padding:.7rem 1.3rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
-      background:transparent; color:var(--ink); transition:all .2s; display:inline-flex; align-items:center; gap:.55rem;
+    .ambience-toggle {
+      margin-top:1.5rem; display:inline-flex; align-items:center; gap:.55rem;
+      cursor:pointer; user-select:none; font-family:'DM Mono',monospace; font-size:.65rem;
+      letter-spacing:.12em; text-transform:uppercase; color:var(--muted); transition:color .2s;
+      background:none; border:none; padding:0;
     }
-    .ambience-btn:hover { border-color:var(--accent); color:var(--accent); }
-    .ambience-btn.playing { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
+    .ambience-toggle-wrap { display:flex; justify-content:center; }
+    .ambience-toggle:hover, .ambience-toggle.open { color:var(--accent); }
+    .ambience-chevron { font-size:.7rem; transition:transform .25s; display:inline-block; }
+    .ambience-toggle.open .ambience-chevron { transform:rotate(90deg); }
+
+    .ambience-panel {
+      max-width:400px; margin:0 auto; overflow:hidden;
+      max-height:0; opacity:0; transition:max-height .4s ease, opacity .3s ease, margin-top .4s ease;
+    }
+    .ambience-panel.open { max-height:220px; opacity:1; margin-top:1.1rem; }
+
+    .ambience-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+    .ambience-chip {
+      font-family:'DM Mono',monospace; font-size:.66rem; letter-spacing:.05em; text-transform:uppercase;
+      padding:.7rem .8rem; border-radius:999px; cursor:pointer; border:1px solid var(--line);
+      background:transparent; color:var(--ink); transition:all .2s; display:inline-flex; align-items:center;
+      justify-content:center; gap:.5rem;
+    }
+    .ambience-chip:hover { border-color:var(--accent); color:var(--accent); }
+    .ambience-chip.playing { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
+    .chip-icon { font-size:.9rem; }
+    .ambience-chip.playing .chip-icon { animation:chipPulse 1.7s ease-in-out infinite; }
+    @keyframes chipPulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+
+    @media (max-width:480px) {
+      .ambience-grid { grid-template-columns:1fr; }
+    }
 
     /* ── POST-IT ── */
     .postit-wrap { display:flex; justify-content:center; margin-top:2.4rem; }
@@ -288,15 +337,29 @@
     <div class="controls">
       <button class="btn primary" id="startPauseBtn">Start</button>
       <button class="btn" id="resetBtn">Reset</button>
-      <button class="btn" id="paletteBtn" title="Try another color combination">🎨 Colors</button>
+      <button class="btn" id="paletteToggle" type="button" aria-expanded="false" aria-controls="palettePanel" title="Choose a color combination">
+        🎨 <span id="paletteToggleLabel">Change color</span><span class="btn-chevron">›</span>
+      </button>
     </div>
-    <p class="palette-name" id="paletteName"></p>
 
-    <div class="ambience-row">
-      <button class="ambience-btn" id="fireBtn">🔥 Play fireplace sounds</button>
-      <button class="ambience-btn" id="cafeBtn">☕ Play café ambience</button>
-      <button class="ambience-btn" id="forestBtn">🌲 Play forest sounds</button>
-      <button class="ambience-btn" id="wavesBtn">🌊 Play ocean waves</button>
+    <div class="ambience-panel" id="palettePanel">
+      <div class="palette-grid" id="paletteGrid"></div>
+      <button class="palette-shuffle" id="paletteShuffle" type="button">🔀 Show other combinations</button>
+    </div>
+
+    <div class="ambience-toggle-wrap">
+      <button class="ambience-toggle" id="ambienceToggle" type="button" aria-expanded="false" aria-controls="ambiencePanel">
+        <span class="ambience-toggle-label">🎧 Add background noise</span>
+        <span class="ambience-chevron">›</span>
+      </button>
+    </div>
+    <div class="ambience-panel" id="ambiencePanel">
+      <div class="ambience-grid">
+        <button class="ambience-chip" id="fireBtn"><span class="chip-icon">🔥</span><span class="chip-label">Fireplace</span></button>
+        <button class="ambience-chip" id="cafeBtn"><span class="chip-icon">☕</span><span class="chip-label">Café</span></button>
+        <button class="ambience-chip" id="forestBtn"><span class="chip-icon">🌲</span><span class="chip-label">Forest</span></button>
+        <button class="ambience-chip" id="wavesBtn"><span class="chip-icon">🌊</span><span class="chip-label">Ocean waves</span></button>
+      </div>
       <audio id="fireAudio" loop preload="none" src="fireplace.mp3"></audio>
       <audio id="cafeAudio" loop preload="none" src="ambience-coffee.mp3"></audio>
       <audio id="forestAudio" loop preload="none" src="ambience-forest.mp3"></audio>
@@ -357,8 +420,8 @@
   const dailyHourglasses = $('dailyHourglasses');
   const dailyText = $('dailyText');
   const glassStage = document.querySelector('.glass-stage');
-  const paletteBtn = $('paletteBtn');
-  const paletteName = $('paletteName');
+  const paletteToggle = $('paletteToggle');
+  const palettePanel = $('palettePanel');
 
   const TOP_TOP = 15, TOP_BOTTOM = 250;     // vertical span of top bulb
   const BOT_TOP = 270, BOT_BOTTOM = 505;    // vertical span of bottom bulb
@@ -851,20 +914,64 @@
       g.setAttribute('fill', p.sandAmber[1]);
     });
 
-    if (paletteName) paletteName.textContent = p.name;
     try { localStorage.setItem(PALETTE_KEY, String(index)); } catch (e) {}
   }
 
-  if (paletteBtn) {
-    paletteBtn.addEventListener('click', function () {
-      let current = 0;
-      try { current = parseInt(localStorage.getItem(PALETTE_KEY), 10) || 0; } catch (e) {}
-      // pick a genuinely random palette, just never the one already showing
-      let next = current;
-      if (PALETTES.length > 1) {
-        while (next === current) next = Math.floor(Math.random() * PALETTES.length);
-      }
-      applyPalette(next);
+  // ── color picker — collapsed behind the Colors button; opens to four
+  // fresh, randomly-chosen combinations to pick from, with a shuffle for more ──
+  function pickRandomPalettes(excludeIndex, count) {
+    const pool = PALETTES.map(function (_, i) { return i; }).filter(function (i) { return i !== excludeIndex; });
+    const picks = [];
+    while (picks.length < count && pool.length) {
+      const idx = Math.floor(Math.random() * pool.length);
+      picks.push(pool.splice(idx, 1)[0]);
+    }
+    return picks;
+  }
+
+  function renderPaletteGrid() {
+    const grid = $('paletteGrid');
+    if (!grid) return;
+    let current = 0;
+    try { current = parseInt(localStorage.getItem(PALETTE_KEY), 10) || 0; } catch (e) {}
+    const choices = pickRandomPalettes(current, 4);
+    grid.innerHTML = choices.map(function (i) {
+      const p = PALETTES[i];
+      return '<button class="palette-swatch" data-index="' + i + '" type="button">' +
+        '<span class="swatch-dots">' +
+          '<span class="swatch-dot" style="background:' + p.amber[1] + '"></span>' +
+          '<span class="swatch-dot" style="background:' + p.blue[1] + '"></span>' +
+        '</span>' +
+        '<span class="swatch-label">' + p.name + '</span>' +
+      '</button>';
+    }).join('');
+    grid.querySelectorAll('.palette-swatch').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        applyPalette(parseInt(btn.dataset.index, 10));
+        setPaletteOpen(false);
+      });
+    });
+  }
+
+  function setPaletteOpen(open) {
+    if (!paletteToggle || !palettePanel) return;
+    paletteToggle.classList.toggle('open', open);
+    palettePanel.classList.toggle('open', open);
+    paletteToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) renderPaletteGrid();
+  }
+
+  if (paletteToggle && palettePanel) {
+    paletteToggle.addEventListener('click', function () {
+      setPaletteOpen(!palettePanel.classList.contains('open'));
+    });
+  }
+
+  const paletteShuffle = $('paletteShuffle');
+  if (paletteShuffle) {
+    paletteShuffle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      renderPaletteGrid();
     });
   }
 
@@ -1094,16 +1201,40 @@
   });
 
   // ── ambience sounds — real recordings, self-hosted; each toggles
-  // independently, so any combination can layer together at once ──
+  // independently, so any combination can layer together at once.
+  // Collapsed behind a single "add background noise" toggle by default. ──
   (function () {
+    var toggle = $('ambienceToggle');
+    var panel = $('ambiencePanel');
+    var toggleLabel = toggle ? toggle.querySelector('.ambience-toggle-label') : null;
+
     var tracks = [
-      { btn: $('fireBtn'), audio: $('fireAudio'), label: '🔥 Play fireplace sounds', playing: '⏸ Pause fireplace sounds', volume: 0.55 },
-      { btn: $('cafeBtn'), audio: $('cafeAudio'), label: '☕ Play café ambience', playing: '⏸ Pause café ambience', volume: 0.55 },
-      { btn: $('forestBtn'), audio: $('forestAudio'), label: '🌲 Play forest sounds', playing: '⏸ Pause forest sounds', volume: 0.8 },
-      { btn: $('wavesBtn'), audio: $('wavesAudio'), label: '🌊 Play ocean waves', playing: '⏸ Pause ocean waves', volume: 0.35 }
+      { btn: $('fireBtn'), audio: $('fireAudio'), volume: 0.55 },
+      { btn: $('cafeBtn'), audio: $('cafeAudio'), volume: 0.55 },
+      { btn: $('forestBtn'), audio: $('forestAudio'), volume: 0.8 },
+      { btn: $('wavesBtn'), audio: $('wavesAudio'), volume: 0.35 }
     ];
 
     var FADE_SEC = 1.5; // fade window at each end of the loop, so the seam isn't an audible jump
+
+    function updateToggleLabel() {
+      if (!toggleLabel) return;
+      var playing = tracks.filter(function (t) { return t.audio && !t.audio.paused; }).length;
+      toggleLabel.textContent = playing > 0
+        ? '🎧 ' + playing + ' sound' + (playing === 1 ? '' : 's') + ' playing'
+        : '🎧 Add background noise';
+    }
+
+    if (toggle && panel) {
+      function setOpen(open) {
+        toggle.classList.toggle('open', open);
+        panel.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      toggle.addEventListener('click', function () {
+        setOpen(!panel.classList.contains('open'));
+      });
+    }
 
     tracks.forEach(function (t) {
       if (!t.btn || !t.audio) return;
@@ -1129,21 +1260,22 @@
       t.btn.addEventListener('click', function () {
         if (t.audio.paused) {
           t.audio.play().then(function () {
-            t.btn.textContent = t.playing;
             t.btn.classList.add('playing');
+            updateToggleLabel();
           }).catch(function () {
-            t.btn.textContent = 'Could not play audio — try again';
+            t.btn.classList.add('error');
+            t.btn.title = 'Could not play audio — try again';
           });
         } else {
           t.audio.pause();
-          t.btn.textContent = t.label;
           t.btn.classList.remove('playing');
+          updateToggleLabel();
         }
       });
 
       t.audio.addEventListener('error', function () {
-        t.btn.textContent = 'Audio failed to load';
         t.btn.disabled = true;
+        t.btn.title = 'Audio failed to load';
       });
     });
   })();
