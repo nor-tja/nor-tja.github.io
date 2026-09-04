@@ -333,12 +333,22 @@
   var voicePicker = document.getElementById('voicePicker');
   var voiceSelect = document.getElementById('voiceSelect');
 
+  // ranks voices so the least robotic one is picked by default — Google's
+  // network voices first, then OS-level "Enhanced"/"Premium"/"Neural"/"Natural"
+  // voices (macOS Spoken Content downloads, Windows/Edge natural voices),
+  // then whatever's left
+  function voiceRank(v) {
+    var name = v.name || '';
+    if (/google/i.test(name)) return 3;
+    if (/neural|natural/i.test(name)) return 2;
+    if (/enhanced|premium/i.test(name)) return 1;
+    return 0;
+  }
   function loadVoice() {
     if (!('speechSynthesis' in window)) return;
     var voices = speechSynthesis.getVoices();
     matchingVoices = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf('fr') === 0; });
-    var googleVoices = matchingVoices.filter(function (v) { return /google/i.test(v.name); });
-    if (googleVoices.length > 0) matchingVoices = googleVoices;
+    matchingVoices.sort(function (a, b) { return voiceRank(b) - voiceRank(a); });
     if (matchingVoices.length === 0) { frVoice = null; return; }
 
     var savedName = null;
