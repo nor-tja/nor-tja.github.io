@@ -67,11 +67,6 @@
     }
     .flavor-tag:hover { transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.08); }
 
-    .pattern-callout { background:#f9f6ee; border:1px solid var(--line); border-radius:4px; padding:1rem 1.3rem; font-size:.9rem; line-height:1.65; margin-bottom:.8rem; }
-    .pattern-callout:last-child { margin-bottom:0; }
-    .pattern-callout.like { border-left:3px solid #4a7a5c; }
-    .pattern-callout.watch { border-left:3px solid var(--accent); }
-
     @media (max-width:600px) {
       .bar-label { width:100px; font-size:.78rem; }
       .bar-value { width:56px; font-size:.62rem; }
@@ -216,11 +211,6 @@
       <h3>Flavor language in my favourites</h3>
       <div class="tag-cloud" id="flavorCloud"></div>
     </div>
-
-    <div class="pattern-block">
-      <div class="pattern-callout like" id="likesCallout"></div>
-      <div class="pattern-callout watch" id="watchCallout"></div>
-    </div>
   </div>
 
   <details class="brew">
@@ -320,8 +310,8 @@
           <div class="bean"><span class="bean-name">Musasa — Rwanda Mbilima (Bourbon Mayaguez) Dried without pulp</span><span class="bean-score">4.5 / 5</span><span class="bean-notes">Lemonade, morello cherry & honeydew melon.</span></div>
           <div class="bean"><span class="bean-name">Hayma Kharijiya — Yemen, Bait Alal (Yemenia) Berry-dried</span><span class="bean-score">4.5 / 5</span><span class="bean-notes">Jasmine, maraschino cherry & mango.</span></div>
           <div class="bean"><span class="bean-name">Uraga — Ethiopia Heirloom, Tebe</span><span class="bean-score">4 / 5</span><span class="bean-notes">Hops, honeydew melon & bergamot.</span></div>
-          <div class="bean"><span class="bean-name">Muranga — Kenya, Kagaa (SL-28, SL-34, Ruiri 11) Dried without pulp</span><span class="bean-score">—</span><span class="bean-notes">Pineapple, rock sugar & lemonade. 1,800 masl.</span></div>
-          <div class="bean"><span class="bean-name">Sediloya — Ethiopia Heirloom, Limu Dried without pulp</span><span class="bean-score">—</span><span class="bean-notes">Raspberry, red apple & black tea.</span></div>
+          <div class="bean"><span class="bean-name">Muranga — Kenya, Kagaa (SL-28, SL-34, Ruiri 11) Dried without pulp</span><span class="bean-score">5 / 5</span><span class="bean-notes">Pineapple, rock sugar & lemonade. 1,800 masl.</span></div>
+          <div class="bean"><span class="bean-name">Sediloya — Ethiopia Heirloom, Limu Dried without pulp</span><span class="bean-score">5 / 5</span><span class="bean-notes">Raspberry, red apple & black tea.</span></div>
         </div>
       </div>
     </details>
@@ -429,13 +419,16 @@
       { re: /washed|dried without (the )?fruit|dried without pulp/i, label: 'Washed' }
     ];
     const COUNTRIES = ['Ethiopia', 'Kenya', 'Colombia', 'Peru', 'Rwanda', 'Panama', 'Guatemala', 'Costa Rica', 'Brazil', 'El Salvador', 'Honduras', 'Nicaragua', 'Bolivia', 'Burundi', 'Uganda', 'Yemen', 'Indonesia', 'Tanzania'];
+    // Colors sourced from Sanzo Wada's 1933 Dictionary of Color Combinations
+    // (via colorcombinations.org) — the same real, named palette the hourglass
+    // uses, mapped here by flavor family instead of by hour
     const FLAVOR_CATEGORIES = [
-      { re: /berr|blackcurrant|raspberr|blueberr|cherr|strawberr|plum|currant/i, color: '#c0392b', bg: '#faeae8' },
-      { re: /jasmine|floral|flower|rose|lavender|wisteria/i, color: '#9b6bc7', bg: '#f3ecf9' },
-      { re: /citrus|lemon|lime|orange|grapefruit|lemonade/i, color: '#e2963a', bg: '#fdf1e2' },
-      { re: /^tea$|herbal|chamomile|hay|hibiscus/i, color: '#6f8f5a', bg: '#eef4ea' },
-      { re: /chocolate|cacao|cocoa|honey|caramel|vanilla|toffee|nougat|nutty|hazelnut|biscuit|sugar/i, color: '#b8823a', bg: '#f7eee1' },
-      { re: /peach|apricot|apple|pear|nectarine|pineapple/i, color: '#e07a5f', bg: '#fbeae5' }
+      { re: /berr|blackcurrant|raspberr|blueberr|cherr|strawberr|plum|currant/i, color: '#b23b3b', bg: '#f6e7e7', wada: 'Akane — madder red' },
+      { re: /jasmine|floral|flower|rose|lavender|wisteria/i, color: '#b5a6c9', bg: '#f6f4f9', wada: 'Fuji — wisteria' },
+      { re: /citrus|lemon|lime|orange|grapefruit|lemonade/i, color: '#f2a355', bg: '#fdf4eb', wada: 'Daidai — bitter orange' },
+      { re: /^tea$|herbal|chamomile|hay|hibiscus/i, color: '#8db6a5', bg: '#f1f6f4', wada: 'Seiji — celadon' },
+      { re: /chocolate|cacao|cocoa|honey|caramel|vanilla|toffee|nougat|nutty|hazelnut|biscuit|sugar/i, color: '#4b2e20', bg: '#e9e6e4', wada: 'Kogecha — burnt brown' },
+      { re: /peach|apricot|apple|pear|nectarine|pineapple/i, color: '#d66b37', bg: '#faede7', wada: 'Kaki — persimmon' }
     ];
     const STOPWORDS = new Set(['and', 'the', 'with', 'moh', 'masl', 'altitude', 'dried', 'without', 'uten', 'torket', 'fruktkjott', 'fruktkjøtt']);
 
@@ -471,7 +464,10 @@
 
     const processGroups = groupAvg(b => b.process).filter(g => g.count >= 2);
     const countryGroups = groupAvg(b => b.country).filter(g => g.count >= 2);
-    const BAR_COLORS = ['#c0392b', '#9b6bc7', '#e2963a', '#6f8f5a', '#b8823a', '#e07a5f', '#4a7ba6'];
+    // Same Wada-sourced set as the flavor categories below, plus Murasaki
+    // (royal purple) and Ai (indigo) for extra variety when there are more
+    // than six process/origin groups to color
+    const BAR_COLORS = ['#b23b3b', '#7a4e8f', '#f2a355', '#8db6a5', '#4b2e20', '#d66b37', '#1c3d5a'];
 
     function renderBars(containerId, groups) {
       const el = document.getElementById(containerId);
@@ -505,7 +501,7 @@
         wordCounts[word] = (wordCounts[word] || 0) + 1;
       });
     });
-    const topWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]).slice(0, 16);
+    const topWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
     const cloudEl = document.getElementById('flavorCloud');
     if (cloudEl) {
       if (!topWords.length) {
@@ -516,40 +512,11 @@
           const cat = FLAVOR_CATEGORIES.find(c => c.re.test(word));
           const color = cat ? cat.color : 'var(--muted)';
           const bg = cat ? cat.bg : '#f2efe8';
+          const title = cat ? cat.wada : '';
           const size = (0.68 + (count / maxCount) * 0.28).toFixed(2);
-          return `<span class="flavor-tag" style="font-size:${size}rem; color:${color}; background:${bg};">${word}</span>`;
+          return `<span class="flavor-tag" style="font-size:${size}rem; color:${color}; background:${bg};" title="${title}">${word}</span>`;
         }).join('');
       }
-    }
-
-    // Narrative callouts
-    const likesEl = document.getElementById('likesCallout');
-    const watchEl = document.getElementById('watchCallout');
-    if (likesEl) {
-      const bestProcess = processGroups[0];
-      const bestCountry = countryGroups[0];
-      let text = '';
-      if (bestProcess) text += `You rate <strong>${bestProcess.label.toLowerCase()}</strong>-processed beans highest — ${bestProcess.avg.toFixed(2)} / 5 on average across ${bestProcess.count} beans. `;
-      if (bestCountry) text += `<strong>${bestCountry.label}</strong> is your most reliable origin, averaging ${bestCountry.avg.toFixed(2)} / 5 over ${bestCountry.count} beans.`;
-      likesEl.innerHTML = text || 'Log a few more rated beans to surface your favourite patterns.';
-    }
-    if (watchEl) {
-      const worstProcess = processGroups[processGroups.length - 1];
-      const negWords = ['burnt', 'bitter', 'sour', 'flat', 'musty', 'ashy'];
-      const negFound = new Set();
-      parsed.forEach(b => {
-        if (b.score !== null && b.score < 4) {
-          negWords.forEach(w => { if (b.notesText.toLowerCase().includes(w)) negFound.add(w); });
-        }
-      });
-      let text = '';
-      if (worstProcess && processGroups.length > 1 && worstProcess.avg < processGroups[0].avg) {
-        text += `<strong>${worstProcess.label}</strong>-processed beans score lowest for you — ${worstProcess.avg.toFixed(2)} / 5 across ${worstProcess.count} beans. `;
-      }
-      if (negFound.size) {
-        text += `Lower scores tend to mention ${Array.from(negFound).map(w => `"${w}"`).join(', ')} — worth flagging to the roaster next time.`;
-      }
-      watchEl.innerHTML = text || 'No clear dislikes yet — your ratings are consistently high.';
     }
   }
   renderPatterns();
