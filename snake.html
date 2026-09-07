@@ -163,7 +163,7 @@
   const bestEl = document.getElementById('best');
   const msgEl = document.getElementById('msg');
 
-  let best = SnakeLogic.readBest(window.localStorage);
+  let best = SnakeLogic.readBest();
   bestEl.textContent = best;
 
   let snake, dir, nextDir, food, score, running, paused, speed, timer;
@@ -238,7 +238,7 @@
     clearTimeout(timer);
     if (score > best) {
       best = score;
-      SnakeLogic.writeBest(window.localStorage, best);
+      SnakeLogic.writeBest(best);
       bestEl.textContent = best;
       msgEl.textContent = 'New best — press a key to retry';
     } else {
