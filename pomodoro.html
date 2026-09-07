@@ -180,7 +180,17 @@
       max-width:400px; margin:0 auto; overflow:hidden;
       max-height:0; opacity:0; transition:max-height .4s ease, opacity .3s ease, margin-top .4s ease;
     }
-    .ambience-panel.open { max-height:220px; opacity:1; margin-top:1.1rem; }
+    /* Generous cap: the panel is overflow:hidden, and the credit line below the
+       chips is a licence requirement, so it must never be the thing that gets
+       clipped. Wraps to more lines on a narrow screen, hence the media query. */
+    .ambience-panel.open { max-height:400px; opacity:1; margin-top:1.1rem; }
+
+    .ambience-credit {
+      font-family:'DM Mono',monospace; font-size:.58rem; line-height:1.7;
+      color:var(--muted); letter-spacing:.04em; margin-top:.9rem; text-align:center;
+    }
+    .ambience-credit a { color:var(--muted); }
+    .ambience-credit a:hover { color:var(--accent); }
 
     .ambience-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
     .ambience-chip {
@@ -197,6 +207,8 @@
 
     @media (max-width:480px) {
       .ambience-grid { grid-template-columns:1fr; }
+      /* one chip per row instead of two, plus a credit line that wraps further */
+      .ambience-panel.open { max-height:560px; }
     }
 
     /* ── POST-IT ── */
@@ -373,15 +385,23 @@
     </div>
     <div class="ambience-panel" id="ambiencePanel">
       <div class="ambience-grid">
-        <button class="ambience-chip" id="fireBtn"><span class="chip-icon">🔥</span><span class="chip-label">Fireplace</span></button>
         <button class="ambience-chip" id="cafeBtn"><span class="chip-icon">☕</span><span class="chip-label">Café</span></button>
         <button class="ambience-chip" id="forestBtn"><span class="chip-icon">🌲</span><span class="chip-label">Forest</span></button>
         <button class="ambience-chip" id="wavesBtn"><span class="chip-icon">🌊</span><span class="chip-label">Ocean waves</span></button>
       </div>
-      <audio id="fireAudio" loop preload="none" src="fireplace.mp3"></audio>
       <audio id="cafeAudio" loop preload="none" src="ambience-coffee.mp3"></audio>
       <audio id="forestAudio" loop preload="none" src="ambience-forest.mp3"></audio>
       <audio id="wavesAudio" loop preload="none" src="ambience-waves.mp3"></audio>
+      <!-- The ocean recording is CC BY 4.0, which requires credit naming the
+           author, the work, the source and the licence. The other two are CC0
+           and require nothing; they are credited as a courtesy. -->
+      <p class="ambience-credit">
+        Field recordings from Freesound:
+        <a href="https://freesound.org/s/689957/" target="_blank" rel="noopener">Café</a> by Matias44 (CC0),
+        <a href="https://freesound.org/s/121965/" target="_blank" rel="noopener">Forest</a> by nfsgit (CC0),
+        <a href="https://freesound.org/s/400632/" target="_blank" rel="noopener">Ocean waves</a> by InspectorJ
+        (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>)
+      </p>
     </div>
 
     <div class="postit-wrap">
@@ -1226,7 +1246,6 @@
     var toggleLabel = toggle ? toggle.querySelector('.ambience-toggle-label') : null;
 
     var tracks = [
-      { btn: $('fireBtn'), audio: $('fireAudio'), volume: 0.55 },
       { btn: $('cafeBtn'), audio: $('cafeAudio'), volume: 0.55 },
       { btn: $('forestBtn'), audio: $('forestAudio'), volume: 1 },
       { btn: $('wavesBtn'), audio: $('wavesAudio'), volume: 0.35 }
