@@ -110,6 +110,47 @@ body {
 /* text-align is unanimous across all 11 pages with a footer; padding is not. */
 footer { text-align: center; }
 
+/* Site-wide navigation.
+ *
+ * The site was a strict tree: every page offered "back" to its parent and
+ * nothing else, so reaching Coffee notes from the Pomodoro timer meant two
+ * hops through the homepage, and a language page was three from anywhere
+ * that was not a language. This is the flat version, in the same mono /
+ * uppercase / tracked vocabulary as .back and .eyebrow so it reads as
+ * furniture rather than as content competing with the page.
+ *
+ * .back stays. It is the one-key escape and it names WHERE back goes,
+ * which a flat list of six cannot. */
+.sitenav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* No row gap: the links carry their own vertical padding for the tap
+     target, and a gap on top of that opens a visible hole between rows. */
+  gap: 0 1rem;
+  margin-bottom: .6rem;
+  font-family: 'DM Mono', monospace;
+  font-size: var(--fs-4xs);
+  line-height: 1.4;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.sitenav a,
+.sitenav span {
+  /* WCAG 2.5.8 wants 24px. The text alone is a ~13px line box, so the
+     padding is what makes these tappable -- same reasoning as the learned
+     dot, and the reason this is padding rather than a row gap. */
+  display: inline-block;
+  padding: .55rem .15rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .2s;
+}
+.sitenav a:hover { color: var(--accent); }
+/* The page you are on is listed but not linked: it says where you are
+   without offering a click that goes nowhere. */
+.sitenav [aria-current="page"] { color: var(--ink); }
+
 @keyframes rise {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }

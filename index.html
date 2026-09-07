@@ -30,7 +30,24 @@
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    body { display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+    /* `overflow:hidden` here used to be safe: the content was a short greeting
+       and five one-line links, always shorter than the viewport. Six two-line
+       links are tall enough to overflow a phone in landscape, and hidden
+       overflow on a centred flex child clips BOTH ends with no way to scroll
+       to either. `safe center` falls back to flex-start once the child no
+       longer fits, so the top stays reachable. */
+    body {
+      display: flex;
+      /* Declared twice on purpose. A browser without `safe` alignment drops
+         the second line as invalid and keeps plain `center`, rather than
+         dropping both and falling back to `stretch`. */
+      align-items: center;
+      align-items: safe center;
+      justify-content: center;
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
 
     /* ── coffee cup ── */
     .coffee-scene {
@@ -93,20 +110,21 @@
     .links {
       display: flex;
       flex-direction: column;
-      gap: 0.9rem;
+      gap: 1.5rem;
       opacity: 0;
       animation: rise 0.9s ease forwards 0.4s;
     }
+    /* Grid rather than flex, because each link is now two stacked lines beside
+       one rule: the rule and the label share row 1, the note sits under the
+       label in row 2. The first column is `auto` so the rule can still grow
+       from 24px to 40px on hover -- a fixed 24px track would clip it. */
     .links a {
-      font-family: 'DM Mono', monospace;
-      font-size: var(--fs-2xs);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 0.35rem 0.7rem;
       color: var(--muted);
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
       transition: color 0.2s;
     }
     .links a::before {
@@ -116,9 +134,24 @@
       height: 1px;
       background: var(--line);
       transition: width 0.25s, background 0.2s;
-      flex-shrink: 0;
     }
-    .links a:hover { color: var(--accent); }
+    .link-label {
+      font-family: 'DM Mono', monospace;
+      font-size: var(--fs-2xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    /* The note is the part a stranger actually reads, so it is set in the
+       body serif at a readable size rather than as more tracked-out mono.
+       It stays muted on hover; only the label answers. */
+    .link-note {
+      grid-column: 2;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: var(--fs-sm);
+      line-height: 1.35;
+      color: var(--muted);
+    }
+    .links a:hover .link-label { color: var(--accent); }
     .links a:hover::before { width: 40px; background: var(--accent); }
 
 
@@ -142,16 +175,38 @@
 
   <div class="center">
     <p class="greeting">
-      Hello, I am <em>Katja</em>. I am a data scientist who enjoys building
-      and organising things. Here are links to my CV, resources I appreciate, a coffee guide,
-      a pomodoro timer and a daily language practice page.
+      Hello, I am <em>Katja</em> — a data scientist who enjoys building and
+      organising things. These are the small tools I made and kept using.
     </p>
+    <!-- Each note says what the page actually is. "Pomodoro Timer" on its own
+         gave a stranger no reason to click it, and no hint that there is an
+         hourglass and a forest recording on the other side. Every line here
+         is taken from what the page itself says, not from memory. -->
     <nav class="links">
-      <a href="cv.html">CV</a>
-      <a href="resources.html">Resources</a>
-      <a href="pomodoro.html">Pomodoro Timer</a>
-      <a href="languages.html">Practise a language</a>
-      <a href="snake.html">Play snake</a>
+      <a href="cv.html">
+        <span class="link-label">CV</span>
+        <span class="link-note">Data science work, in Oslo</span>
+      </a>
+      <a href="resources.html">
+        <span class="link-label">Resources</span>
+        <span class="link-note">Reading and videos worth the time</span>
+      </a>
+      <a href="coffee.html">
+        <span class="link-label">Coffee notes</span>
+        <span class="link-note">Tasting notes and a map of Oslo cafés</span>
+      </a>
+      <a href="pomodoro.html">
+        <span class="link-label">Pomodoro</span>
+        <span class="link-note">An hourglass that flips itself over</span>
+      </a>
+      <a href="languages.html">
+        <span class="link-label">Languages</span>
+        <span class="link-note">Five words a day, in five languages</span>
+      </a>
+      <a href="snake.html">
+        <span class="link-label">Snake</span>
+        <span class="link-note">For old time's sake</span>
+      </a>
     </nav>
   </div>
 </body>
