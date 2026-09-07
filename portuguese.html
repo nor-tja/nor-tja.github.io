@@ -82,7 +82,8 @@
 
     .learned-dot {
       flex-shrink:0; width:9px; height:9px; border-radius:50%;
-      border:1px solid var(--line); cursor:pointer; transition:background .25s,border-color .25s;
+      border:1px solid var(--line); background:none; padding:0; appearance:none; -webkit-appearance:none;
+      cursor:pointer; transition:background .25s,border-color .25s;
     }
     .learned-dot.on { background:var(--accent); border-color:var(--accent); }
 
@@ -625,13 +626,22 @@
         '<div class="word-ipa">' + ipa + '</div>' +
         '<div class="word-en">' + en + '</div>';
 
-      var dot = document.createElement('span');
-      dot.className = 'learned-dot' + (learned.indexOf(fr) !== -1 ? ' on' : '');
+      // A real <button>, not a <span>: the dot is the only way to record a
+      // word, and as a span it was unreachable by keyboard and invisible to
+      // screen readers. aria-pressed carries the on/off state, which a class
+      // name alone cannot express.
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      var dotOn = learned.indexOf(fr) !== -1;
+      dot.className = 'learned-dot' + (dotOn ? ' on' : '');
+      dot.setAttribute('aria-pressed', dotOn ? 'true' : 'false');
+      dot.setAttribute('aria-label', 'Mark ' + fr + ' as practiced today');
       dot.title = 'Mark as practiced today';
       dot.addEventListener('click', function () {
         var list = toggleLearned(fr);
         var isOn = list.indexOf(fr) !== -1;
         dot.classList.toggle('on', isOn);
+        dot.setAttribute('aria-pressed', isOn ? 'true' : 'false');
         if (isOn) {
           addToReview(fr);
           renderReview();
