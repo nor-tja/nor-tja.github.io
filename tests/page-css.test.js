@@ -92,6 +92,56 @@ test('.wrap max-width is unchanged on every page', () => {
   }
 });
 
+// --- extraction actually removed the duplicates ---------------------------
+
+// Grows to every page in the next task. Without a list like this the pilot
+// page cannot be asserted separately from the eleven not yet migrated.
+const MIGRATED = ['resources.html'];
+
+const PALETTE_VARS = ['--bg', '--ink', '--muted', '--accent', '--line'];
+
+test('migrated pages define no palette variables locally', () => {
+  for (const page of MIGRATED) {
+    const src = readPage(page);
+    for (const v of PALETTE_VARS) {
+      assert.ok(!new RegExp(`${v}\\s*:`).test(src),
+        `${page} still defines ${v} locally, shadowing site.css`);
+    }
+  }
+});
+
+test('migrated pages define no duplicated furniture', () => {
+  for (const page of MIGRATED) {
+    const src = readPage(page);
+    for (const sel of ['.back', '.back:hover', '.eyebrow', '@keyframes rise']) {
+      assert.equal(extractRule(src, sel), null,
+        `${page} still defines ${sel} locally; the extraction added the link ` +
+        `but did not actually deduplicate anything`);
+    }
+    assert.equal(extractRule(src, '*, *::before, *::after'), null,
+      `${page} still defines the universal reset locally`);
+  }
+});
+
+test('migrated pages keep only their own footer padding', () => {
+  for (const page of MIGRATED) {
+    const decls = declarations(extractRule(readPage(page), 'footer'));
+    assert.equal(decls['text-align'], undefined,
+      `${page} still sets footer text-align; that half moved to site.css`);
+    assert.ok(decls['padding'], `${page} must keep its own footer padding`);
+  }
+});
+
+test('migrated pages keep only the non-universal half of body', () => {
+  for (const page of MIGRATED) {
+    const decls = declarations(extractRule(readPage(page), 'body'));
+    for (const p of ['background', 'color', 'font-family', 'font-weight', 'min-height']) {
+      assert.equal(decls[p], undefined,
+        `${page} still sets body ${p}; that moved to site.css`);
+    }
+  }
+});
+
 // --- shared stylesheet is linked ------------------------------------------
 
 const LINK = '<link rel="stylesheet" href="assets/css/site.css">';
