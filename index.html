@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
     /* `overflow:hidden` here used to be safe only by luck: the content was
-       always shorter than the viewport. A greeting plus six links still
+       always shorter than the viewport. A greeting plus five links still
        overflows a phone in landscape (~370px of usable height), and hidden
        overflow on a centred flex child clips BOTH ends with no way to scroll
        to either. `safe center` falls back to flex-start once the child no
@@ -101,10 +101,22 @@
       position: relative;
       z-index: 1;
     }
+    /* This page has no h1, so it opts into the display treatment by hand --
+       see the long note beside the h1 rule in site.css. Same two properties,
+       same reason: at 32px EB Garamond 400 is the heaviest thing on the site
+       and there is no lighter cut of it to reach for.
+
+       1.8 rather than 1.55 for the same end. Weighed on a render, smoothing
+       alone got the greeting to 80% of its old ink; the extra leading spreads
+       what is left over a third more paper, which lands the ink-per-area at
+       -29% against the old face's -28%. Air is the half of "lighter" that
+       does not cost any contrast at all. */
     .greeting {
       font-size: clamp(1.3rem, 3.8vw, 1.8rem);
-      line-height: 1.55;
+      line-height: 1.8;
       margin-bottom: 2.4rem;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       opacity: 0;
       animation: rise 0.9s ease forwards 0.15s;
     }
@@ -177,14 +189,21 @@
          labels for someone who already knows what is behind them; "Reading &
          watching" and "Pomodoro hourglass" tell a stranger. Kept short enough
          to stay on one line as tracked-out uppercase -- a name that wraps is
-         a subtitle wearing a disguise. -->
+         a subtitle wearing a disguise.
+
+         Coffee notes is deliberately NOT in this list. It is the one
+         destination with a picture of its own -- the mug in the corner is a
+         link, and it labels itself on hover -- so a text link three lines
+         above the illustration was the same door twice. Everything else here
+         has only its name, which is why everything else here is a name.
+         tests/nav.test.js still checks the homepage reaches all six; it just
+         counts the mug now. -->
     <nav class="links">
       <a href="cv.html">CV</a>
       <a href="resources.html">Reading &amp; watching</a>
-      <a href="coffee.html">Coffee notes</a>
       <a href="pomodoro.html">Pomodoro hourglass</a>
       <a href="languages.html">Language practice</a>
-      <a href="snake.html">Snake</a>
+      <a href="snake.html">Play snake</a>
     </nav>
   </div>
 </body>

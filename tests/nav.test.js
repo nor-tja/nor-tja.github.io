@@ -129,15 +129,63 @@ function homeLinks() {
   return [...list[1].matchAll(/<a href="([^"]+\.html)"[^>]*>([\s\S]*?)<\/a>/g)];
 }
 
+// coffee.html is reached from the illustrated mug in the corner instead of
+// from the list. It is the only destination with a picture of its own, and a
+// text link three lines above that picture was the same door twice.
+//
+// Named, not inferred: if a second page ever gets an illustration, adding it
+// here has to be a decision. Dropping a link from the list without adding it
+// here fails the reachability test below.
+const ILLUSTRATED = { 'coffee.html': 'coffee-scene' };
+
 test('the homepage names every destination, and names it something', () => {
   const links = homeLinks();
-  assert.deepEqual(links.map((m) => m[1]), DEST.filter((d) => d !== 'index.html'),
-    'index.html does not list exactly the destinations, in nav order');
+  const listed = DEST.filter((d) => d !== 'index.html' && !(d in ILLUSTRATED));
+  assert.deepEqual(links.map((m) => m[1]), listed,
+    'index.html does not list exactly the destinations that have no picture ' +
+    'of their own, in nav order');
   for (const [, href, inner] of links) {
     assert.ok(!/<[a-z]/i.test(inner),
       `index.html ${href} wraps its name in markup. The name is the whole ` +
       `link now; a nested element is a subtitle growing back.`);
     assert.ok(inner.trim().length >= 2, `index.html ${href} has no visible name`);
+  }
+});
+
+// The point the list was serving, stated directly so that trimming the list
+// cannot quietly cost the homepage a destination. Every top-level page is one
+// click from the hub, whether the click is on a name or on a drawing.
+test('every destination is one click from the homepage', () => {
+  const src = readPage('index.html');
+  for (const dest of DEST) {
+    if (dest === 'index.html') continue;
+    const cls = ILLUSTRATED[dest];
+    if (cls) {
+      const tag = new RegExp(`<a href="${dest}"[^>]*class="[^"]*\\b${cls}\\b`).exec(src);
+      assert.ok(tag, `index.html has no .${cls} anchor to ${dest}, so the only ` +
+        `way to ${dest} from the hub is gone`);
+      continue;
+    }
+    assert.ok(homeLinks().some((m) => m[1] === dest),
+      `index.html neither lists ${dest} nor illustrates it`);
+  }
+});
+
+// An anchor whose only content is an <img> is a link with no name to a screen
+// reader unless something supplies one. The mug carries a .cup-link-text
+// label, which is visually revealed on hover but present in the accessibility
+// tree the whole time -- opacity:0 hides it from sight, not from the tree.
+test('the illustrated links are not anonymous', () => {
+  const src = readPage('index.html');
+  for (const [dest, cls] of Object.entries(ILLUSTRATED)) {
+    const a = new RegExp(`<a href="${dest}"[^>]*class="[^"]*\\b${cls}\\b[^>]*>([\\s\\S]*?)</a>`)
+      .exec(src);
+    assert.ok(a, `no .${cls} anchor to ${dest}`);
+    const text = a[1].replace(/<[^>]+>/g, '').trim();
+    const alt = /alt="([^"]*)"/.exec(a[1]);
+    assert.ok(text.length >= 2 || (alt && alt[1].trim().length >= 2),
+      `the .${cls} link to ${dest} has neither text nor a non-empty alt, so ` +
+      `it is announced as "link" and nothing else`);
   }
 });
 

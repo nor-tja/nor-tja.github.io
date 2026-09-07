@@ -62,7 +62,10 @@
       background:#eee7da; display:flex; align-items:center; justify-content:center;
       font-size:1.4rem; line-height:1.7; }
     .lang-body { flex:1; min-width:0; }
-    .lang-name { font-size: var(--fs-xl); font-weight:500; transition:color .2s; }
+    /* No weight, same reasoning as .word-fr in language-page.css: at 23px
+       against a 14px subtitle, size has already picked it out, and a 500 on
+       top of that is EB Garamond at its blackest for no extra meaning. */
+    .lang-name { font-size: var(--fs-xl); transition:color .2s; }
     .lang-sub { color:var(--muted); font-size: var(--fs-sm); margin-top:.15rem; }
     .lang-arrow {
       flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line);

@@ -11,6 +11,21 @@ const FONTS = fs.readFileSync(path.join(ROOT, 'assets/css/fonts.css'), 'utf8');
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
+// Every stylesheet that sets type, labelled. pageCss() already folds in the
+// shared language-page.css for the five pages that link it, so a bad rule
+// there is reported once per page rather than once -- which is noisier, and
+// also true: it does affect all five.
+//
+// Comments are stripped first. The tests below read a block's selector as
+// "the text before the {", and this file's comments are long: without this,
+// a rule preceded by twenty lines of prose has a twenty-line selector, and a
+// check for the selector being exactly `body` can never match. That is not
+// hypothetical -- it made the "never thin running text" guard silent, and the
+// mutation that proved it is the reason this line exists.
+const decomment = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '');
+const CSS_SOURCES = [['site.css', SITE], ...PAGES.map((p) => [p, pageCss(p)])]
+  .map(([name, css]) => [name, decomment(css)]);
+
 // --font-serif / --font-ui / --font-mono, each mapped to the family it leads
 // with. Everything below is expressed against this map rather than against
 // family names, so swapping a face is a one-line change in site.css and not a
@@ -158,6 +173,121 @@ test('the serif has a real italic rather than a slanted upright', () => {
   assert.ok(FONTS.includes(`font-family: '${serif}';\n  font-style: italic;`),
     `fonts.css carries no italic ${serif}. The site uses font-style:italic on ` +
     `every heading, so the browser would shear the upright instead.`);
+});
+
+// EB Garamond's wght axis starts at 400: there is no lighter cut, and Google
+// answers a request for 300 with the 400 file. So the only way to make large
+// text lighter is to stop macOS fattening the strokes, which takes TWO
+// properties -- WebKit and Firefox each have their own -- and one of them
+// alone silently fixes half the browsers.
+const SMOOTHING = [
+  ['-webkit-font-smoothing', 'antialiased'],
+  ['-moz-osx-font-smoothing', 'grayscale'],
+];
+
+// Where the serif runs at display size and therefore gets the treatment.
+// Named rather than derived from font-size, because h1 picks it up from an
+// element selector in site.css while the other two are page rules -- that is
+// the cascade, and no scan of font-size declarations can see it. A fourth
+// display-size rule means a fourth line here.
+const DISPLAY_RULES = [
+  ['site.css', 'h1'],
+  ['index.html', '.greeting'],
+  ['mots-du-jour.html', '.word-fr'],   // shared by all five language pages
+];
+
+test('the serif is thinned everywhere it runs at display size', () => {
+  for (const [file, selector] of DISPLAY_RULES) {
+    const css = file === 'site.css' ? SITE : pageCss(file);
+    const rule = new RegExp(`(^|[},\\s])${selector.replace(/\./g, '\\.')}\\s*\\{([^}]*)\\}`, 'm')
+      .exec(css);
+    assert.ok(rule, `${file} has no ${selector} rule`);
+    for (const [prop, value] of SMOOTHING) {
+      assert.match(rule[2], new RegExp(`${prop}\\s*:\\s*${value}`),
+        `${file} ${selector} runs at display size but does not set ${prop}. ` +
+        `EB Garamond has no cut below 400, so this is the only lever left; ` +
+        `without it the text goes back to being the heaviest thing on the page.`);
+    }
+  }
+});
+
+test('font smoothing is always declared as a pair', () => {
+  const bad = [];
+  for (const [name, css] of CSS_SOURCES) {
+    for (const block of css.split('}')) {
+      const has = SMOOTHING.map(([prop]) => new RegExp(`${prop}\\s*:`).test(block));
+      if (!has[0] && !has[1]) continue;
+      const sel = (/([^{;]+)\{/.exec(block) || [, block]).pop().trim().replace(/\s+/g, ' ');
+      for (const [i, [prop, value]] of SMOOTHING.entries()) {
+        if (!has[i]) bad.push(`${name}: ${sel} sets no ${prop}`);
+        else if (!new RegExp(`${prop}\\s*:\\s*${value}`).test(block)) {
+          bad.push(`${name}: ${sel} sets ${prop} to something other than ${value}`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(bad, [], `half-applied font smoothing:\n  ${bad.join('\n  ')}`);
+});
+
+// The reason it is scoped to headings. Thinning 18px running text by 20% is
+// the exact complaint that got Cormorant Garamond replaced; putting this on
+// body or on * would undo that swap without changing a single font file.
+test('running text is never thinned by font smoothing', () => {
+  const bad = [];
+  for (const [name, css] of CSS_SOURCES) {
+    for (const block of css.split('}')) {
+      if (!/-font-smoothing\s*:/.test(block)) continue;
+      const sel = (/([^{;]+)\{/.exec(block) || [, ''])[1] || '';
+      for (const part of sel.split(',')) {
+        const s = part.trim();
+        if (s === 'body' || s === 'html' || s === '*' || s === ':root') {
+          bad.push(`${name}: "${s}" thins every word on the page, not just the big ones`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(bad, [], `${bad.join('\n  ')}`);
+});
+
+// The defect this pins, twice reported: a serif rule that is BOTH large and
+// heavy. The 500 tier exists so a name can be picked out of body copy at body
+// size. Above ~23px, size has already done that, and EB Garamond's 500 is a
+// good deal blacker than the Cormorant 400 the site used to set these in --
+// so the two compound and the word reads as shouting.
+//
+// 1.3rem is where the tokens put --fs-xl, and --fs-xl at 500 was one of the
+// two rules that prompted this.
+const DISPLAY_REM = 1.3;
+
+test('no serif rule is both display-size and heavy', () => {
+  const tokens = {};
+  for (const m of SITE.matchAll(/(--fs-[\w-]+):\s*([\d.]+)rem/g)) tokens[m[1]] = +m[2];
+
+  // The largest size the rule can ever reach: a clamp is its upper bound.
+  const remOf = (decl) => {
+    const tok = /var\((--fs-[\w-]+)\)/.exec(decl);
+    if (tok) return tokens[tok[1]] ?? 0;
+    const rems = [...decl.matchAll(/([\d.]+)rem/g)].map((m) => +m[1]);
+    return rems.length ? Math.max(...rems) : 0;
+  };
+
+  const offenders = [];
+  for (const [name, css] of CSS_SOURCES) {
+    for (const block of css.split('}')) {
+      if (/var\(--font-(ui|mono)\)/.test(block)) continue;  // not the serif
+      const size = /font-size:\s*([^;]+)/.exec(block);
+      const weight = /font-weight:\s*(\d+)/.exec(block);
+      if (!size || !weight) continue;
+      const rem = remOf(size[1]);
+      if (rem < DISPLAY_REM || +weight[1] < 500) continue;
+      const sel = (/([^{;]+)\{/.exec(block) || [, block]).pop().trim().replace(/\s+/g, ' ');
+      offenders.push(`${name}: ${sel} is ${rem}rem at weight ${weight[1]}`);
+    }
+  }
+  assert.deepEqual(offenders, [],
+    `these set the serif large AND heavy; at ${DISPLAY_REM}rem and up, size ` +
+    `has already picked the text out and the weight only adds ink:\n  ` +
+    `${offenders.join('\n  ')}`);
 });
 
 // A preload is a promise that the page needs this file NOW. Preloading a face

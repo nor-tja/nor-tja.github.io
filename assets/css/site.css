@@ -125,6 +125,37 @@ body {
   min-height: 100vh;
 }
 
+/* Optical sizing, done by hand, because EB Garamond has no optical axis and
+   no cut below 400 -- its wght axis is literally min 400, and Google answers
+   a request for 300 with the 400 file and no warning. So when large text
+   reads too heavy, weight is not available as the fix.
+   ------------------------------------------------------------------------
+   What IS available: macOS renders text with a smoothing pass that fattens
+   the strokes, and turning it off thins them without touching size, colour
+   or contrast. Measured on the homepage greeting by rendering it and weighing
+   the ink pixel by pixel (see the note in the commit):
+
+     as it was, EB Garamond 400        ink 100%   stroke darkness 100%
+     grayscale smoothing                   -20%                   100%
+     Cormorant 300, the old face           -27%                   100%
+
+   That last row is the target: this is a correction of a regression the font
+   swap introduced, not a new preference. Fading the colour would also have
+   dropped the ink 11%, but it drops stroke darkness with it -- that is not
+   lighter type, that is greyer type, and the old face was full black too.
+
+   Scoped to headings on purpose. The same rule on body copy would thin 18px
+   running text by the same 20%, which is the exact complaint that got
+   Cormorant replaced in the first place. Thin at display size, full weight
+   at reading size, which is what an optical axis would have done for us.
+
+   Does nothing off macOS -- and does not need to. Windows and Linux never
+   applied the fattening pass, so the heaviness this corrects is not there. */
+h1 {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .back {
   display: inline-flex;
   align-items: center;
