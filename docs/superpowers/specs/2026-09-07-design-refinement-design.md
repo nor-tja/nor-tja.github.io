@@ -351,3 +351,51 @@ rather than hand-edited, and guarded by the type-scale test.
 ## Open items
 
 None. All decisions in this spec are settled.
+
+## What implementation changed
+
+Recorded after the fact. The spec's measurements all held; these are places
+where the work went differently anyway.
+
+**A typography pass was added mid-flight** after comparing the site to
+collusion.wiki and nytimes.com. Three changes were agreed: narrow the
+measure, responsive type tokens, absolute leading. The first was then
+**withdrawn on measurement** — every page already caps its prose well inside
+`.wrap` (`.resource-summary` 580px, coffee's `.intro` 540px,
+`.patterns-intro` 560px, `.place-summary-text` 640px), giving measures of
+55–84 characters. The 860px column governs the map, the bean grid and the
+video embeds, not the reading line. The real defect was size, not width:
+Cormorant Garamond's small x-height makes 18px read like 15px of a normal
+face. Scaling the root with `clamp(1rem, .944rem + .25vw, 1.125rem)` fixed
+it and narrowed the measure to 70 characters as a side effect.
+
+**The 11-token scale is not fine enough at the small end.** It bottoms out
+at `.65rem`, while the site uses eight distinct sizes below `.7rem` across
+94 declarations. Snapping everything would have grown the smallest labels by
+up to 30%, so `tools/normalize-type.js` substitutes a token only within 5%:
+201 declarations tokenised, 39 left as literals and pinned by test. The
+remaining tail is the honest residue of a scale that was designed before
+this distribution was known.
+
+**Correction to a commit message.** `a39f6ec` says "the plan assumed 47
+ad-hoc sizes. Measurement found 240." That misreads this spec, which
+correctly recorded **47 distinct values across 289 declarations**. The 240
+was a count of literal declarations excluding `clamp()` and `var()`, taken
+after eleven pages had already had their duplicated `.back` and `.eyebrow`
+rules removed. The two figures are consistent; the spec was not wrong.
+
+**`--leading-body` needed nineteen guards.** Because it is a length rather
+than a multiplier, elements set larger than the body text inherit a line box
+too small for their glyphs. `.word-fr` (24px), `.time-display` (25.6px),
+`.lang-flag`, `.place-name` and `.stat-value` all needed an explicit
+`line-height`. They were given 1.7, which is what they inherit today, so
+nothing moves. Whether a 24px display word wants 1.7 is still open.
+
+**Three exceptions survive the deduplication**, each deliberate: cv.html
+keeps its 18px `@keyframes rise` and the divergent half of its `.eyebrow`,
+and pomodoro.html keeps six `--amber-*`/`--blue-*` variables beside the
+shared palette.
+
+**Known and not fixed:** the learned dot is 9×9px, well under the 24×24
+minimum touch target in WCAG 2.5.8. Keyboard reach was the agreed scope;
+target size is a separate criterion and a separate decision.
