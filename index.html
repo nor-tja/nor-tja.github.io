@@ -21,12 +21,14 @@
   <meta name="twitter:description" content="Data scientist in Oslo. A pomodoro timer, daily language practice with spaced repetition, coffee tasting notes, and a few other things I built.">
   <meta name="twitter:image" content="https://katjanorstad.no/assets/og/index.png">
   <!-- meta:end -->
-  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the two faces every
-       page renders immediately skips the stylesheet->font discovery hop.
+  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the faces THIS page
+       renders immediately skips the stylesheet->font discovery hop.
        crossorigin is required even same-origin: fonts always fetch in CORS
-       mode, and without it the preload is discarded and fetched twice. -->
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/cormorant-garamond-normal-300-latin.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
+       mode, and without it the preload is discarded and fetched twice.
+       Only faces the page can reach belong here -- a preload nothing uses
+       spends a connection on a file the browser throws away. Checked by
+       tests/typography.test.js. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/eb-garamond-normal-400-latin.woff2">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
@@ -79,7 +81,7 @@
       transform: translate(-50%, -50%);
       white-space: nowrap;
       text-align: center;
-      font-family: 'DM Mono', monospace;
+      font-family: var(--font-ui);
       font-size: var(--fs-4xs);
       letter-spacing: 0.16em;
       text-transform: uppercase;
@@ -126,7 +128,7 @@
       /* WCAG 2.5.8 wants 24px. The label alone is a ~13px line box, so this
          padding is what makes the row tappable: 13 + 2 x 5.6 = 24.2px. */
       padding: 0.35rem 0;
-      font-family: 'DM Mono', monospace;
+      font-family: var(--font-ui);
       font-size: var(--fs-2xs);
       letter-spacing: 0.14em;
       text-transform: uppercase;

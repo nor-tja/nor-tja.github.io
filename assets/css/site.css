@@ -21,9 +21,15 @@
    default to 20px, which is the exact group that cannot afford to lose it.
 
    Measured against a 16px default: 16.04px at 375px wide (mobile is unchanged)
-   rising to 18px at 1280px and holding. Cormorant Garamond has a small
-   x-height, so 18px of it reads nearer 15px of a normal face; the site was
-   genuinely undersized on a desktop. */
+   rising to 18px at 1280px and holding. Old-style faces have a small x-height,
+   so 18px of one reads nearer 15px of a normal face; the site was genuinely
+   undersized on a desktop.
+
+   That still holds after the switch from Cormorant Garamond to EB Garamond.
+   Measured from the OS/2 tables: x-height 0.400 em against Cormorant's 0.386,
+   3.6% larger, which at 18px is a quarter of a pixel. EB Garamond reads
+   sturdier because its strokes carry more ink, not because it is bigger, so
+   the compensation here is not double-counting. */
 html { font-size: clamp(1rem, .944rem + .25vw, 1.125rem); }
 
 :root {
@@ -32,6 +38,40 @@ html { font-size: clamp(1rem, .944rem + .25vw, 1.125rem); }
   --muted: #6e6963;
   --accent: #9a2a2a;
   --line: #d8d3cc;
+
+  /* Three roles, three faces. The split is the one both of the sites this
+     design borrows from use: a serif you read, a sans for the furniture
+     around it, and a mono reserved for things that are not words.
+     collusion.wiki names its three --serif / --sans / --mono; the New York
+     Times sets its body in Imperial and every kicker, byline and label in
+     Franklin.
+     ------------------------------------------------------------------------
+     WHICH ROLE GETS WHICH is not a matter of taste, and there is a test on it
+     in tests/typography.test.js:
+
+       --font-serif   running text, headings, anything that is a sentence
+       --font-ui      names: labels, navigation, buttons, tags, captions
+       --font-mono    figures and notation: clock readouts, scores, counts,
+                      IPA. Never a word, and never uppercase.
+
+     The site used to have no such rule. DM Mono set 65 of its 91 font-family
+     declarations -- every eyebrow, every footer, every button -- which is why
+     the furniture read as terminal output rather than as an editorial page.
+     Neither reference site uses a monospace that way. */
+  --font-serif: 'EB Garamond', Georgia, 'Times New Roman', serif;
+
+  /* A system stack, and deliberately not a fourth webfont.
+     Libre Franklin was the alternative and it measured 28.6KB per weight for
+     text that is never larger than 12px and always tracked-out uppercase --
+     the exact size at which SF, Segoe UI and Roboto are indistinguishable
+     from a bought face. It would also have arrived after first paint, so the
+     furniture would have swapped under the reader while the page settled.
+     collusion.wiki reaches the same conclusion: its --sans is a system stack
+     headed by Avenir Next, and only its serif is self-hosted. */
+  --font-ui: 'Avenir Next', Avenir, -apple-system, system-ui, 'Segoe UI',
+             Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --font-mono: 'DM Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   /* One scale replacing 47 ad-hoc font-size values. Headings keep their
      clamp() rules and are not tokenised.
@@ -70,12 +110,18 @@ html { font-size: clamp(1rem, .944rem + .25vw, 1.125rem); }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* The universal core only. font-size and line-height stay on the pages that
-   set them, because index.html and snake.html deliberately do not. */
+   set them, because index.html and snake.html deliberately do not.
+
+   font-weight is 400 where it said 300 for Cormorant. EB Garamond's lightest
+   cut IS 400, so a 300 here would not have lightened anything -- the browser
+   would have used 400 anyway and the tier above it would have collapsed into
+   the body text. The three tiers the site had (300 body / 400 title / 500
+   strong) are now two: 400 running text, 500 anything picked out of it. */
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 300;
+  font-family: var(--font-serif);
+  font-weight: 400;
   min-height: 100vh;
 }
 
@@ -83,7 +129,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: .4rem;
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-ui);
   font-size: var(--fs-3xs);
   /* Explicit, so the length --leading-body cannot inherit down and wrap this
      10px label in a 30px line box. Same reason on .eyebrow below. */
@@ -98,7 +144,7 @@ body {
 .back:hover { color: var(--accent); }
 
 .eyebrow {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-ui);
   font-size: var(--fs-2xs);
   line-height: 1.4;
   letter-spacing: .18em;
@@ -115,7 +161,7 @@ footer { text-align: center; }
  * The site was a strict tree: every page offered "back" to its parent and
  * nothing else, so reaching Coffee notes from the Pomodoro timer meant two
  * hops through the homepage, and a language page was three from anywhere
- * that was not a language. This is the flat version, in the same mono /
+ * that was not a language. This is the flat version, in the same sans /
  * uppercase / tracked vocabulary as .back and .eyebrow so it reads as
  * furniture rather than as content competing with the page.
  *
@@ -129,7 +175,7 @@ footer { text-align: center; }
      target, and a gap on top of that opens a visible hole between rows. */
   gap: 0 1rem;
   margin-bottom: .6rem;
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-ui);
   font-size: var(--fs-4xs);
   line-height: 1.4;
   letter-spacing: .12em;

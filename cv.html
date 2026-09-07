@@ -21,11 +21,14 @@
   <meta name="twitter:description" content="Curriculum vitae of Katja Norstad, a data scientist based in Oslo working with data since 2012.">
   <meta name="twitter:image" content="https://katjanorstad.no/assets/og/cv.png">
   <!-- meta:end -->
-  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the two faces every
-       page renders immediately skips the stylesheet->font discovery hop.
+  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the faces THIS page
+       renders immediately skips the stylesheet->font discovery hop.
        crossorigin is required even same-origin: fonts always fetch in CORS
-       mode, and without it the preload is discarded and fetched twice. -->
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/cormorant-garamond-normal-300-latin.woff2">
+       mode, and without it the preload is discarded and fetched twice.
+       Only faces the page can reach belong here -- a preload nothing uses
+       spends a connection on a file the browser throws away. Checked by
+       tests/typography.test.js. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/eb-garamond-normal-400-latin.woff2">
   <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
@@ -36,7 +39,7 @@
     header { padding: 3rem 0; border-bottom: 1px solid var(--line); }
     .eyebrow { margin-bottom:1.4rem; opacity:0; animation:rise 0.8s ease forwards 0.1s; }
     h1 {
-      font-size: clamp(2.2rem, 5.5vw, 3.2rem); font-weight: 300;
+      font-size: clamp(2.2rem, 5.5vw, 3.2rem); font-weight: 400;
       line-height: 1.05; letter-spacing: -0.01em;
       opacity: 0; animation: rise 0.9s ease forwards 0.25s;
     }
@@ -51,7 +54,7 @@
       opacity: 0; animation: rise 0.9s ease forwards 0.6s;
     }
     .contact-strip a {
-      font-family: 'DM Mono', monospace; font-size: var(--fs-2xs);
+      font-family: var(--font-ui); font-size: var(--fs-2xs);
       letter-spacing: 0.06em; color: var(--ink); text-decoration: none;
       display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s;
     }
@@ -69,7 +72,7 @@
     section:nth-of-type(3) { animation-delay: 1s; }
     section:nth-of-type(4) { animation-delay: 1.1s; }
     .section-label {
-      font-family: 'DM Mono', monospace; font-size: var(--fs-3xs);
+      font-family: var(--font-ui); font-size: var(--fs-3xs);
       letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem;
     }
     .job { margin-bottom: 2.2rem; }
@@ -78,26 +81,26 @@
       display: flex; justify-content: space-between; align-items: baseline;
       flex-wrap: wrap; gap: 0.2rem; margin-bottom: 0.25rem;
     }
-    .job-title { font-size: var(--fs-md); font-weight: 400; }
-    .job-period { font-family: 'DM Mono', monospace; font-size: var(--fs-3xs); letter-spacing: 0.05em; color: var(--muted); white-space: nowrap; }
+    .job-title { font-size: var(--fs-md); font-weight: 500; }
+    .job-period { font-family: var(--font-mono); font-size: var(--fs-3xs); letter-spacing: 0.05em; color: var(--muted); white-space: nowrap; }
     .job-company { font-style: italic; color: var(--muted); font-size: var(--fs-base); margin-bottom: 0.6rem; }
     .job-desc { font-size: var(--fs-base); color: var(--muted); line-height: 1.6; }
     .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem 3rem; }
-    .skill-group-label { font-family: 'DM Mono', monospace; font-size: var(--fs-3xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); margin-bottom: 0.4rem; }
+    .skill-group-label { font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); margin-bottom: 0.4rem; }
     .skill-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-    .tag { font-family: 'DM Mono', monospace; font-size: var(--fs-3xs); letter-spacing: 0.04em; color: var(--muted); border: 1px solid var(--line); padding: 0.15rem 0.55rem; border-radius: 2px; transition: color 0.2s, border-color 0.2s; }
+    .tag { font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing: 0.04em; color: var(--muted); border: 1px solid var(--line); padding: 0.15rem 0.55rem; border-radius: 2px; transition: color 0.2s, border-color 0.2s; }
     .tag:hover { color: var(--accent); border-color: var(--accent); }
     .edu { margin-bottom: 1.6rem; }
     .edu:last-child { margin-bottom: 0; }
-    .edu-degree { font-size: var(--fs-base); font-weight: 400; }
+    .edu-degree { font-size: var(--fs-base); font-weight: 500; }
     .edu-school { font-style: italic; color: var(--muted); font-size: var(--fs-sm); }
-    .edu-period { font-family: 'DM Mono', monospace; font-size: var(--fs-3xs); letter-spacing: 0.05em; color: var(--muted); margin-top: 0.1rem; }
+    .edu-period { font-family: var(--font-mono); font-size: var(--fs-3xs); letter-spacing: 0.05em; color: var(--muted); margin-top: 0.1rem; }
     .lang-row { display: flex; flex-wrap: wrap; gap: 0.5rem 2.5rem; }
     .lang-item { display: flex; align-items: baseline; gap: 0.6rem; }
-    .lang-name { font-weight: 400; font-size: var(--fs-base); }
-    .lang-level { font-family: 'DM Mono', monospace; font-size: var(--fs-3xs); color: var(--muted); letter-spacing: 0.05em; }
+    .lang-name { font-weight: 500; font-size: var(--fs-base); }
+    .lang-level { font-family: var(--font-ui); font-size: var(--fs-3xs); color: var(--muted); letter-spacing: 0.05em; }
     footer { padding:2.5rem 0; }
-    footer p { font-family: 'DM Mono', monospace; font-size: var(--fs-3xs); letter-spacing: 0.1em; color: var(--muted); }
+    footer p { font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing: 0.1em; color: var(--muted); }
     @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
     @media (max-width: 520px) { .skills-grid { grid-template-columns: 1fr; } .job-header { flex-direction: column; } }
   </style>

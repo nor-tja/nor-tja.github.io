@@ -40,9 +40,26 @@ const OUT_CSS = path.join(ROOT, 'assets/css/fonts.css');
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) ' +
   'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
+/* Two families, and only the instances the site can actually reach.
+ *
+ * EB Garamond replaced Cormorant Garamond. Cormorant is a display face: very
+ * high stroke contrast and a small x-height, which is why the body copy read
+ * thin and why site.css had inflated the root size to compensate. EB Garamond
+ * is the same old-style lineage -- so the italics still sound like the same
+ * voice -- with text-weight strokes and a normal x-height.
+ *
+ * Weights are the tiers the stylesheets ask for and nothing else. The serif
+ * has two (400 running text, 500 the title tier) plus one italic; measured,
+ * that is 111KB of latin against Cormorant's 97KB at three faces, and index
+ * .html now pulls one 43KB face where it used to pull two.
+ *
+ * DM Mono is down to a single weight because it is down to a single job: see
+ * the --font-mono note in assets/css/site.css. It used to set every label on
+ * the site at 300, 400 and 500; it now sets figures, and figures are 400.
+ */
 const SRC = 'https://fonts.googleapis.com/css2' +
-  '?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400' +
-  '&family=DM+Mono:wght@300;400;500' +
+  '?family=EB+Garamond:ital,wght@0,400;0,500;1,400' +
+  '&family=DM+Mono:wght@400' +
   '&display=swap';
 
 // The site is English, French, Spanish, Portuguese and Ukrainian. Vietnamese
@@ -107,8 +124,12 @@ async function main() {
  *
  * Both families are licensed under the SIL Open Font License 1.1, which
  * permits redistribution including self-hosting:
- *   Cormorant Garamond  Catharsis Fonts    https://fonts.google.com/specimen/Cormorant+Garamond
- *   DM Mono             Colophon Foundry   https://fonts.google.com/specimen/DM+Mono
+ *   EB Garamond  Georg Duffner, Octavio Pardo  https://fonts.google.com/specimen/EB+Garamond
+ *   DM Mono      Colophon Foundry              https://fonts.google.com/specimen/DM+Mono
+ *
+ * There is no third file here for the UI sans. That one is a system stack --
+ * no download, no swap, no third face to keep in sync. See --font-ui in
+ * assets/css/site.css.
  *
  * No Japanese face is loaded. Noto Sans JP ships as ~124 subset files PER
  * WEIGHT, and japanese.html needs two weights; self-hosting ~250 files to

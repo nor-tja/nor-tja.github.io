@@ -21,12 +21,14 @@
   <meta name="twitter:description" content="A small collection of books, tools and links I keep coming back to, with a line on why each one earned its place.">
   <meta name="twitter:image" content="https://katjanorstad.no/assets/og/resources.png">
   <!-- meta:end -->
-  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the two faces every
-       page renders immediately skips the stylesheet->font discovery hop.
+  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the faces THIS page
+       renders immediately skips the stylesheet->font discovery hop.
        crossorigin is required even same-origin: fonts always fetch in CORS
-       mode, and without it the preload is discarded and fetched twice. -->
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/cormorant-garamond-normal-300-latin.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
+       mode, and without it the preload is discarded and fetched twice.
+       Only faces the page can reach belong here -- a preload nothing uses
+       spends a connection on a file the browser throws away. Checked by
+       tests/typography.test.js. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/eb-garamond-normal-400-latin.woff2">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="stylesheet" href="assets/css/site.css">
@@ -36,14 +38,14 @@
 
     header { padding:3rem 0; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
     .header-text { flex:1; }
-    h1 { font-size:clamp(1.6rem,4vw,2.3rem); font-weight:300; line-height:1.15; }
+    h1 { font-size:clamp(1.6rem,4vw,2.3rem); font-weight:400; line-height:1.15; }
     h1 em { font-style:italic; color:var(--accent); }
 
     /* Category sections */
     .cat-section { border-bottom:1px solid var(--line); opacity:0; animation:rise .9s ease forwards; }
     .cat-trigger { display:flex; align-items:center; justify-content:space-between; cursor:pointer; list-style:none; user-select:none; padding:2.8rem 0 0; }
     .cat-trigger::-webkit-details-marker { display:none; }
-    .cat-chevron { font-family:'DM Mono',monospace; font-size: var(--fs-2xs); line-height:1.4; color:var(--muted); transition:transform .25s; flex-shrink:0; margin-left:1rem; }
+    .cat-chevron { font-family: var(--font-ui); font-size: var(--fs-2xs); line-height:1.4; color:var(--muted); transition:transform .25s; flex-shrink:0; margin-left:1rem; }
     details.cat-section[open] .cat-chevron { transform:rotate(90deg); color:var(--accent); }
     details.cat-section .resource-list { padding:1.6rem 0 2.8rem; }
     details.cat-section .section-label { margin-bottom:0; }
@@ -52,10 +54,10 @@
     .cat-section:nth-of-type(3) { animation-delay:.6s; }
     .cat-section:nth-of-type(4) { animation-delay:.75s; }
     .cat-section:nth-of-type(5) { animation-delay:.9s; }
-    .section-label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); line-height:1.4; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.6rem; }
+    .section-label { font-family: var(--font-ui); font-size: var(--fs-3xs); line-height:1.4; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.6rem; }
 
     .resource-list { display:flex; flex-direction:column; gap:1.8rem; }
-    .resource-title { font-size: var(--fs-md); font-weight:400; margin-bottom:.4rem; }
+    .resource-title { font-size: var(--fs-md); font-weight:500; margin-bottom:.4rem; }
     .resource-title a { color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line); transition:color .2s,border-color .2s; }
     .resource-title a:hover { color:var(--accent); border-color:var(--accent); }
     .resource-summary { font-size: var(--fs-sm); color:var(--muted); line-height:1.6; max-width:580px; }
@@ -65,7 +67,7 @@
     .video-play { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:56px; height:56px; border-radius:50%; background:rgba(26,24,20,.55); display:flex; align-items:center; justify-content:center; color:#fdf9f2; font-size: var(--fs-lg); line-height:1; pointer-events:none; transition:background .2s; }
     .video-wrap:hover .video-play { background:var(--accent); }
     footer { padding:2.5rem 0; }
-    footer p { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); line-height:1.4; letter-spacing:.1em; color:var(--muted); }
+    footer p { font-family: var(--font-ui); font-size: var(--fs-3xs); line-height:1.4; letter-spacing:.1em; color:var(--muted); }
   </style>
 </head>
 <body>
