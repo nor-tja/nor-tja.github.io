@@ -247,6 +247,7 @@
       .settings-body { grid-template-columns:1fr; }
     }
   </style>
+  <script src="assets/js/pomodoro-cycle.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -432,9 +433,16 @@
   let isRunning = false;
   let flipped = false;          // false = amber on top (focus), true = blue on top (break)
   let timerId = null;
-  let completedFocusSessions = 0;
   let audioCtx = null;
   let endTime = null;           // wall-clock ms timestamp the current session ends at (only meaningful while running)
+
+  const cycle = PomodoroCycle.create({
+    cyclesBeforeLong: () => totalCycles(),
+    onFocusCompleted: (minutes) => {
+      updateDots();
+      recordFocusCompleted(minutes);
+    }
+  });
 
   function totalCycles() {
     return Math.max(1, parseInt(cyclesInput.value, 10) || 4);
@@ -453,7 +461,7 @@
 
   function updateDots() {
     const n = totalCycles();
-    const filled = completedFocusSessions % n;
+    const filled = cycle.completedFocusSessions % n;
     [...dotsWrap.children].forEach((d, i) => d.classList.toggle('filled', i < filled));
   }
 
@@ -1067,15 +1075,21 @@
     if (isRunning) endTime = Date.now() + remainingSec * 1000;
   }
 
-  function nextMode() {
-    if (mode === 'focus') {
-      completedFocusSessions++;
-      updateDots();
-      recordFocusCompleted(Math.round(durationSec / 60));
-      const isLong = completedFocusSessions % totalCycles() === 0;
-      return isLong ? 'long' : 'short';
-    }
-    return 'focus';
+  function completeSession() {
+    const upcoming = cycle.complete(mode, Math.round(durationSec / 60));
+    if (upcoming === null) return;      // already transitioning — the guard
+
+    clearInterval(timerId);
+    timerId = null;
+    pling(mode === 'focus' ? 1 : 2);
+    flipped = !flipped;
+    rotor.classList.toggle('flipped', flipped);
+
+    setTimeout(() => {
+      cycle.finishTransition();
+      startSession(upcoming, true);
+      if (isRunning) timerId = setInterval(tick, 250);
+    }, 550);
   }
 
   function tick() {
@@ -1094,15 +1108,7 @@
     document.title = fmt(Math.max(0, remainingSec)) + ' · ' + (mode === 'focus' ? 'Focus' : 'Break');
 
     if (remainingSec <= 0) {
-      // focus ending (break about to begin) → one pling; break ending
-      // (focus about to resume) → two plings
-      pling(mode === 'focus' ? 1 : 2);
-      flipped = !flipped;
-      rotor.classList.toggle('flipped', flipped);
-      const upcoming = nextMode();
-      setTimeout(() => {
-        startSession(upcoming, true);
-      }, 550);
+      completeSession();
     }
   }
 
@@ -1134,7 +1140,7 @@
     pause();
     flipped = false;
     rotor.classList.remove('flipped');
-    completedFocusSessions = 0;
+    cycle.reset();
     updateDots();
     document.title = 'Katja Norstad — Pomodoro';
     startSession('focus', true);
@@ -1161,13 +1167,7 @@
     document.title = fmt(Math.max(0, remainingSec)) + ' · ' + (mode === 'focus' ? 'Focus' : 'Break');
 
     if (remainingSec <= 0) {
-      // shortened below however much had already elapsed — finish this
-      // session right now, same as the timer running out naturally
-      pling(mode === 'focus' ? 1 : 2);
-      flipped = !flipped;
-      rotor.classList.toggle('flipped', flipped);
-      const upcoming = nextMode();
-      setTimeout(() => { startSession(upcoming, true); }, 550);
+      completeSession();
     }
   }
 
