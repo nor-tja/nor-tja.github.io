@@ -37,10 +37,10 @@ function literalFontSizes(css) {
   return out;
 }
 
-test('site.css defines the ten scale steps the normalizer assumes', () => {
+test('site.css defines the eleven scale steps the normalizer assumes', () => {
   const scale = scaleFromSiteCss();
-  assert.equal(scale.size, 10,
-    `expected 10 --fs-* steps beside --fs-body, found ${scale.size}. ` +
+  assert.equal(scale.size, 11,
+    `expected 11 --fs-* steps beside --fs-body, found ${scale.size}. ` +
     `tools/normalize-type.js carries its own copy of this list; if the scale ` +
     `changed, that copy has to change with it or it will substitute the ` +
     `wrong token.`);
@@ -85,21 +85,22 @@ test('no literal font-size sits within tolerance of a token', () => {
 });
 
 // Characterisation pin, in the same spirit as FOOTER_PADDING and
-// WRAP_MAX_WIDTH: these are the sizes deliberately left off the scale because
-// snapping them would have been visible. The pin is exact so that new drift
-// has to be an explicit decision rather than something that accumulates.
+// WRAP_MAX_WIDTH. This started at 39 literals across nine values; adding
+// --fs-4xs absorbed 25 of them and eleven more were changed by explicit
+// decision. What is left is not residue -- each one is a reason:
 //
-// The concentration below .7rem is the real story: the scale bottoms out at
-// .65rem while the site wants finer steps than that for its uppercase labels.
+//   11px, 12px   Leaflet's own popup chrome on coffee.html. Overriding a
+//                third-party widget's px sizing with a rem token would make
+//                it scale with the fluid root, which the widget's internal
+//                layout does not expect. px is the correct answer here.
+//   1.4rem       .lang-flag on languages.html -- a flag emoji, not type.
+//                --fs-xl is 7.1% away and --fs-2xl 7.1% the other way; a
+//                thirteenth token for one decorative glyph is not worth it.
+//
+// The pin is exact so any new value has to be argued for, not absorbed.
 const OFF_SCALE = {
-  '.6rem': 17,
-  '.58rem': 8,
-  '.95rem': 7,
-  '0.95rem': 2,
   '11px': 1,
   '12px': 1,
-  '.55rem': 1,
-  '0.5rem': 1,
   '1.4rem': 1,
 };
 

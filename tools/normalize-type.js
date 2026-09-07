@@ -32,9 +32,9 @@ const TOLERANCE = 0.05;
 // Mirrors :root in assets/css/site.css. --fs-body is deliberately absent: it is
 // the body's own size, not a step on the scale.
 const TOKENS = [
-  ['--fs-3xs', 0.65], ['--fs-2xs', 0.7], ['--fs-xs', 0.8], ['--fs-sm', 0.875],
-  ['--fs-base', 1], ['--fs-md', 1.1], ['--fs-lg', 1.2], ['--fs-xl', 1.3],
-  ['--fs-2xl', 1.5], ['--fs-3xl', 1.6],
+  ['--fs-4xs', 0.6], ['--fs-3xs', 0.65], ['--fs-2xs', 0.7], ['--fs-xs', 0.8],
+  ['--fs-sm', 0.875], ['--fs-base', 1], ['--fs-md', 1.1], ['--fs-lg', 1.2],
+  ['--fs-xl', 1.3], ['--fs-2xl', 1.5], ['--fs-3xl', 1.6],
 ];
 
 function nearest(rem) {

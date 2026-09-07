@@ -93,7 +93,7 @@
 
     .daily-summary { margin-top:1.8rem; text-align:center; max-width:320px; }
     .daily-reset {
-      margin-top:.5rem; font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em;
+      margin-top:.5rem; font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.08em;
       text-transform:uppercase; color:var(--muted); background:none; border:none; cursor:pointer;
       text-decoration:underline; text-underline-offset:2px; padding:0; transition:color .2s;
     }
@@ -101,7 +101,7 @@
     .daily-hourglasses { display:flex; flex-wrap:wrap; justify-content:center; gap:.25rem .3rem; margin-bottom:.55rem; }
     .daily-hourglasses span { font-size: var(--fs-sm); line-height:1; opacity:.9; }
     .daily-text {
-      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase;
+      font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.08em; text-transform:uppercase;
       color:var(--muted);
     }
 
@@ -130,13 +130,13 @@
     .swatch-dots { display:flex; gap:.35rem; }
     .swatch-dot { width:16px; height:16px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.08); }
     .swatch-label {
-      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.03em;
+      font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.03em;
       text-transform:uppercase; color:var(--muted); text-align:center; line-height:1.3;
     }
     .palette-swatch:hover .swatch-label { color:var(--accent); }
 
     .palette-shuffle {
-      display:block; margin:1rem auto 0; font-family:'DM Mono',monospace; font-size:.6rem;
+      display:block; margin:1rem auto 0; font-family:'DM Mono',monospace; font-size: var(--fs-4xs);
       letter-spacing:.08em; text-transform:uppercase; color:var(--muted); background:none; border:none;
       cursor:pointer; text-decoration:underline; text-underline-offset:2px; transition:color .2s;
     }
@@ -167,7 +167,7 @@
     .ambience-panel.open { max-height:400px; opacity:1; margin-top:1.1rem; }
 
     .ambience-credit {
-      font-family:'DM Mono',monospace; font-size:.58rem; line-height:1.7;
+      font-family:'DM Mono',monospace; font-size: var(--fs-4xs); line-height:1.7;
       color:var(--muted); letter-spacing:.04em; margin-top:.9rem; text-align:center;
     }
     .ambience-credit a { color:var(--muted); }
@@ -237,7 +237,7 @@
     .field { display:flex; flex-direction:column; gap:.5rem; }
     .field label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
     .field input {
-      font-family:'DM Mono',monospace; font-size:.95rem; color:var(--ink);
+      font-family:'DM Mono',monospace; font-size: var(--fs-base); color:var(--ink);
       background:transparent; border:1px solid var(--line); border-radius:2px;
       padding:.55rem .7rem; width:100%; transition:border-color .2s;
     }

@@ -62,6 +62,33 @@ test('the learned dot is visually reset from platform button styling', () => {
   }
 });
 
+// WCAG 2.5.8 puts the floor at 24x24 CSS px. The visible ring is 9px and
+// should stay 9px -- it is a dot, not a checkbox -- so the target is widened
+// with a transparent overlay instead. Guarding the overlay rather than the
+// ring is the point: someone tidying up "an empty ::after that does nothing"
+// would silently take the tap target back to 9px.
+test('the learned dot is at least 24x24 to tap', () => {
+  for (const page of LANGUAGE_PAGES) {
+    const src = readPage(page);
+    const m = /\.learned-dot::after\s*\{([^}]*)\}/.exec(src);
+    assert.ok(m, `${page} has no .learned-dot::after; the tap target is ` +
+      `whatever the 9px ring is, which is a third of the WCAG 2.5.8 minimum`);
+    const decls = m[1];
+    for (const axis of ['width', 'height']) {
+      const v = new RegExp(`${axis}:\\s*(\\d+(?:\\.\\d+)?)px`).exec(decls);
+      assert.ok(v, `${page} .learned-dot::after sets no ${axis} in px`);
+      assert.ok(Number(v[1]) >= 24,
+        `${page} .learned-dot::after is ${v[1]}px ${axis}; WCAG 2.5.8 asks 24`);
+    }
+    assert.match(decls, /position:\s*absolute/,
+      `${page} the overlay must be absolutely positioned, or it changes the ` +
+      `dot's own box and pushes the card layout around`);
+    assert.match(/\.learned-dot\s*\{([^}]*)\}/.exec(src)[1], /position:\s*relative/,
+      `${page} .learned-dot needs position:relative or the 24px overlay ` +
+      `centres on the nearest positioned ancestor instead of the dot`);
+  }
+});
+
 // Catches the general version of the same mistake anywhere on the site: an
 // element given a click listener but no way to receive focus.
 test('no page attaches a click listener to a non-focusable created element', () => {

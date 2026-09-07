@@ -34,7 +34,14 @@ html { font-size: clamp(1rem, .944rem + .25vw, 1.125rem); }
   --line: #d8d3cc;
 
   /* One scale replacing 47 ad-hoc font-size values. Headings keep their
-     clamp() rules and are not tokenised. */
+     clamp() rules and are not tokenised.
+
+     --fs-4xs was added after the first tokenising pass left 39 literals
+     behind. Counting them showed the omission: 25 of the 39 sat at 9.28 or
+     9.6px -- 0.32px apart, the same size in practice -- while the scale
+     bottomed out at 10.4px. The site has two micro tiers for its uppercase
+     mono labels, and the scale had only ever named the upper one. */
+  --fs-4xs: .6rem;
   --fs-3xs: .65rem;
   --fs-2xs: .7rem;
   --fs-xs: .8rem;
