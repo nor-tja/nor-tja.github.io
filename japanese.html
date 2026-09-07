@@ -21,9 +21,13 @@
   <meta name="twitter:description" content="Five Japanese words a day, with spaced repetition that brings each word back just before you would have forgotten it.">
   <meta name="twitter:image" content="https://katjanorstad.no/assets/og/japanese.png">
   <!-- meta:end -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet" />
+  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the two faces every
+       page renders immediately skips the stylesheet->font discovery hop.
+       crossorigin is required even same-origin: fonts always fetch in CORS
+       mode, and without it the preload is discarded and fetched twice. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/cormorant-garamond-normal-300-latin.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
+  <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
     body { font-size:var(--fs-body); line-height:var(--leading-body); }
@@ -75,7 +79,7 @@
 
     .word-body { flex:1; min-width:0; }
     .word-top { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
-    .word-fr { font-family:'Noto Sans JP','Cormorant Garamond',serif; font-size: var(--fs-2xl); font-weight:400; line-height:1.25; }
+    .word-fr { font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic','Yu Gothic UI',Meiryo,'Noto Sans JP',sans-serif; font-size: var(--fs-2xl); font-weight:400; line-height:1.25; }
     .word-pos { font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:.15rem .4rem; }
     .word-ipa { font-family:'DM Mono',monospace; font-size: var(--fs-xs); color:var(--accent); margin-top:.25rem; }
     .word-en { font-style:italic; color:var(--muted); font-size: var(--fs-base); margin-top:.15rem; }
@@ -110,7 +114,7 @@
     .review-fr { font-size: var(--fs-md); line-height:1.7; }
     .review-answer { margin-top:.3rem; display:none; }
     .review-answer.shown { display:block; }
-    .review-fr-answer { font-family:'Noto Sans JP','Cormorant Garamond',serif; font-style:normal; font-size: var(--fs-md); line-height:1.7; }
+    .review-fr-answer { font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic','Yu Gothic UI',Meiryo,'Noto Sans JP',sans-serif; font-style:normal; font-size: var(--fs-md); line-height:1.7; }
     .review-ipa { font-family:'DM Mono',monospace; font-size: var(--fs-xs); color:var(--accent); margin-left:.5rem; }
     .review-actions { flex-shrink:0; display:flex; gap:.5rem; }
     .review-btn {
@@ -128,7 +132,7 @@
     .phrase-play { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size: var(--fs-sm); transition:all .2s; margin-top:.1rem; }
     .phrase-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
     .phrase-play.playing { background:var(--accent); color:#fdf9f2; }
-    .phrase-fr { font-family:'Noto Sans JP','Cormorant Garamond',serif; font-size: var(--fs-md); }
+    .phrase-fr { font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic','Yu Gothic UI',Meiryo,'Noto Sans JP',sans-serif; font-size: var(--fs-md); }
     .phrase-en { font-style:italic; color:var(--muted); font-size: var(--fs-sm); margin-top:.2rem; }
 
     .settings { margin-top:1rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .8s; }
