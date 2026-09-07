@@ -30,9 +30,9 @@
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    /* `overflow:hidden` here used to be safe: the content was a short greeting
-       and five one-line links, always shorter than the viewport. Six two-line
-       links are tall enough to overflow a phone in landscape, and hidden
+    /* `overflow:hidden` here used to be safe only by luck: the content was
+       always shorter than the viewport. A greeting plus six links still
+       overflows a phone in landscape (~370px of usable height), and hidden
        overflow on a centred flex child clips BOTH ends with no way to scroll
        to either. `safe center` falls back to flex-start once the child no
        longer fits, so the top stays reachable. */
@@ -107,51 +107,44 @@
       animation: rise 0.9s ease forwards 0.15s;
     }
     .greeting em { font-style: italic; color: var(--accent); }
+    /* The gap is 0.8rem rather than the 1.5rem it looks like it should be:
+       each link carries 0.35rem of its own vertical padding for the tap
+       target, so the measured space between two labels is 0.8 + 0.35 + 0.35
+       = 1.5rem. Raising the gap without subtracting the padding would space
+       them half again as far apart as intended. */
     .links {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 0.8rem;
       opacity: 0;
       animation: rise 0.9s ease forwards 0.4s;
     }
-    /* Grid rather than flex, because each link is now two stacked lines beside
-       one rule: the rule and the label share row 1, the note sits under the
-       label in row 2. The first column is `auto` so the rule can still grow
-       from 24px to 40px on hover -- a fixed 24px track would clip it. */
     .links a {
-      display: grid;
-      grid-template-columns: auto 1fr;
+      display: flex;
       align-items: center;
-      gap: 0.35rem 0.7rem;
+      gap: 0.7rem;
+      /* WCAG 2.5.8 wants 24px. The label alone is a ~13px line box, so this
+         padding is what makes the row tappable: 13 + 2 x 5.6 = 24.2px. */
+      padding: 0.35rem 0;
+      font-family: 'DM Mono', monospace;
+      font-size: var(--fs-2xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
       color: var(--muted);
       text-decoration: none;
       transition: color 0.2s;
     }
+    /* flex-shrink:0 because the rule is a flex item now. Without it a long
+       label squeezes the 24px rule down and the left edge stops lining up. */
     .links a::before {
       content: '';
-      display: block;
+      flex: 0 0 auto;
       width: 24px;
       height: 1px;
       background: var(--line);
       transition: width 0.25s, background 0.2s;
     }
-    .link-label {
-      font-family: 'DM Mono', monospace;
-      font-size: var(--fs-2xs);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-    /* The note is the part a stranger actually reads, so it is set in the
-       body serif at a readable size rather than as more tracked-out mono.
-       It stays muted on hover; only the label answers. */
-    .link-note {
-      grid-column: 2;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: var(--fs-sm);
-      line-height: 1.35;
-      color: var(--muted);
-    }
-    .links a:hover .link-label { color: var(--accent); }
+    .links a:hover { color: var(--accent); }
     .links a:hover::before { width: 40px; background: var(--accent); }
 
 
@@ -178,35 +171,18 @@
       Hello, I am <em>Katja</em> — a data scientist who enjoys building and
       organising things. These are the small tools I made and kept using.
     </p>
-    <!-- Each note says what the page actually is. "Pomodoro Timer" on its own
-         gave a stranger no reason to click it, and no hint that there is an
-         hourglass and a forest recording on the other side. Every line here
-         is taken from what the page itself says, not from memory. -->
+    <!-- The name carries the description. "Resources" and "Pomodoro" are
+         labels for someone who already knows what is behind them; "Reading &
+         watching" and "Pomodoro hourglass" tell a stranger. Kept short enough
+         to stay on one line as tracked-out uppercase -- a name that wraps is
+         a subtitle wearing a disguise. -->
     <nav class="links">
-      <a href="cv.html">
-        <span class="link-label">CV</span>
-        <span class="link-note">Data science work, in Oslo</span>
-      </a>
-      <a href="resources.html">
-        <span class="link-label">Resources</span>
-        <span class="link-note">Reading and videos worth the time</span>
-      </a>
-      <a href="coffee.html">
-        <span class="link-label">Coffee notes</span>
-        <span class="link-note">Tasting notes and a map of Oslo cafés</span>
-      </a>
-      <a href="pomodoro.html">
-        <span class="link-label">Pomodoro</span>
-        <span class="link-note">An hourglass that flips itself over</span>
-      </a>
-      <a href="languages.html">
-        <span class="link-label">Languages</span>
-        <span class="link-note">Five words a day, in five languages</span>
-      </a>
-      <a href="snake.html">
-        <span class="link-label">Snake</span>
-        <span class="link-note">For old time's sake</span>
-      </a>
+      <a href="cv.html">CV</a>
+      <a href="resources.html">Reading &amp; watching</a>
+      <a href="coffee.html">Coffee notes</a>
+      <a href="pomodoro.html">Pomodoro hourglass</a>
+      <a href="languages.html">Language practice</a>
+      <a href="snake.html">Snake</a>
     </nav>
   </div>
 </body>

@@ -197,13 +197,18 @@ test('site.css is linked before whatever a page overrides it with', () => {
     const src = readPage(page);
     const link = src.indexOf(LINK);
     // A page contributes its own rules either through a page-level stylesheet
-    // (the five language pages) or an inline <style> (the other seven).
-    // Demanding a <style> would have quietly excused the language pages from
-    // this check the moment their CSS moved into a file.
-    const own = [
-      src.indexOf('<link rel="stylesheet" href="assets/css/language-page.css">'),
-      src.indexOf('<style>'),
-    ].filter((i) => i !== -1);
+    // or an inline <style>. Demanding a <style> would have quietly excused
+    // the language pages from this check the moment their CSS moved into a
+    // file -- and naming those files one by one has the same failure a step
+    // later, which is what happened when pomodoro.css was extracted. So:
+    // anything under assets/css/ that is not one of the two foundations
+    // counts as the page's own rules.
+    const own = [...src.matchAll(
+      /<link[^>]+rel="stylesheet"[^>]+href="assets\/css\/([^"]+)"/g)]
+      .filter((m) => !['site.css', 'fonts.css'].includes(m[1]))
+      .map((m) => m.index);
+    const style = src.indexOf('<style>');
+    if (style !== -1) own.push(style);
     assert.ok(link !== -1, `${page} is missing the site.css link`);
     assert.ok(own.length,
       `${page} has neither a page stylesheet nor a <style>; it contributes ` +

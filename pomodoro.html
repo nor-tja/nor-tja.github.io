@@ -29,237 +29,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
-  <style>
-    :root { --amber-1:#f8d9ae; --amber-2:#f2a355; --amber-3:#b8460f; --blue-1:#dde4ee; --blue-2:#6b83a8; --blue-3:#1b2a4e; }
-    body { font-size:var(--fs-body); line-height:var(--leading-body); }
-    .wrap { max-width: 640px; margin: 0 auto; padding: 0 2rem 4rem; }
-
-
-    header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; text-align:center; }
-    h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:300; line-height:1.1; }
-    h1 em { font-style:italic; color:var(--accent); }
-    .intro { margin-top:1rem; color:var(--muted); font-size: var(--fs-base); max-width:440px; margin-left:auto; margin-right:auto; }
-
-    /* ── HOURGLASS ── */
-    .glass-section { padding:2.6rem 0 1rem; display:flex; flex-direction:column; align-items:center; opacity:0; animation:rise .9s ease forwards .25s; }
-
-    /* Base size at --glass-scale:1. The scale itself is set from JS and tracks
-       the focus length, so these two numbers set the whole range rather than
-       one size: at the default 25 minutes the scale is ~0.905, which puts the
-       glass at 145 x 358. Keep the 200:495 ratio, which matches the SVG's
-       210x520 viewBox -- diverging from it letterboxes the drawing. */
-    .glass-stage {
-      --glass-scale: 1;
-      width: calc(160px * var(--glass-scale));
-      height: calc(396px * var(--glass-scale));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      perspective: 800px;
-      transition: width .5s ease, height .5s ease;
-    }
-    .glass-rotor {
-      width: 100%;
-      height: 100%;
-      transition: transform 1.1s cubic-bezier(.65,0,.35,1);
-      transform-style: preserve-3d;
-    }
-    .glass-rotor.flipped { transform: rotate(180deg); }
-    #hourglass-svg { width: 100%; height: 100%; display:block; filter: drop-shadow(0 10px 18px rgba(26,24,20,0.14)); }
-
-    .sand-rect { transition: none; }
-    .grain { animation: fall 0.5s linear infinite; animation-play-state: paused; }
-    #hourglass-svg.flowing .grain { animation-play-state: running; }
-    @keyframes fall { from { transform: translateY(0); opacity:1; } to { transform: translateY(16px); opacity:0; } }
-
-    .time-display {
-      margin-top: 1.2rem;
-      font-family: 'DM Mono', monospace;
-      font-size: var(--fs-3xl);
-      font-weight: 400;
-      letter-spacing: .04em;
-      color: var(--ink);
-      font-variant-numeric: tabular-nums; line-height:1.7; }
-    .mode-label {
-      margin-top: .4rem;
-      font-family: 'DM Mono', monospace;
-      font-size: var(--fs-2xs);
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      transition: color .3s;
-    }
-    .mode-label.is-break { color: var(--blue-3); }
-
-    .dots { display:flex; gap:.5rem; margin-top:1.2rem; }
-    .dot { width:7px; height:7px; border-radius:50%; border:1px solid var(--line); transition: background .3s, border-color .3s; }
-    .dot.filled { background: var(--accent); border-color: var(--accent); }
-
-    .daily-summary { margin-top:1.8rem; text-align:center; max-width:320px; }
-    .daily-reset {
-      margin-top:.5rem; font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.08em;
-      text-transform:uppercase; color:var(--muted); background:none; border:none; cursor:pointer;
-      text-decoration:underline; text-underline-offset:2px; padding:0; transition:color .2s;
-    }
-    .daily-reset:hover { color:var(--accent); }
-    .daily-hourglasses { display:flex; flex-wrap:wrap; justify-content:center; gap:.25rem .3rem; margin-bottom:.55rem; }
-    .daily-hourglasses span { font-size: var(--fs-sm); line-height:1; opacity:.9; }
-    .daily-text {
-      font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.08em; text-transform:uppercase;
-      color:var(--muted);
-    }
-
-    /* ── CONTROLS ── */
-    .controls { display:flex; gap:.9rem; margin-top:1.8rem; }
-    .btn {
-      font-family:'DM Mono',monospace; font-size: var(--fs-2xs); letter-spacing:.12em; text-transform:uppercase;
-      padding:.75rem 1.6rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
-      background:transparent; color:var(--ink); transition: all .2s;
-    }
-    .btn:hover { border-color:var(--accent); color:var(--accent); }
-    .btn.primary { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
-    .btn.primary:hover { background:#6f1e1e; border-color:#6f1e1e; color:#fdf9f2; }
-    .btn:active { transform: translateY(1px); }
-
-    .btn-chevron { display:inline-block; font-size: var(--fs-2xs); margin-left:.3rem; transition:transform .25s; }
-    #paletteToggle.open .btn-chevron { transform:rotate(90deg); }
-
-    .palette-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
-    .palette-swatch {
-      display:flex; flex-direction:column; align-items:center; gap:.5rem;
-      padding:.7rem .6rem; border-radius:10px; cursor:pointer; border:1px solid var(--line);
-      background:transparent; transition:all .2s;
-    }
-    .palette-swatch:hover { border-color:var(--accent); }
-    .swatch-dots { display:flex; gap:.35rem; }
-    .swatch-dot { width:16px; height:16px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.08); }
-    .swatch-label {
-      font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.03em;
-      text-transform:uppercase; color:var(--muted); text-align:center; line-height:1.3;
-    }
-    .palette-swatch:hover .swatch-label { color:var(--accent); }
-
-    .palette-shuffle {
-      display:block; margin:1rem auto 0; font-family:'DM Mono',monospace; font-size: var(--fs-4xs);
-      letter-spacing:.08em; text-transform:uppercase; color:var(--muted); background:none; border:none;
-      cursor:pointer; text-decoration:underline; text-underline-offset:2px; transition:color .2s;
-    }
-    .palette-shuffle:hover { color:var(--accent); }
-
-    @media (max-width:480px) {
-      .palette-grid { grid-template-columns:1fr; }
-    }
-
-    .ambience-toggle {
-      margin-top:1.5rem; display:inline-flex; align-items:center; gap:.55rem;
-      cursor:pointer; user-select:none; font-family:'DM Mono',monospace; font-size: var(--fs-3xs);
-      letter-spacing:.12em; text-transform:uppercase; color:var(--muted); transition:color .2s;
-      background:none; border:none; padding:0;
-    }
-    .ambience-toggle-wrap { display:flex; justify-content:center; }
-    .ambience-toggle:hover, .ambience-toggle.open { color:var(--accent); }
-    .ambience-chevron { font-size: var(--fs-2xs); transition:transform .25s; display:inline-block; }
-    .ambience-toggle.open .ambience-chevron { transform:rotate(90deg); }
-
-    .ambience-panel {
-      max-width:400px; margin:0 auto; overflow:hidden;
-      max-height:0; opacity:0; transition:max-height .4s ease, opacity .3s ease, margin-top .4s ease;
-    }
-    /* Generous cap: the panel is overflow:hidden, and the credit line below the
-       chips is a licence requirement, so it must never be the thing that gets
-       clipped. Wraps to more lines on a narrow screen, hence the media query. */
-    .ambience-panel.open { max-height:400px; opacity:1; margin-top:1.1rem; }
-
-    .ambience-credit {
-      font-family:'DM Mono',monospace; font-size: var(--fs-4xs); line-height:1.7;
-      color:var(--muted); letter-spacing:.04em; margin-top:.9rem; text-align:center;
-    }
-    .ambience-credit a { color:var(--muted); }
-    .ambience-credit a:hover { color:var(--accent); }
-
-    .ambience-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
-    .ambience-chip {
-      font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.05em; text-transform:uppercase;
-      padding:.7rem .8rem; border-radius:999px; cursor:pointer; border:1px solid var(--line);
-      background:transparent; color:var(--ink); transition:all .2s; display:inline-flex; align-items:center;
-      justify-content:center; gap:.5rem;
-    }
-    .ambience-chip:hover { border-color:var(--accent); color:var(--accent); }
-    .ambience-chip.playing { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
-    .chip-icon { font-size: var(--fs-sm); }
-    .ambience-chip.playing .chip-icon { animation:chipPulse 1.7s ease-in-out infinite; }
-    @keyframes chipPulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
-
-    @media (max-width:480px) {
-      .ambience-grid { grid-template-columns:1fr; }
-      /* one chip per row instead of two, plus a credit line that wraps further */
-      .ambience-panel.open { max-height:560px; }
-    }
-
-    /* ── POST-IT ── */
-    .postit-wrap { display:flex; justify-content:center; margin-top:2.4rem; }
-    .postit {
-      position:relative;
-      width:210px;
-      min-height:190px;
-      padding:1.5rem 1.1rem 1.1rem;
-      background:#e5d6a3;
-      background-image: linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
-      background-size: 100% 1.7em;
-      box-shadow: 3px 8px 18px rgba(26,24,20,0.2), 0 1px 0 rgba(255,255,255,0.4) inset;
-      transform: rotate(-2.5deg);
-      transition: transform .2s ease;
-    }
-    .postit:focus-within { transform: rotate(0deg); }
-    .postit::before {
-      content:'';
-      position:absolute; top:-11px; left:50%; transform:translateX(-50%) rotate(-2deg);
-      width:64px; height:24px;
-      background:rgba(255,255,255,0.5);
-      border:1px solid rgba(255,255,255,0.65);
-      box-shadow: 0 1px 3px rgba(26,24,20,0.15);
-    }
-    .postit textarea {
-      width:100%; height:155px; border:none; background:transparent; resize:none;
-      font-family:'Cormorant Garamond', serif; font-size: var(--fs-md); line-height:1.7;
-      color:#5c5133; outline:none;
-    }
-    .postit textarea::placeholder { color:#9c9270; font-style:italic; }
-
-    /* ── SETTINGS ── */
-    .settings { margin-top:2.6rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .4s; }
-    .settings-trigger {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:1.1rem 0; cursor:pointer; list-style:none; user-select:none;
-      font-family:'DM Mono',monospace; font-size: var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
-    }
-    .settings-trigger::-webkit-details-marker { display:none; }
-    .settings-chevron { color:var(--muted); transition:transform .25s; }
-    details[open] .settings-chevron { transform:rotate(90deg); }
-
-    .settings-body { padding:.3rem 0 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.4rem 1.6rem; }
-    .field { display:flex; flex-direction:column; gap:.5rem; }
-    .field label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
-    .field input {
-      font-family:'DM Mono',monospace; font-size: var(--fs-base); color:var(--ink);
-      background:transparent; border:1px solid var(--line); border-radius:2px;
-      padding:.55rem .7rem; width:100%; transition:border-color .2s;
-    }
-    .field input:focus { outline:none; border-color:var(--accent); }
-    .settings-note { grid-column:1 / -1; font-size: var(--fs-xs); color:var(--muted); font-style:italic; }
-
-    footer { padding:3rem 0 1rem; }
-    footer p { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.1em; color:var(--muted); }
-
-
-    @media (max-width:600px) {
-      .wrap { padding:0 1.2rem 3rem; }
-      header { padding:2rem 0 1.5rem; }
-      .time-display { font-size: var(--fs-xl); }
-      .glass-stage { width:calc(130px * var(--glass-scale)); height:calc(322px * var(--glass-scale)); }
-      .settings-body { grid-template-columns:1fr; }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/pomodoro.css">
   <script src="assets/js/pomodoro-cycle.js"></script>
 </head>
 <body>
@@ -275,7 +45,12 @@
   <div class="glass-section">
     <div class="glass-stage">
       <div class="glass-rotor" id="rotor">
-        <svg id="hourglass-svg" viewBox="0 0 210 520" xmlns="http://www.w3.org/2000/svg">
+        <!-- The viewBox grew outward from `0 0 210 520` to make room for the
+             frame; every original coordinate is untouched. The glass still
+             spans x 25-185, y 15-505, and the box is centred exactly on
+             (105, 260), the same point the rotor spins about, so the flip
+             stays perfectly registered. -->
+        <svg id="hourglass-svg" viewBox="-10 -24 230 568" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="amberGlass" x1="0" y1="0" x2="1" y2="1">
               <stop id="stopAmber1" offset="0%" stop-color="#f8d9ae"/>
@@ -287,13 +62,31 @@
               <stop id="stopBlue2" offset="55%" stop-color="#6b83a8"/>
               <stop id="stopBlue3" offset="100%" stop-color="#1b2a4e"/>
             </linearGradient>
+            <!-- The leading stop-opacity:0 is what stops the sand surface
+                 reading as a water line. Gradient units are the object
+                 bounding box, so offset 3% is always 3% of however much sand
+                 is currently in the bulb: the soft edge tracks the surface
+                 up and down for free, with no JS touching it. -->
             <linearGradient id="sandAmber" x1="0" y1="0" x2="0" y2="1">
-              <stop id="stopSandAmber1" offset="0%" stop-color="#fbe6c4"/>
+              <stop id="stopSandAmber0" offset="0%" stop-color="#fbe6c4" stop-opacity="0"/>
+              <stop id="stopSandAmber1" offset="3%" stop-color="#fbe6c4"/>
               <stop id="stopSandAmber2" offset="100%" stop-color="#f0ab5a"/>
             </linearGradient>
             <linearGradient id="sandBlue" x1="0" y1="0" x2="0" y2="1">
-              <stop id="stopSandBlue1" offset="0%" stop-color="#e3e8f2"/>
+              <stop id="stopSandBlue0" offset="0%" stop-color="#e3e8f2" stop-opacity="0"/>
+              <stop id="stopSandBlue1" offset="3%" stop-color="#e3e8f2"/>
               <stop id="stopSandBlue2" offset="100%" stop-color="#a9b7d3"/>
+            </linearGradient>
+            <!-- Deliberately NOT in the palette: the four palettes recolour
+                 the sand and the glass, and a frame that changed with them
+                 would read as a fifth coloured element rather than as the
+                 thing holding the other four. This warm taupe sits against
+                 all of them. Left-to-right, so each post and cap gets its own
+                 highlight from the object bounding box and reads as turned. -->
+            <linearGradient id="frameWood" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="#b3a48d"/>
+              <stop offset="34%"  stop-color="#d9cfbc"/>
+              <stop offset="100%" stop-color="#97896f"/>
             </linearGradient>
             <clipPath id="topClip">
               <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z"/>
@@ -302,6 +95,18 @@
               <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z"/>
             </clipPath>
           </defs>
+
+          <!-- Frame. Every shape here is mirror-symmetric about y=260, the
+               rotor's centre of rotation, so the 180deg flip leaves it
+               looking identical: the glass turns over inside a frame that
+               appears to stand still. The posts run under the caps rather
+               than butting against them, so no seam shows at the joint. -->
+          <g id="frame">
+            <rect x="8"   y="6" width="7" height="508" rx="3.5" fill="url(#frameWood)"/>
+            <rect x="195" y="6" width="7" height="508" rx="3.5" fill="url(#frameWood)"/>
+            <rect x="0" y="-6"  width="210" height="18" rx="4" fill="url(#frameWood)"/>
+            <rect x="0" y="508" width="210" height="18" rx="4" fill="url(#frameWood)"/>
+          </g>
 
           <!-- top bulb glass -->
           <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z" fill="url(#amberGlass)" opacity="0.34"/>
@@ -319,16 +124,30 @@
           </g>
           <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z" fill="none" stroke="url(#blueGlass)" stroke-width="3" opacity="0.85"/>
 
-          <!-- neck -->
-          <rect x="95" y="250" width="20" height="20" rx="3" fill="#e8e2d6" opacity="0.9"/>
+          <!-- Neck, waisted rather than a straight 20px channel: the curves
+               pull it in to 14px at y=260 so the two bulbs look pinched
+               together instead of joined by a peg. Symmetric about both axes,
+               so it survives the flip. -->
+          <path d="M95,250 C99,255 99,265 95,270 L115,270 C111,265 111,255 115,250 Z"
+                fill="#e8e2d6" opacity="0.9"/>
+          <!-- Collar. The waist is only 20px of a 568px drawing and it was
+               cream on cream, so the two bulbs looked merely adjacent rather
+               than joined. Borrowing the frame's material ties the middle of
+               the glass to the stand holding it. Centred on (105,260), so it
+               is unmoved by the flip like the rest of the frame. -->
+          <rect x="92" y="256.5" width="26" height="7" rx="2.5"
+                fill="url(#frameWood)" opacity="0.92"/>
 
-          <!-- falling grains -->
+          <!-- Falling grains. The delays are an even 0.1s apart across the
+               0.5s cycle, so the stream is continuous; they used to be
+               0/.13/.26/.39/.42, and that last near-duplicate made two grains
+               drop together and left a visible gap after them. -->
           <g id="stream">
-            <circle class="grain" cx="103" cy="260" r="1.8" fill="#f0ab5a" style="animation-delay:0s"/>
-            <circle class="grain" cx="107" cy="260" r="1.6" fill="#f0ab5a" style="animation-delay:.13s"/>
-            <circle class="grain" cx="105" cy="260" r="1.7" fill="#f0ab5a" style="animation-delay:.26s"/>
-            <circle class="grain" cx="104" cy="260" r="1.5" fill="#f0ab5a" style="animation-delay:.39s"/>
-            <circle class="grain" cx="106" cy="260" r="1.7" fill="#f0ab5a" style="animation-delay:.42s"/>
+            <circle class="grain" cx="103" cy="258" r="1.8" fill="#f0ab5a" style="animation-delay:0s"/>
+            <circle class="grain" cx="107" cy="258" r="1.6" fill="#f0ab5a" style="animation-delay:.1s"/>
+            <circle class="grain" cx="105" cy="258" r="1.7" fill="#f0ab5a" style="animation-delay:.2s"/>
+            <circle class="grain" cx="104" cy="258" r="1.5" fill="#f0ab5a" style="animation-delay:.3s"/>
+            <circle class="grain" cx="106" cy="258" r="1.7" fill="#f0ab5a" style="animation-delay:.4s"/>
           </g>
 
           <!-- glass highlights -->
@@ -950,8 +769,13 @@
     $('stopBlue1').setAttribute('stop-color', p.blue[0]);
     $('stopBlue2').setAttribute('stop-color', p.blue[1]);
     $('stopBlue3').setAttribute('stop-color', p.blue[2]);
+    // ...0 is the soft-edge stop; it carries the same colour as ...1 and only
+    // differs in stop-opacity, so it has to be recoloured alongside it or the
+    // surface fades through the previous palette's sand on the way out.
+    $('stopSandAmber0').setAttribute('stop-color', p.sandAmber[0]);
     $('stopSandAmber1').setAttribute('stop-color', p.sandAmber[0]);
     $('stopSandAmber2').setAttribute('stop-color', p.sandAmber[1]);
+    $('stopSandBlue0').setAttribute('stop-color', p.sandBlue[0]);
     $('stopSandBlue1').setAttribute('stop-color', p.sandBlue[0]);
     $('stopSandBlue2').setAttribute('stop-color', p.sandBlue[1]);
 

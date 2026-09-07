@@ -11,9 +11,9 @@ const PAGES = pagePaths().map((p) => path.basename(p));
 const DEST = ['index.html', 'cv.html', 'resources.html', 'coffee.html',
               'pomodoro.html', 'languages.html', 'snake.html'];
 
-// index.html carries no footer nav on purpose: its entire body is this same
-// list with a line of description under each entry. A footer repeating the
-// six links a screenful below would be duplication, not navigation.
+// index.html carries no footer nav on purpose: its entire body IS this same
+// list. A footer repeating the six links a screenful below would be
+// duplication, not navigation.
 const NO_FOOTER_NAV = ['index.html'];
 
 function navOf(page) {
@@ -116,34 +116,62 @@ test('site-nav entries are tall enough to tap', () => {
     `.sitenav entries are about ${px.toFixed(0)}px tall; WCAG 2.5.8 asks 24`);
 });
 
-// The homepage is the hub: it is the one page that describes each destination
-// rather than just naming it.
-test('the homepage describes every destination it links to', () => {
-  const src = readPage('index.html');
-  for (const dest of DEST) {
-    if (dest === 'index.html') continue;
-    assert.ok(src.includes(`href="${dest}"`), `index.html does not link ${dest}`);
-  }
-  // Scoped to the links list. The coffee-mug illustration above it is also an
-  // anchor to coffee.html and legitimately has no label -- it is a picture,
-  // labelled by its own .cup-link-text.
-  const list = /<nav class="links">([\s\S]*?)<\/nav>/.exec(src);
+// The homepage is the hub, and its list is the only place every destination
+// is introduced rather than just listed. The name has to do that work on its
+// own -- there is no second line under it.
+//
+// Scoped to <nav class="links">. The coffee-mug illustration above it is also
+// an anchor to coffee.html and legitimately carries no text; it is a picture,
+// labelled by its own .cup-link-text.
+function homeLinks() {
+  const list = /<nav class="links">([\s\S]*?)<\/nav>/.exec(readPage('index.html'));
   assert.ok(list, 'index.html has no <nav class="links">');
-  const links = [...list[1].matchAll(/<a href="([^"]+\.html)"[^>]*>([\s\S]*?)<\/a>/g)]
-    .filter((m) => DEST.includes(m[1]));
-  assert.equal(links.length, DEST.length - 1,
-    `index.html lists ${links.length} destinations; expected ${DEST.length - 1}`);
+  return [...list[1].matchAll(/<a href="([^"]+\.html)"[^>]*>([\s\S]*?)<\/a>/g)];
+}
+
+test('the homepage names every destination, and names it something', () => {
+  const links = homeLinks();
+  assert.deepEqual(links.map((m) => m[1]), DEST.filter((d) => d !== 'index.html'),
+    'index.html does not list exactly the destinations, in nav order');
   for (const [, href, inner] of links) {
-    assert.match(inner, /class="link-label"/, `index.html ${href} has no label`);
-    assert.match(inner, /class="link-note"/,
-      `index.html links ${href} with no note saying what it is. A bare label ` +
-      `gives a stranger no reason to click.`);
+    assert.ok(!/<[a-z]/i.test(inner),
+      `index.html ${href} wraps its name in markup. The name is the whole ` +
+      `link now; a nested element is a subtitle growing back.`);
+    assert.ok(inner.trim().length >= 2, `index.html ${href} has no visible name`);
   }
 });
 
+// A decision, pinned so that undoing it has to be deliberate. These three
+// pages used to be listed as "Resources", "Pomodoro" and "Languages" -- names
+// that only mean something to someone who already knows what is behind them.
+// A stranger reading "Pomodoro" learns nothing; "Pomodoro hourglass" tells
+// them there is a picture of one on the other side.
+test('the homepage does not fall back to bare category names', () => {
+  const BARE = { 'resources.html': 'Resources', 'pomodoro.html': 'Pomodoro',
+                 'languages.html': 'Languages' };
+  for (const [, href, inner] of homeLinks()) {
+    if (!(href in BARE)) continue;
+    assert.notEqual(inner.trim(), BARE[href],
+      `index.html calls ${href} just "${BARE[href]}", which tells a stranger ` +
+      `nothing about what it is`);
+  }
+});
+
+// Same floor as the site nav, and for the same reason: these are ~13px mono
+// line boxes, so the padding is the entire tap target and it looks removable.
+test('homepage links are tall enough to tap', () => {
+  const rule = /\.links a \{([^}]*)\}/.exec(pageCss('index.html'));
+  assert.ok(rule, 'index.html has no .links a rule');
+  const pad = /padding:\s*([\d.]+)rem/.exec(rule[1]);
+  assert.ok(pad, '.links a sets no vertical padding');
+  const px = parseFloat(pad[1]) * 16 * 2 + 13;
+  assert.ok(px >= 24,
+    `.links a is about ${px.toFixed(0)}px tall; WCAG 2.5.8 asks 24`);
+});
+
 // The homepage centres its content in a flex column. With overflow hidden and
-// plain `center`, content taller than the viewport is clipped at BOTH ends
-// and cannot be scrolled to -- which six two-line links can be, on a phone in
+// plain `center`, content taller than the viewport is clipped at BOTH ends and
+// cannot be scrolled to -- which a greeting plus six links is, on a phone in
 // landscape.
 test('the homepage can scroll when its content outgrows the viewport', () => {
   const body = /body \{([^}]*)\}/.exec(pageCss('index.html'));
