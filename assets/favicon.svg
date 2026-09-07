@@ -1,0 +1,8 @@
+<!-- The favicon that was already on the site, lifted out of the base64 data URI
+     that ten pages each carried their own copy of. Same design, one file, and
+     now actually cacheable across pages. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#f5f2ed"/>
+  <text x="16" y="23" font-family="Georgia,serif" font-size="15" font-weight="400"
+        text-anchor="middle" fill="#9a2a2a" letter-spacing="1">KN</text>
+</svg>
