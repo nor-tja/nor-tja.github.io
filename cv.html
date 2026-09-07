@@ -26,31 +26,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #f5f2ed; --ink: #1a1814; --muted: #7a7570; --accent: #9a2a2a; --line: #d8d3cc;
-    }
     html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg); color: var(--ink);
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300; font-size: 18px; line-height: 1.7; min-height: 100vh;
-    }
+    body { font-size:var(--fs-body); line-height:var(--leading-body); }
     .wrap { max-width: 780px; margin: 0 auto; padding: 0 2rem; }
-    .back {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      font-family: 'DM Mono', monospace; font-size: 0.65rem;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--muted); text-decoration: none; padding: 1.8rem 0 0;
-      transition: color 0.2s;
-    }
-    .back:hover { color: var(--accent); }
     header { padding: 3rem 0; border-bottom: 1px solid var(--line); }
-    .eyebrow {
-      font-family: 'DM Mono', monospace; font-size: 0.7rem;
-      letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
-      margin-bottom: 1.4rem; opacity: 0; animation: rise 0.8s ease forwards 0.1s;
-    }
+    .eyebrow { margin-bottom:1.4rem; opacity:0; animation:rise 0.8s ease forwards 0.1s; }
     h1 {
       font-size: clamp(2.2rem, 5.5vw, 3.2rem); font-weight: 300;
       line-height: 1.05; letter-spacing: -0.01em;
@@ -112,7 +92,7 @@
     .lang-item { display: flex; align-items: baseline; gap: 0.6rem; }
     .lang-name { font-weight: 400; font-size: 1rem; }
     .lang-level { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--muted); letter-spacing: 0.05em; }
-    footer { padding: 2.5rem 0; text-align: center; }
+    footer { padding:2.5rem 0; }
     footer p { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; color: var(--muted); }
     @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
     @media (max-width: 520px) { .skills-grid { grid-template-columns: 1fr; } .job-header { flex-direction: column; } }

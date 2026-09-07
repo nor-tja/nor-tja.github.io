@@ -96,7 +96,11 @@ test('.wrap max-width is unchanged on every page', () => {
 
 // Grows to every page in the next task. Without a list like this the pilot
 // page cannot be asserted separately from the eleven not yet migrated.
-const MIGRATED = ['resources.html'];
+const MIGRATED = [
+  'coffee.html', 'cv.html', 'index.html', 'japanese.html', 'languages.html',
+  'mots-du-jour.html', 'pomodoro.html', 'portuguese.html', 'resources.html',
+  'snake.html', 'spanish.html', 'ukrainian.html',
+];
 
 const PALETTE_VARS = ['--bg', '--ink', '--muted', '--accent', '--line'];
 
@@ -110,22 +114,54 @@ test('migrated pages define no palette variables locally', () => {
   }
 });
 
+// cv.html's rise travels 18px where every other page travels 16px. A local
+// @keyframes replaces the shared one wholesale rather than merging with it, so
+// keeping cv's copy is both safe and necessary: delete it and cv's entrance
+// animation silently changes. Listed here so the exception is a decision on the
+// record rather than an oversight nobody noticed.
+const KEYFRAMES_EXCEPT = ['cv.html'];
+
 test('migrated pages define no duplicated furniture', () => {
   for (const page of MIGRATED) {
     const src = readPage(page);
-    for (const sel of ['.back', '.back:hover', '.eyebrow', '@keyframes rise']) {
+    for (const sel of ['.back', '.back:hover']) {
       assert.equal(extractRule(src, sel), null,
         `${page} still defines ${sel} locally; the extraction added the link ` +
         `but did not actually deduplicate anything`);
     }
     assert.equal(extractRule(src, '*, *::before, *::after'), null,
       `${page} still defines the universal reset locally`);
+    if (!KEYFRAMES_EXCEPT.includes(page)) {
+      assert.equal(extractRule(src, '@keyframes rise'), null,
+        `${page} still defines @keyframes rise locally`);
+    }
+  }
+});
+
+// .eyebrow is the one piece of furniture a page may legitimately keep, because
+// cv.html adds a longer margin and its own entrance animation. What it may not
+// keep is the half that moved to site.css -- so the test polices the shared
+// declarations rather than the rule's existence.
+test('no migrated page re-declares the shared half of .eyebrow', () => {
+  const SHARED = ['font-family', 'font-size', 'letter-spacing', 'text-transform', 'color'];
+  for (const page of MIGRATED) {
+    const rule = extractRule(readPage(page), '.eyebrow');
+    if (rule === null) continue;
+    const decls = declarations(rule);
+    for (const p of SHARED) {
+      assert.equal(decls[p], undefined,
+        `${page} .eyebrow still sets ${p}; that moved to site.css. Only ` +
+        `genuinely divergent declarations may stay behind.`);
+    }
   }
 });
 
 test('migrated pages keep only their own footer padding', () => {
   for (const page of MIGRATED) {
-    const decls = declarations(extractRule(readPage(page), 'footer'));
+    const rule = extractRule(readPage(page), 'footer');
+    // index.html has no footer element at all; a separate test pins that.
+    if (rule === null) continue;
+    const decls = declarations(rule);
     assert.equal(decls['text-align'], undefined,
       `${page} still sets footer text-align; that half moved to site.css`);
     assert.ok(decls['padding'], `${page} must keep its own footer padding`);
@@ -213,13 +249,23 @@ test('pages using the length leading protect their oversized text', () => {
     // the oversized elements too.
     const bodyPx = 1.125 * 16;
 
-    for (const m of src.matchAll(/([.#][\w-]+)\s*\{([^}]*font-size[^}]*)\}/g)) {
+    // Aggregate by selector before judging. A selector routinely sets its
+    // line-height in the base rule and then re-declares only font-size inside
+    // a media query; the base line-height still applies there, so scoring each
+    // rule in isolation would report a break that cannot happen.
+    const biggest = new Map();
+    const guarded = new Set();
+    for (const m of src.matchAll(/([.#][\w-]+)\s*\{([^}]*)\}/g)) {
       const [, sel, decls] = m;
+      if (/line-height/.test(decls)) guarded.add(sel);
       const f = /font-size:\s*([\d.]+)(rem|px)/.exec(decls);
       if (!f) continue;
       const px = f[2] === 'rem' ? parseFloat(f[1]) * 16 : parseFloat(f[1]);
+      biggest.set(sel, Math.max(biggest.get(sel) || 0, px));
+    }
+    for (const [sel, px] of biggest) {
       if (px <= bodyPx) continue;          // smaller text only gains air
-      if (/line-height/.test(decls)) continue;
+      if (guarded.has(sel)) continue;
       offenders.push(`${page} ${sel} is ${px.toFixed(1)}px vs a ${bodyPx}px line box`);
     }
   }

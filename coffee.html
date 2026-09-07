@@ -29,16 +29,11 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#9a2a2a; --line:#d8d3cc; }
-    body { background:var(--bg); color:var(--ink); font-family:'Cormorant Garamond',serif; font-weight:300; font-size:18px; line-height:1.7; min-height:100vh; }
+    body { font-size:var(--fs-body); line-height:var(--leading-body); }
     .wrap { max-width:860px; margin:0 auto; padding:0 2rem; }
 
-    .back { display:inline-flex; align-items:center; gap:.4rem; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:1.8rem 0 0; transition:color .2s; }
-    .back:hover { color:var(--accent); }
 
     header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
-    .eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
     h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:300; line-height:1.1; }
     h1 em { font-style:italic; color:var(--accent); }
     .intro { margin-top:1rem; color:var(--muted); font-size:1rem; max-width:540px; }
@@ -117,7 +112,7 @@
     }
     .place-trigger::-webkit-details-marker { display:none; }
     .place-left { display:flex; flex-direction:column; gap:.2rem; }
-    .place-name { font-size:1.15rem; font-weight:400; }
+    .place-name { font-size:1.15rem; font-weight:400; line-height:1.7; }
     .place-address { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--muted); letter-spacing:.05em; }
     .place-chevron { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); transition:transform .25s; }
     details[open] .place-chevron { transform:rotate(90deg); }
@@ -141,9 +136,8 @@
     .bean-score { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--accent); white-space:nowrap; grid-column:2; grid-row:1; align-self:start; }
     .bean-heart { font-size:.72rem; grid-column:2; grid-row:2; color:var(--accent); text-align:right; }
 
-    footer { padding:2.5rem 0; text-align:center; }
+    footer { padding:2.5rem 0; }
     footer p { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; color:var(--muted); }
-    @keyframes rise { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
     /* BREW GUIDE — compact, collapsed by default */
     .brew { border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin-top:.5rem; }

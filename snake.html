@@ -27,31 +27,11 @@
   <script src="assets/js/snake-logic.js"></script>
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#9a2a2a; --line:#d8d3cc; }
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      min-height: 100vh;
-    }
     .wrap { max-width: 520px; margin: 0 auto; padding: 0 2rem 3rem; }
-    .back {
-      display: inline-flex; align-items: center; gap: .4rem;
-      font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .12em;
-      text-transform: uppercase; color: var(--muted); text-decoration: none;
-      padding: 1.8rem 0 0; transition: color .2s;
-    }
-    .back:hover { color: var(--accent); }
 
     header {
       padding: 2rem 0 2.4rem;
       opacity: 0; animation: rise .8s ease forwards .1s;
-    }
-    .eyebrow {
-      font-family: 'DM Mono', monospace; font-size: .7rem; letter-spacing: .18em;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
     }
     h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 300; line-height: 1.15; }
     h1 em { font-style: italic; color: var(--accent); }
@@ -123,16 +103,12 @@
       opacity: .8;
     }
 
-    footer { padding: 3rem 0 0; text-align: center; }
+    footer { padding:3rem 0 0; }
     footer p {
       font-family: 'DM Mono', monospace; font-size: .62rem;
       letter-spacing: .1em; color: var(--muted);
     }
 
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
   </style>
 </head>
 <body>
