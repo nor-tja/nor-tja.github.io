@@ -62,10 +62,15 @@
     /* ── HOURGLASS ── */
     .glass-section { padding:2.6rem 0 1rem; display:flex; flex-direction:column; align-items:center; opacity:0; animation:rise .9s ease forwards .25s; }
 
+    /* Base size at --glass-scale:1. The scale itself is set from JS and tracks
+       the focus length, so these two numbers set the whole range rather than
+       one size: at the default 25 minutes the scale is ~0.905, which puts the
+       glass at 145 x 358. Keep the 200:495 ratio, which matches the SVG's
+       210x520 viewBox -- diverging from it letterboxes the drawing. */
     .glass-stage {
       --glass-scale: 1;
-      width: calc(200px * var(--glass-scale));
-      height: calc(495px * var(--glass-scale));
+      width: calc(160px * var(--glass-scale));
+      height: calc(396px * var(--glass-scale));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -272,7 +277,7 @@
       .wrap { padding:0 1.2rem 3rem; }
       header { padding:2rem 0 1.5rem; }
       .time-display { font-size:1.3rem; }
-      .glass-stage { width:calc(145px * var(--glass-scale)); height:calc(359px * var(--glass-scale)); }
+      .glass-stage { width:calc(130px * var(--glass-scale)); height:calc(322px * var(--glass-scale)); }
       .settings-body { grid-template-columns:1fr; }
     }
   </style>
