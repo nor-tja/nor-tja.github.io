@@ -89,11 +89,23 @@ test('the glass is its own reflection in the line the flip turns about', () => {
   }
 });
 
-// A funnel is widest at the rim and narrows all the way to the waist. An
-// ovoid is widest somewhere in its middle. That one number is the difference
-// between reading as an hourglass and reading as a balloon, and it regressed
-// once already -- silently, because the wooden frame was carrying the meaning
-// until it was removed.
+// There used to be a stricter rule here: the bulb had to be widest within the
+// top 25% of its height, on the theory that a real hourglass is widest at the
+// RIM and anything widest at its middle is a balloon. It was enforced, it did
+// its job, and the shape it produced was wrong -- at this size a bulb widest
+// 18% down reads as a plumb bob. Katja asked for the oval back. The rule was
+// removed rather than loosened, because a threshold nobody believes in is
+// worse than no threshold: the next person would have tuned it instead of
+// looking at the drawing.
+//
+// Worth recording why the rule looked so convincing at the time. The visible
+// bug it was written to fix was mostly the glass TINT (see below), which made
+// an empty bulb look 71% as full as a full one. That is fixed at 0.12 and had
+// nothing to do with the outline. Two faults, one diagnosis.
+//
+// What replaced it is the part of the silhouette that is not a matter of
+// taste: the waist has to be a real pinch, and the wall must not waver on its
+// way down to it.
 // Walk the path rather than reading its control points. Where a curve is
 // widest is not generally at a control point, so checking the numbers in the
 // `d` string answers a different question than the eye asks.
@@ -119,38 +131,74 @@ function flatten(d) {
   return pts;
 }
 
-test('the bulb is widest at its rim, not at its belly', () => {
-  const pts = flatten(/d="(M95,250 [^"]+)"/.exec(SVG[0])[1]);
-  const leftmost = Math.min(...pts.map((p) => p[0]));
+// Where the bulb is widest, measured down from the rim at y=15 towards the
+// waist at y=250. The oval sits at 38%.
+function widest(d) {
+  const pts = flatten(d);
+  const x = Math.min(...pts.map((p) => p[0]));
   // Highest point on the path that is (near enough) as wide as it ever gets.
-  const widestY = Math.min(...pts.filter((p) => p[0] <= leftmost + 0.5).map((p) => p[1]));
-  // The bulb runs y=15 at the rim to y=250 at the waist.
-  const frac = (widestY - 15) / (250 - 15);
-  assert.ok(frac < 0.25,
-    `the top bulb is at its widest (x=${leftmost.toFixed(1)}) at y=${widestY.toFixed(0)}, ` +
-    `which is ${(frac * 100).toFixed(0)}% of the way from the rim to the waist. ` +
-    `A funnel is widest at the rim; the ovoid this replaced was widest at 42% ` +
-    `and read as a balloon, which is the whole reason this test exists.`);
+  const y = Math.min(...pts.filter((p) => p[0] <= x + 0.5).map((p) => p[1]));
+  return { pts, x, y, frac: (y - 15) / (250 - 15) };
+}
+
+// The one thing an hourglass cannot do without. Sand falls through a pinch; a
+// shape whose middle is merely a bit narrower than its ends is a vase, an egg
+// timer, a chess pawn. At 20 units against 160 the waist is 12.5% of the
+// widest span, and the ceiling here is 25% -- room to redraw the bulbs, none
+// to open the neck up into a soft join.
+test('the waist is a pinch and not just a narrowing', () => {
+  const { x } = widest(/d="(M95,250 [^"]+)"/.exec(SVG[0])[1]);
+  const ratio = (105 - 95) / (105 - x);
+  assert.ok(ratio < 0.25,
+    `the waist is ${(105 - 95) * 2} wide against a widest span of ${((105 - x) * 2).toFixed(0)}, ` +
+    `which is ${(ratio * 100).toFixed(0)}% -- too little of a pinch to read as an hourglass`);
 });
 
-// ...and having got wide at the top, it has to keep narrowing. A profile that
-// pinches in and bulges out again is a vase, not an hourglass, and the check
-// above would not notice.
-test('the bulb narrows all the way from rim to waist', () => {
-  const pts = flatten(/d="(M95,250 [^"]+)"/.exec(SVG[0])[1]);
-  const BANDS = 10, TOP = 40, BOT = 250;   // from below the corner radius
+// A bulb widest in its lower half is a light bulb: heaviest just above the
+// neck, which puts the visual weight in the wrong place and makes the pinch
+// look like a mistake rather than the point. The oval is at 38%, the funnel
+// that this replaced was at 18%; both are fine. 50% is where it stops being.
+test('the bulb carries its weight above its middle', () => {
+  const { x, y, frac } = widest(/d="(M95,250 [^"]+)"/.exec(SVG[0])[1]);
+  assert.ok(frac < 0.5,
+    `the top bulb is at its widest (x=${x.toFixed(1)}) at y=${y.toFixed(0)}, which is ` +
+    `${(frac * 100).toFixed(0)}% of the way from the rim to the waist, so it is bottom-heavy`);
+});
+
+// ...and having reached its widest, it has to keep narrowing. A profile that
+// pinches in and swells out again is a gourd, and neither check above would
+// notice.
+//
+// Both walls. The version written for the funnel took Math.min of each band,
+// which only ever inspected the LEFT one. Nothing else covers the right: the
+// mirror test pairs the top bulb with the bottom bulb, never a bulb with
+// itself. The probe for this is a bulb whose left wall is byte-identical to
+// the one above and whose right wall turns back out below the belly -- band
+// minima are unchanged, so the old check could only have passed it.
+//
+// It takes a whole extra path segment to build that, which is the other thing
+// worth writing down. A Bezier stays inside its control hull, so dragging a
+// control point can make a wall narrow faster but never make it swell. The
+// first three attempts at a gourd mutation all went green, and the reading
+// "the test is weak" was wrong: the shapes were fine.
+test('the bulb narrows without wavering from its widest point to the waist', () => {
+  const { pts, y } = widest(/d="(M95,250 [^"]+)"/.exec(SVG[0])[1]);
+  const BANDS = 12, TOP = Math.ceil(y), BOT = 250;
   const wall = [];
   for (let b = 0; b < BANDS; b++) {
     const lo = TOP + ((BOT - TOP) * b) / BANDS;
     const hi = TOP + ((BOT - TOP) * (b + 1)) / BANDS;
     const xs = pts.filter((p) => p[1] >= lo && p[1] < hi).map((p) => p[0]);
-    if (xs.length) wall.push({ y: Math.round(lo), x: Math.min(...xs) });
+    if (xs.length) wall.push({ y: Math.round(lo), l: Math.min(...xs), r: Math.max(...xs) });
   }
-  const bulges = wall
-    .filter((b, i) => i && b.x < wall[i - 1].x - 0.5)
-    .map((b, i) => `at y=${b.y} the wall moves back out to x=${b.x.toFixed(1)}`);
-  assert.deepEqual(bulges, [],
-    `the bulb wall stops narrowing on the way down, so the silhouette bulges:\n  ${bulges.join('\n  ')}`);
+  const swells = [];
+  for (const [i, b] of wall.entries()) {
+    if (!i) continue;
+    if (b.l < wall[i - 1].l - 0.5) swells.push(`at y=${b.y} the left wall moves back out to x=${b.l.toFixed(1)}`);
+    if (b.r > wall[i - 1].r + 0.5) swells.push(`at y=${b.y} the right wall moves back out to x=${b.r.toFixed(1)}`);
+  }
+  assert.deepEqual(swells, [],
+    `the bulb wall stops narrowing on the way down, so the silhouette swells:\n  ${swells.join('\n  ')}`);
 });
 
 // The tint in an empty bulb has to stay much fainter than it looks like it

@@ -101,38 +101,35 @@
               <stop offset="100%" stop-color="#97896f"/>
             </linearGradient>
             <clipPath id="topClip">
-              <path d="M95,250 C45,200 25,130 25,58 C25,30 55,15 105,15 C155,15 185,30 185,58 C185,130 165,200 115,250 L95,250 Z"/>
+              <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z"/>
             </clipPath>
             <clipPath id="bottomClip">
-              <path d="M95,270 C45,320 25,390 25,462 C25,490 55,505 105,505 C155,505 185,490 185,462 C185,390 165,320 115,270 L95,270 Z"/>
+              <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z"/>
             </clipPath>
           </defs>
 
-          <!-- The bulb profile. It used to be an ovoid, widest at y=114,
-               which is 42% of the way down from the dome, then tapering to a
-               point at the neck. That is the outline of a balloon, and with a
-               gloss streak down one side and a small collar at the pinch it
-               read as one: rendered on its own, the drawing was an orange
-               balloon knotted to a clear one. The wooden frame used to carry
-               the meaning instead, so nobody noticed; taking the frame away
-               left the silhouette to say "hourglass" by itself, and it could
-               not.
+          <!-- The bulb profile: an oval, widest at y=114, which is 42% of the
+               way down from the crown, tapering to the neck at (95,250).
 
-               What an hourglass actually looks like: widest at the top RIM,
-               with walls that funnel steadily inward to the waist. So the
-               widest point moved from y=114 up to y=58, and the walls are one
-               long concave sweep from there down to the neck at (95,250). The
-               bounding box is unchanged (x 25 to 185, y 15 to 505, waist 20
-               wide), so nothing else in the drawing had to move.
+               This shape was changed and then changed back, so the reasoning
+               is worth keeping. The argument for replacing it was that an oval
+               is the outline of a balloon and an hourglass is widest at the
+               RIM, and that once the wooden frame came off the silhouette had
+               to say "hourglass" on its own. That produced a bulb widest 18%
+               of the way down, and the honest verdict on it is that it read as
+               a plumb bob. A rule that is right in the abstract can still be
+               wrong at the size it is drawn.
 
-               The cap is a dome rather than the flat lid with corner radii it
-               was first drawn with. Same silhouette logic either way: what
-               makes this read as an hourglass is where the widest point sits,
-               not what happens above it. The dome costs 43 units of height
-               before the wall reaches full width, which puts the widest point
-               18% of the way from rim to waist. The ovoid that read as a
-               balloon had it at 42%, and the test below draws the line at 25%,
-               so there is room for a dome but not for a bulge.
+               The other half of that argument does not survive either. The
+               real defect at the time was the glass TINT: at 0.34 an empty
+               bulb measured 71% as far from the paper as a full one, so at
+               25:00 both halves looked full and the drawing said nothing about
+               the time left. That is fixed independently, at 0.12, and it was
+               never a property of the outline. Two problems were diagnosed as
+               one.
+
+               So: oval, and the frame stays off. Bounding box x 25 to 185,
+               y 15 to 505, waist 20 wide.
 
                Every coordinate has a partner at y -> 520-y with x unchanged,
                because the flip is a rotateX about the stage's middle. Pinned
@@ -157,20 +154,20 @@
                separate path at opacity 0.85 and is untouched, so the
                silhouette holds regardless of what happens here. -->
           <!-- top bulb glass -->
-          <path d="M95,250 C45,200 25,130 25,58 C25,30 55,15 105,15 C155,15 185,30 185,58 C185,130 165,200 115,250 L95,250 Z" fill="url(#amberGlass)" opacity="0.12"/>
+          <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z" fill="url(#amberGlass)" opacity="0.12"/>
           <!-- top sand fill -->
           <g clip-path="url(#topClip)">
             <rect id="sandTop" x="20" y="15" width="170" height="235" fill="url(#sandAmber)"/>
           </g>
-          <path d="M95,250 C45,200 25,130 25,58 C25,30 55,15 105,15 C155,15 185,30 185,58 C185,130 165,200 115,250 L95,250 Z" fill="none" stroke="url(#amberGlass)" stroke-width="3" opacity="0.85"/>
+          <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z" fill="none" stroke="url(#amberGlass)" stroke-width="3" opacity="0.85"/>
 
           <!-- bottom bulb glass -->
-          <path d="M95,270 C45,320 25,390 25,462 C25,490 55,505 105,505 C155,505 185,490 185,462 C185,390 165,320 115,270 L95,270 Z" fill="url(#blueGlass)" opacity="0.12"/>
+          <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z" fill="url(#blueGlass)" opacity="0.12"/>
           <!-- bottom sand fill -->
           <g clip-path="url(#bottomClip)">
             <rect id="sandBottom" x="20" y="505" width="170" height="0" fill="url(#sandBlue)"/>
           </g>
-          <path d="M95,270 C45,320 25,390 25,462 C25,490 55,505 105,505 C155,505 185,490 185,462 C185,390 165,320 115,270 L95,270 Z" fill="none" stroke="url(#blueGlass)" stroke-width="3" opacity="0.85"/>
+          <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z" fill="none" stroke="url(#blueGlass)" stroke-width="3" opacity="0.85"/>
 
           <!-- Neck, waisted rather than a straight 20px channel: the curves
                pull it in to 14px at y=260 so the two bulbs look pinched
