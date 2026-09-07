@@ -2,7 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
-const { pagePaths, readPage } = require('./helpers');
+const { pagePaths, readPage, pageCss } = require('./helpers');
 
 const PAGES = pagePaths().map((p) => path.basename(p));
 const LANGUAGE_PAGES = [
@@ -53,7 +53,7 @@ test('the learned dot names the word it belongs to', () => {
 // reset the hollow 9px circle renders as a grey OS button.
 test('the learned dot is visually reset from platform button styling', () => {
   for (const page of LANGUAGE_PAGES) {
-    const m = /\.learned-dot\s*\{([^}]*)\}/.exec(readPage(page));
+    const m = /\.learned-dot\s*\{([^}]*)\}/.exec(pageCss(page));
     assert.ok(m, `${page} has no .learned-dot rule`);
     for (const prop of ['background', 'padding', 'appearance']) {
       assert.match(m[1], new RegExp(`(^|[;\\s])${prop}\\s*:`),
@@ -69,7 +69,7 @@ test('the learned dot is visually reset from platform button styling', () => {
 // would silently take the tap target back to 9px.
 test('the learned dot is at least 24x24 to tap', () => {
   for (const page of LANGUAGE_PAGES) {
-    const src = readPage(page);
+    const src = pageCss(page);
     const m = /\.learned-dot::after\s*\{([^}]*)\}/.exec(src);
     assert.ok(m, `${page} has no .learned-dot::after; the tap target is ` +
       `whatever the 9px ring is, which is a third of the WCAG 2.5.8 minimum`);

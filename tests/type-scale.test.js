@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
-const { ROOT, pagePaths, readPage } = require('./helpers');
+const { ROOT, pagePaths, pageCss } = require('./helpers');
 
 const SITE_CSS = fs.readFileSync(path.join(ROOT, 'assets/css/site.css'), 'utf8');
 const PAGES = pagePaths().map((p) => path.basename(p));
@@ -12,10 +12,6 @@ const PAGES = pagePaths().map((p) => path.basename(p));
 // test cannot drift away from the tool it is checking.
 const TOLERANCE = 0.05;
 
-function styleBlock(src) {
-  const m = /<style>([\s\S]*?)<\/style>/.exec(src);
-  return m ? m[1] : '';
-}
 
 // --fs-* tokens as site.css actually defines them, not as anyone remembers.
 function scaleFromSiteCss() {
@@ -53,7 +49,7 @@ test('every --fs- token a page references is defined in site.css', () => {
   const scale = scaleFromSiteCss();
   const unknown = [];
   for (const page of PAGES) {
-    for (const m of styleBlock(readPage(page)).matchAll(/var\((--fs-[\w-]+)\)/g)) {
+    for (const m of pageCss(page).matchAll(/var\((--fs-[\w-]+)\)/g)) {
       if (m[1] !== '--fs-body' && !scale.has(m[1])) unknown.push(`${page} -> ${m[1]}`);
     }
   }
@@ -68,7 +64,7 @@ test('no literal font-size sits within tolerance of a token', () => {
   const scale = [...scaleFromSiteCss().entries()];
   const strays = [];
   for (const page of PAGES) {
-    for (const value of literalFontSizes(styleBlock(readPage(page)))) {
+    for (const value of literalFontSizes(pageCss(page))) {
       if (!/rem$/.test(value)) continue;               // px is out of scope
       const rem = parseFloat(value);
       for (const [name, tokenRem] of scale) {
@@ -107,7 +103,7 @@ const OFF_SCALE = {
 test('the off-scale tail is exactly the known set', () => {
   const found = new Map();
   for (const page of PAGES) {
-    for (const value of literalFontSizes(styleBlock(readPage(page)))) {
+    for (const value of literalFontSizes(pageCss(page))) {
       found.set(value, (found.get(value) || 0) + 1);
     }
   }
