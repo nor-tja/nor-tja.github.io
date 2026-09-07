@@ -118,7 +118,7 @@
     .review-actions { flex-shrink:0; display:flex; gap:.5rem; }
     .review-btn {
       font-family: var(--font-ui); font-size: var(--fs-4xs); letter-spacing:.06em; text-transform:uppercase;
-      padding:.5rem .75rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
+      padding:.5rem .75rem; border-radius:999px; cursor:pointer; border:1px solid var(--line);
       background:transparent; color:var(--ink); transition:all .2s; white-space:nowrap;
     }
     .review-btn:hover { border-color:var(--accent); color:var(--accent); }

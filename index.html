@@ -53,11 +53,16 @@
 
     /* ── coffee cup ── */
     .coffee-scene {
+      /* One number for the illustration, declared here because the hover
+         label is sized off it too. It used to be written out twice, once for
+         width and once for height, and the label was a fixed 9.6px that knew
+         nothing about either. */
+      --mug: clamp(150px, 18vw, 250px);
       position: fixed;
       bottom: clamp(24px, 5vw, 56px);
       right: clamp(18px, 4vw, 44px);
-      width: clamp(130px, 15vw, 210px);
-      height: clamp(130px, 15vw, 210px);
+      width: var(--mug);
+      height: var(--mug);
       opacity: 0;
       animation: fadeStain 2s ease forwards 1.2s;
       cursor: pointer;
@@ -82,10 +87,37 @@
       white-space: nowrap;
       text-align: center;
       font-family: var(--font-ui);
-      font-size: var(--fs-4xs);
+      /* Measured on a render: the label was 63% of the mug's width, which is
+         why it crowded it. Not because the glyphs were big -- at 9.6px they
+         were already the smallest tier on the site -- but because "COFFEE
+         NOTES" is twelve tracked-out capitals and the mug was small.
+
+         So it is sized off the mug rather than off the type scale, which is
+         the honest description of what it is: part of an illustration, not
+         part of the running UI. That also fixes a drift nobody had noticed --
+         the mug scaled with the viewport and the label did not, so the label
+         ran from 46% of the mug on a wide screen to 71% on a narrow one. It
+         now holds between 36% and 47%.
+
+         The ceiling is what keeps it SMALLER: 0.045 of a 250px mug would be
+         11px, bigger than what was here before. The floor is legibility --
+         these are tracked capitals, and below about 7px they stop being
+         readable at all. Between the two it just follows the cup. */
+      font-size: clamp(7px, calc(var(--mug) * 0.045), 9px);
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--accent);
+      /* Paper cream, not the accent red, because of where this lands. The
+         label floats over the surface of the coffee, which is very close to
+         black: the accent measured 2.4:1 against it, and 9px tracked capitals
+         at 2.4:1 are not text, they are a texture. Cream measures about 16:1
+         on the same pixels.
+
+         It was red before and half-readable by accident -- at 63% of the mug's
+         width the words ran off the pool and onto the lit ceramic, so the ends
+         had contrast even though the middle never did. Shrinking the label
+         pulled it entirely inside the dark, which is what turned a partial
+         problem into a total one. */
+      color: var(--bg);
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
@@ -163,9 +195,11 @@
 
 
     @media (max-width: 480px) {
+      /* Only --mug changes. Width, height and the label all follow it, so the
+         phone size cannot fall out of step with the label the way it did when
+         these were three independent numbers. */
       .coffee-scene {
-        width: clamp(110px, 30vw, 150px);
-        height: clamp(110px, 30vw, 150px);
+        --mug: clamp(125px, 34vw, 170px);
         bottom: 18px;
         right: 14px;
       }

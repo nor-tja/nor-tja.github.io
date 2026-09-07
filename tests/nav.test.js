@@ -230,3 +230,67 @@ test('the homepage can scroll when its content outgrows the viewport', () => {
     'index.html must use `safe center`, or the top of overflowing content ' +
     'cannot be scrolled to');
 });
+
+// The mug scales with the viewport and its hover label used to not, so the
+// label ran from 46% of the mug's width on a wide screen to 71% on a narrow
+// one. Nobody chose that; it fell out of one clamp() and one fixed px value
+// being written independently. Same shape of bug as the hourglass stage, and
+// the same fix: one number, everything else derived from it.
+test('the mug is one number and the label follows it', () => {
+  // Selectors are compared exactly rather than searched for. `.cup-link-text`
+  // appears twice on this page and the first one is
+  // `.coffee-scene:hover .cup-link-text { opacity: 1 }` -- a substring search
+  // finds that, reads a body with no font-size in it, and reports the label as
+  // unsized no matter what the real rule says. Comments come out first for the
+  // same reason they do in typography.test.js.
+  const style = /<style>([\s\S]*?)<\/style>/.exec(readPage('index.html'))[1]
+    .replace(/\/\*[\s\S]*?\*\//g, '');
+  const rules = (want) => [...style.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .filter((m) => m[1].trim().replace(/\s+/g, ' ') === want)
+    .map((m) => m[2]);
+
+  const scene = rules('.coffee-scene');
+  assert.ok(scene.length, 'index.html has no .coffee-scene rule');
+
+  // The rule that SPENDS --mug has to be the rule that declares it. Asking
+  // only whether some .coffee-scene rule anywhere declares --mug is not the
+  // same question and does not bite: `.coffee-scene` is written twice, once
+  // at the top level and once inside the phone breakpoint, and both bodies
+  // land in `scene`. Delete the base declaration and the phone one still
+  // answers yes -- while every screen wider than 480px is left with
+  // `width: var(--mug)` resolving to nothing and no cup on the page at all.
+  const spender = scene.filter((b) => /width:\s*var\(--mug\)/.test(b));
+  assert.ok(spender.length, '.coffee-scene no longer sizes itself off --mug');
+  const undeclared = spender.filter((b) => !/--mug:\s*clamp\(/.test(b));
+  assert.equal(undeclared.length, 0,
+    'a .coffee-scene rule sizes itself with var(--mug) but does not declare --mug, ' +
+    'so the cup has no size outside whatever breakpoint happens to set one');
+
+  const literal = scene
+    .flatMap((b) => [...b.matchAll(/(width|height):\s*([^;]+)/g)])
+    .filter((d) => !/var\(--mug\)/.test(d[2]))
+    .map((d) => `${d[1]}: ${d[2].trim()}`);
+  assert.deepEqual(literal, [],
+    `a .coffee-scene rule sizes itself directly instead of through --mug, so the ` +
+    `label will drift out of proportion with the cup again:\n  ${literal.join('\n  ')}`);
+
+  const label = rules('.cup-link-text');
+  assert.ok(label.length, 'index.html has no .cup-link-text rule');
+  const size = /font-size:\s*([^;]+)/.exec(label[0]);
+  assert.ok(size && /var\(--mug\)/.test(size[1]),
+    `the hover label is set to ${size ? size[1].trim() : 'nothing'}, which does not ` +
+    `follow the mug. It was a fixed 9.6px against a mug that ranged 130-210px, and ` +
+    `that is the drift this checks for.`);
+
+  // Sampled off a render: the accent red measures 2.4:1 against the coffee the
+  // label sits on, and the label only got small enough to sit wholly inside the
+  // coffee in the same change that shrank it. Cream is about 16:1 there. This
+  // is the one place on the site where the accent is the wrong colour, so it is
+  // worth a line -- reaching for var(--accent) is otherwise exactly right.
+  const colour = /(?:^|;)\s*color:\s*([^;]+)/.exec(label[0]);
+  assert.ok(colour, '.cup-link-text sets no colour');
+  assert.ok(!/--accent|#9a2a2a/.test(colour[1]),
+    `the hover label is ${colour[1].trim()}. It floats on the surface of the coffee, ` +
+    `which is nearly black, so the accent red reads at 2.4:1 there -- below every ` +
+    `threshold there is. It needs to be light.`);
+});
