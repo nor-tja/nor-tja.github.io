@@ -57,11 +57,12 @@ test('no unreferenced audio files are shipped', () => {
 });
 
 // Attribution for CC BY material is a licence condition, not a nicety: use
-// without credit is simply unlicensed use. Unlike the other two recordings,
-// which are CC0, this one cannot ship without naming its author.
+// without credit is simply unlicensed use. Unlike the two CC0 recordings,
+// these cannot ship without naming their author.
 test('CC BY audio is credited on the page that plays it', () => {
   const REQUIRED = [
-    { file: 'ambience-waves.mp3', author: 'InspectorJ', licence: 'creativecommons.org/licenses/by/' }
+    { file: 'ambience-waves.mp3', author: 'InspectorJ', licence: 'creativecommons.org/licenses/by/' },
+    { file: 'ambience-fire.mp3', author: 'reinsamba', licence: 'creativecommons.org/licenses/by/' }
   ];
   eachPage((name, src) => {
     for (const { file, author, licence } of REQUIRED) {
