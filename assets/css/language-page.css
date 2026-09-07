@@ -24,7 +24,12 @@
     .streak { margin-top:1.2rem; display:inline-flex; align-items:center; gap:.5rem; font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing:.08em; text-transform:uppercase; color:var(--accent); opacity:0; transition:opacity .3s; }
 
     .voice-tip { margin-top:.8rem; font-size: var(--fs-xs); font-style:italic; color:var(--muted); max-width:440px; line-height:1.5; }
-    .voice-tip strong { font-style:normal; color:var(--ink); font-weight:500; }
+    /* No font-weight. It used to say 500, which was a third signal on top of
+       two that already work: this run is upright inside an italic sentence
+       and full ink inside a muted one. Any one of those three reads as
+       emphasis on its own, and EB Garamond's 500 is heavy enough that all
+       three together read as shouting. */
+    .voice-tip strong { font-style:normal; color:var(--ink); }
     .streak.visible { opacity:1; }
 
     .voice-picker { margin-top:.9rem; display:none; align-items:center; gap:.5rem; font-family: var(--font-ui); font-size: var(--fs-4xs); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
@@ -60,7 +65,20 @@
 
     .word-body { flex:1; min-width:0; }
     .word-top { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
-    .word-fr { font-size: var(--fs-2xl); font-weight:500; line-height:1.25; }
+    /* The vocabulary word, and the biggest thing in the card by a factor of
+       two. It does not also need to be the heaviest: at 27px, size alone has
+       already said "this is the word". The 500 that used to be here was a
+       tier borrowed from body copy, where a word does have to fight for
+       attention, and EB Garamond's 500 is a good deal blacker than the
+       Cormorant 400 it replaced.
+
+       Smoothing for the same reason h1 has it in site.css -- this is display
+       size, and there is no lighter cut to fall back on. */
+    .word-fr {
+      font-size: var(--fs-2xl); line-height:1.25;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
     .word-pos { font-family: var(--font-ui); font-size: var(--fs-4xs); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:.15rem .4rem; }
     .word-ipa { font-family: var(--font-mono); font-size: var(--fs-xs); color:var(--accent); margin-top:.25rem; }
     .word-en { font-style:italic; color:var(--muted); font-size: var(--fs-base); margin-top:.15rem; }

@@ -22,15 +22,31 @@
     .glass-section { padding:2.6rem 0 1rem; display:flex; flex-direction:column; align-items:center; opacity:0; animation:rise .9s ease forwards .25s; }
 
     /* Base size at --glass-scale:1. The scale itself is set from JS and tracks
-       the focus length, so these two numbers set the whole range rather than
-       one size: at the default 25 minutes the scale is ~0.905, which puts the
-       glass at 145 x 357.
-       Keep 160:395 -- it matches the SVG's 230x568 viewBox to within 0.02%.
-       Diverging from it letterboxes the drawing inside the stage. */
+       the focus length, so --glass-h sets the whole range rather than one
+       size: at the default 25 minutes the scale is ~0.905, which puts the
+       stage at 124 x 362.
+
+       Only the height is a free number. Width is derived, because
+       preserveAspectRatio defaults to "meet" and a stage that disagrees with
+       the viewBox letterboxes the drawing inside it -- silently, visible only
+       as the glass drifting away from the timer beneath it. Two independent
+       px values were how that stayed possible; now there is one, and the
+       ratio is spelled once.
+
+       0.34 is the viewBox: 170 wide over 500 tall, exactly. Change the
+       viewBox and this has to change with it. tests/hourglass.test.js checks
+       the two still agree.
+
+       The glass is ~15% bigger than it was, and none of that came from
+       scaling anything up: the old stage was 160 x 395 for a 230 x 568
+       viewBox, and 24 units of that box at each end were empty margin held
+       open for the frame's caps. Removing the frame let the box crop in, and
+       the same stage now spends its pixels on glass. */
     .glass-stage {
       --glass-scale: 1;
-      width: calc(160px * var(--glass-scale));
-      height: calc(395px * var(--glass-scale));
+      --glass-h: 400px;
+      width: calc(var(--glass-h) * var(--glass-scale) * 0.34);
+      height: calc(var(--glass-h) * var(--glass-scale));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -309,7 +325,8 @@
       .wrap { padding:0 1.2rem 3rem; }
       header { padding:2rem 0 1.5rem; }
       .time-display { font-size: var(--fs-xl); }
-      /* Same 230:568 viewBox ratio as the desktop rule above. */
-      .glass-stage { width:calc(130px * var(--glass-scale)); height:calc(321px * var(--glass-scale)); }
+      /* One number. Width follows it through the ratio set above, so the
+         phone size cannot drift out of step with the viewBox on its own. */
+      .glass-stage { --glass-h: 325px; }
       .settings-body { grid-template-columns:1fr; }
     }

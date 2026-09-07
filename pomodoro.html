@@ -48,12 +48,18 @@
   <div class="glass-section">
     <div class="glass-stage">
       <div class="glass-rotor" id="rotor">
-        <!-- The viewBox grew outward from `0 0 210 520` to make room for the
-             frame; every original coordinate is untouched. The glass still
-             spans x 25-185, y 15-505, and the box is centred exactly on
-             (105, 260), the same point the rotor spins about, so the flip
-             stays perfectly registered. -->
-        <svg id="hourglass-svg" viewBox="-10 -24 230 568" xmlns="http://www.w3.org/2000/svg">
+        <!-- The box is cropped close to the glass, which is where the extra
+             size comes from: no coordinate in the drawing moved, the frame it
+             used to hold just went away, and `-10 -24 230 568` had 24 units
+             of empty margin top and bottom for the caps that are no longer
+             there. The glass spans x 25-185, y 15-505; this leaves 5 units of
+             air on every side, enough for the 3-unit stroke and its
+             antialiasing and nothing else.
+
+             Still centred exactly on (105, 260) -- the point the rotor spins
+             about -- so the flip stays registered. Off-centre, the drawing
+             would swing sideways instead of turning in place. -->
+        <svg id="hourglass-svg" viewBox="20 10 170 500" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="amberGlass" x1="0" y1="0" x2="1" y2="1">
               <stop id="stopAmber1" offset="0%" stop-color="#f8d9ae"/>
@@ -80,52 +86,83 @@
               <stop id="stopSandBlue1" offset="3%" stop-color="#e3e8f2"/>
               <stop id="stopSandBlue2" offset="100%" stop-color="#a9b7d3"/>
             </linearGradient>
-            <!-- Deliberately NOT in the palette: the four palettes recolour
-                 the sand and the glass, and a frame that changed with them
-                 would read as a fifth coloured element rather than as the
-                 thing holding the other four. This warm taupe sits against
-                 all of them. Left-to-right, so each post and cap gets its own
-                 highlight from the object bounding box and reads as turned. -->
-            <linearGradient id="frameWood" x1="0" y1="0" x2="1" y2="0">
+            <!-- The collar's material. It was the frame's too, until the
+                 frame went; the name changed with the job but the colours
+                 did not, because the reason for them is unchanged.
+                 Deliberately NOT in the palette: the four palettes recolour
+                 the sand and the glass, and a band that changed with them
+                 would read as a third coloured element rather than as the
+                 hardware pinching the two together. This warm taupe sits
+                 against all four. Left-to-right, so the band picks up its own
+                 highlight across its width and reads as turned metal. -->
+            <linearGradient id="collarBand" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%"   stop-color="#b3a48d"/>
               <stop offset="34%"  stop-color="#d9cfbc"/>
               <stop offset="100%" stop-color="#97896f"/>
             </linearGradient>
             <clipPath id="topClip">
-              <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z"/>
+              <path d="M95,250 C45,200 25,130 25,40 C25,24 33,15 47,15 L163,15 C177,15 185,24 185,40 C185,130 165,200 115,250 L95,250 Z"/>
             </clipPath>
             <clipPath id="bottomClip">
-              <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z"/>
+              <path d="M95,270 C45,320 25,390 25,480 C25,496 33,505 47,505 L163,505 C177,505 185,496 185,480 C185,390 165,320 115,270 L95,270 Z"/>
             </clipPath>
           </defs>
 
-          <!-- Frame. Every shape here is mirror-symmetric about y=260, the
-               rotor's centre of rotation, so the 180deg flip leaves it
-               looking identical: the glass turns over inside a frame that
-               appears to stand still. The posts run under the caps rather
-               than butting against them, so no seam shows at the joint. -->
-          <g id="frame">
-            <rect x="8"   y="6" width="7" height="508" rx="3.5" fill="url(#frameWood)"/>
-            <rect x="195" y="6" width="7" height="508" rx="3.5" fill="url(#frameWood)"/>
-            <rect x="0" y="-6"  width="210" height="18" rx="4" fill="url(#frameWood)"/>
-            <rect x="0" y="508" width="210" height="18" rx="4" fill="url(#frameWood)"/>
-          </g>
+          <!-- The bulb profile. It used to be an ovoid, widest at y=114,
+               which is 42% of the way down from the dome, then tapering to a
+               point at the neck. That is the outline of a balloon, and with a
+               gloss streak down one side and a small collar at the pinch it
+               read as one: rendered on its own, the drawing was an orange
+               balloon knotted to a clear one. The wooden frame used to carry
+               the meaning instead, so nobody noticed; taking the frame away
+               left the silhouette to say "hourglass" by itself, and it could
+               not.
 
+               What an hourglass actually looks like: widest at the top RIM,
+               with walls that funnel steadily inward to the waist. So the
+               widest point moved from y=114 to y=40, the dome became a flat
+               cap on an 8-unit corner radius, and the walls are one long
+               concave sweep from (25,40) to the neck at (95,250). The bounding
+               box is unchanged (x 25 to 185, y 15 to 505, waist 20 wide), so
+               nothing else in the drawing had to move.
+
+               Every coordinate has a partner at y -> 520-y with x unchanged,
+               because the flip is a rotateX about the stage's middle. Pinned
+               by tests/hourglass.test.js. -->
+          <!-- The tint in the empty half of the glass. 0.12, down from 0.34,
+               and the number matters more than it looks.
+
+               The gradient runs to #1b2a4e at its far stop, which is nearly
+               black. At 0.34 that laid enough colour inside the bottom bulb
+               that an EMPTY bulb measured 71% as far from the paper as a bulb
+               packed with sand: at 25:00, with no sand below at all, the
+               drawing showed a solid blue mass. The tint was impersonating
+               the thing it is supposed to contain, which is why both halves
+               looked equally full no matter what the timer said.
+
+               Measured on a render of this page at six values. The full bulb
+               sits at 92.0 from paper at every one of them, because what you
+               see there is sand and the sand is opaque, so this costs nothing
+               on the full side; only the empty side moves. 0.12 puts the
+               empty bulb at 29% of a full one, which is a clear three-to-one
+               read while still leaving visible glass. The outline is a
+               separate path at opacity 0.85 and is untouched, so the
+               silhouette holds regardless of what happens here. -->
           <!-- top bulb glass -->
-          <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z" fill="url(#amberGlass)" opacity="0.34"/>
+          <path d="M95,250 C45,200 25,130 25,40 C25,24 33,15 47,15 L163,15 C177,15 185,24 185,40 C185,130 165,200 115,250 L95,250 Z" fill="url(#amberGlass)" opacity="0.12"/>
           <!-- top sand fill -->
           <g clip-path="url(#topClip)">
             <rect id="sandTop" x="20" y="15" width="170" height="235" fill="url(#sandAmber)"/>
           </g>
-          <path d="M95,250 C35,208 25,160 25,114 C25,66 50,15 105,15 C160,15 185,66 185,114 C185,160 175,208 115,250 L95,250 Z" fill="none" stroke="url(#amberGlass)" stroke-width="3" opacity="0.85"/>
+          <path d="M95,250 C45,200 25,130 25,40 C25,24 33,15 47,15 L163,15 C177,15 185,24 185,40 C185,130 165,200 115,250 L95,250 Z" fill="none" stroke="url(#amberGlass)" stroke-width="3" opacity="0.85"/>
 
           <!-- bottom bulb glass -->
-          <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z" fill="url(#blueGlass)" opacity="0.34"/>
+          <path d="M95,270 C45,320 25,390 25,480 C25,496 33,505 47,505 L163,505 C177,505 185,496 185,480 C185,390 165,320 115,270 L95,270 Z" fill="url(#blueGlass)" opacity="0.12"/>
           <!-- bottom sand fill -->
           <g clip-path="url(#bottomClip)">
             <rect id="sandBottom" x="20" y="505" width="170" height="0" fill="url(#sandBlue)"/>
           </g>
-          <path d="M95,270 C35,312 25,360 25,406 C25,454 50,505 105,505 C160,505 185,454 185,406 C185,360 175,312 115,270 L95,270 Z" fill="none" stroke="url(#blueGlass)" stroke-width="3" opacity="0.85"/>
+          <path d="M95,270 C45,320 25,390 25,480 C25,496 33,505 47,505 L163,505 C177,505 185,496 185,480 C185,390 165,320 115,270 L95,270 Z" fill="none" stroke="url(#blueGlass)" stroke-width="3" opacity="0.85"/>
 
           <!-- Neck, waisted rather than a straight 20px channel: the curves
                pull it in to 14px at y=260 so the two bulbs look pinched
@@ -133,13 +170,18 @@
                so it survives the flip. -->
           <path d="M95,250 C99,255 99,265 95,270 L115,270 C111,265 111,255 115,250 Z"
                 fill="#e8e2d6" opacity="0.9"/>
-          <!-- Collar. The waist is only 20px of a 568px drawing and it was
-               cream on cream, so the two bulbs looked merely adjacent rather
-               than joined. Borrowing the frame's material ties the middle of
-               the glass to the stand holding it. Centred on (105,260), so it
-               is unmoved by the flip like the rest of the frame. -->
-          <rect x="92" y="256.5" width="26" height="7" rx="2.5"
-                fill="url(#frameWood)" opacity="0.92"/>
+          <!-- Collar, and now the only hardware in the drawing. The waist is
+               20 units of a 500-unit glass and it was cream on cream, so the
+               two bulbs looked merely adjacent rather than joined.
+
+               It is also the one shape that must not appear to move when the
+               glass turns over, and it manages that by being its own mirror
+               image about the rotor's centre of rotation, (105,260). 92 + 26
+               = 118, and 210 - 118 = 92; 256.5 + 7 = 263.5, and 520 - 263.5 =
+               256.5. Nudge either and it will visibly jump on every flip.
+               Pinned by tests/hourglass.test.js. -->
+          <rect id="collar" x="92" y="256.5" width="26" height="7" rx="2.5"
+                fill="url(#collarBand)" opacity="0.92"/>
 
           <!-- Falling grains. The delays are an even 0.1s apart across the
                0.5s cycle, so the stream is continuous; they used to be
@@ -153,9 +195,20 @@
             <circle class="grain" cx="106" cy="258" r="1.7" fill="#f0ab5a" style="animation-delay:.4s"/>
           </g>
 
-          <!-- glass highlights -->
-          <path d="M72,39 C58,81 53,122 65,167" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.35"/>
-          <path d="M72,481 C58,439 53,398 65,353" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.3"/>
+          <!-- Glass highlights, redrawn to run parallel to the funnel wall
+               about 15 units inside it. They used to bow the other way, away
+               from the wall and back, which is how light sits on a sphere, and
+               reading as a sphere is exactly the problem the bulb shape above
+               was changed to fix. A highlight that tracks a straight-ish wall
+               reads as a sheet of curved glass instead.
+
+               Both are on the LEFT, and that is deliberate: the flip is a
+               rotateX, which mirrors vertically, so the bottom highlight is
+               the top one with y -> 520-y and x untouched. A point-mirrored
+               copy would slide to the right-hand wall halfway through every
+               turn. -->
+          <path d="M42,60 C42,120 52,168 66,204" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.35"/>
+          <path d="M42,460 C42,400 52,352 66,316" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.3"/>
         </svg>
       </div>
     </div>
