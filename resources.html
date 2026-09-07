@@ -27,7 +27,7 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    body { font-size:18px; line-height:1.7; }
+    body { font-size:var(--fs-body); line-height:var(--leading-body); }
     .wrap { max-width:860px; margin:0 auto; padding:0 2rem; }
 
     header { padding:3rem 0; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
@@ -39,7 +39,7 @@
     .cat-section { border-bottom:1px solid var(--line); opacity:0; animation:rise .9s ease forwards; }
     .cat-trigger { display:flex; align-items:center; justify-content:space-between; cursor:pointer; list-style:none; user-select:none; padding:2.8rem 0 0; }
     .cat-trigger::-webkit-details-marker { display:none; }
-    .cat-chevron { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted); transition:transform .25s; flex-shrink:0; margin-left:1rem; }
+    .cat-chevron { font-family:'DM Mono',monospace; font-size:.7rem; line-height:1.4; color:var(--muted); transition:transform .25s; flex-shrink:0; margin-left:1rem; }
     details.cat-section[open] .cat-chevron { transform:rotate(90deg); color:var(--accent); }
     details.cat-section .resource-list { padding:1.6rem 0 2.8rem; }
     details.cat-section .section-label { margin-bottom:0; }
@@ -48,7 +48,7 @@
     .cat-section:nth-of-type(3) { animation-delay:.6s; }
     .cat-section:nth-of-type(4) { animation-delay:.75s; }
     .cat-section:nth-of-type(5) { animation-delay:.9s; }
-    .section-label { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.6rem; }
+    .section-label { font-family:'DM Mono',monospace; font-size:.65rem; line-height:1.4; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.6rem; }
 
     .resource-list { display:flex; flex-direction:column; gap:1.8rem; }
     .resource-title { font-size:1.1rem; font-weight:400; margin-bottom:.4rem; }
@@ -58,10 +58,10 @@
     .video-wrap { margin-top:1rem; position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:3px; max-width:520px; background:#111; cursor:pointer; }
     .video-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; }
     .video-thumb { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; display:block; }
-    .video-play { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:56px; height:56px; border-radius:50%; background:rgba(26,24,20,.55); display:flex; align-items:center; justify-content:center; color:#fdf9f2; font-size:1.2rem; pointer-events:none; transition:background .2s; }
+    .video-play { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:56px; height:56px; border-radius:50%; background:rgba(26,24,20,.55); display:flex; align-items:center; justify-content:center; color:#fdf9f2; font-size:1.2rem; line-height:1; pointer-events:none; transition:background .2s; }
     .video-wrap:hover .video-play { background:var(--accent); }
     footer { padding:2.5rem 0; }
-    footer p { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; color:var(--muted); }
+    footer p { font-family:'DM Mono',monospace; font-size:.62rem; line-height:1.4; letter-spacing:.1em; color:var(--muted); }
   </style>
 </head>
 <body>

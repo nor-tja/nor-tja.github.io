@@ -184,3 +184,47 @@ test('index.html and snake.html still set no body font-size', () => {
       `${page} deliberately has no body font-size; it must not acquire one`);
   }
 });
+
+// --- absolute leading -------------------------------------------------------
+//
+// var(--leading-body) is a LENGTH, so it inherits to descendants as one fixed
+// line box instead of being re-multiplied by each element's own font-size.
+// That is the whole point of it, and also its one sharp edge: an element set
+// larger than the body text keeps the body's line box, and once the glyphs
+// outgrow it the lines collide.
+//
+// The measurement that motivated this guard: nine of the twelve pages carry at
+// least one such element (.word-fr at 24px, .time-display at 25.6px, .lang-flag
+// at 22.4px ...). None of them are broken today because they have not adopted
+// the token yet -- so this test only polices pages that HAVE adopted it, and
+// starts biting the moment one does.
+test('pages using the length leading protect their oversized text', () => {
+  // Reads the rendered cascade badly on purpose: only same-file rules count,
+  // which is the conservative direction. A false positive costs one explicit
+  // line-height; a false negative ships overlapping text.
+  const offenders = [];
+  for (const page of PAGES) {
+    const src = readPage(page);
+    const body = extractRule(src, 'body');
+    if (!body || !/var\(--leading-body\)/.test(declarations(body)['line-height'] || '')) continue;
+
+    // Body size in px. --fs-body is 1.125rem against a 16px root at the
+    // clamp's floor; the floor is the worst case, since a larger root scales
+    // the oversized elements too.
+    const bodyPx = 1.125 * 16;
+
+    for (const m of src.matchAll(/([.#][\w-]+)\s*\{([^}]*font-size[^}]*)\}/g)) {
+      const [, sel, decls] = m;
+      const f = /font-size:\s*([\d.]+)(rem|px)/.exec(decls);
+      if (!f) continue;
+      const px = f[2] === 'rem' ? parseFloat(f[1]) * 16 : parseFloat(f[1]);
+      if (px <= bodyPx) continue;          // smaller text only gains air
+      if (/line-height/.test(decls)) continue;
+      offenders.push(`${page} ${sel} is ${px.toFixed(1)}px vs a ${bodyPx}px line box`);
+    }
+  }
+  assert.deepEqual(offenders, [],
+    `these elements are larger than the inherited line box and set no ` +
+    `line-height of their own, so their lines will overlap:\n  ` +
+    `${offenders.join('\n  ')}`);
+});

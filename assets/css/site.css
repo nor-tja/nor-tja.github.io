@@ -11,6 +11,21 @@
  * See docs/superpowers/specs/2026-09-07-design-refinement-design.md
  */
 
+/* Every size on this site is already expressed in rem, so scaling the root
+   scales the whole type system at once -- tokens, clamp() headings and all --
+   without editing a single page rule.
+
+   The bounds are in rem, not px, on purpose. Per CSS, rem on the root element
+   resolves against font-size's initial value, i.e. the reader's own browser
+   default. A px clamp here would silently override someone who had set their
+   default to 20px, which is the exact group that cannot afford to lose it.
+
+   Measured against a 16px default: 16.04px at 375px wide (mobile is unchanged)
+   rising to 18px at 1280px and holding. Cormorant Garamond has a small
+   x-height, so 18px of it reads nearer 15px of a normal face; the site was
+   genuinely undersized on a desktop. */
+html { font-size: clamp(1rem, .944rem + .25vw, 1.125rem); }
+
 :root {
   --bg: #f5f2ed;
   --ink: #1a1814;
@@ -30,7 +45,19 @@
   --fs-xl: 1.3rem;
   --fs-2xl: 1.5rem;
   --fs-3xl: 1.6rem;
-  --fs-body: 18px;
+  --fs-body: 1.125rem;
+
+  /* A length, not a multiplier. A unitless line-height is re-multiplied by each
+     descendant's own font-size, so every block invents its own rhythm; a length
+     inherits as one computed value and puts running text on a shared baseline.
+
+     Being in rem it still tracks the fluid root above, so the ratio to body
+     text stays at 1.689 from 375px to 1920px instead of drifting.
+
+     Only safe on elements at or below body size. Anything larger -- a display
+     word, a timer readout -- must set its own line-height or its glyphs will
+     outgrow the line box. */
+  --leading-body: 1.9rem;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,6 +78,9 @@ body {
   gap: .4rem;
   font-family: 'DM Mono', monospace;
   font-size: var(--fs-3xs);
+  /* Explicit, so the length --leading-body cannot inherit down and wrap this
+     10px label in a 30px line box. Same reason on .eyebrow below. */
+  line-height: 1.4;
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--muted);
@@ -63,6 +93,7 @@ body {
 .eyebrow {
   font-family: 'DM Mono', monospace;
   font-size: var(--fs-2xs);
+  line-height: 1.4;
   letter-spacing: .18em;
   text-transform: uppercase;
   color: var(--accent);

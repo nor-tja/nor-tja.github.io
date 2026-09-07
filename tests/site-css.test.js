@@ -54,11 +54,51 @@ test('all eleven type tokens are defined', () => {
     '--fs-3xs': '.65rem', '--fs-2xs': '.7rem', '--fs-xs': '.8rem',
     '--fs-sm': '.875rem', '--fs-base': '1rem', '--fs-md': '1.1rem',
     '--fs-lg': '1.2rem', '--fs-xl': '1.3rem', '--fs-2xl': '1.5rem',
-    '--fs-3xl': '1.6rem', '--fs-body': '18px',
+    '--fs-3xl': '1.6rem', '--fs-body': '1.125rem',
   };
   for (const [name, value] of Object.entries(EXPECTED)) {
     assert.equal(varValue(name), value, `${name} should be ${value}`);
   }
+});
+
+// A px clamp on the root would pin the whole site to 16px regardless of the
+// reader's browser default, silently overriding the one accessibility control
+// every browser ships. rem on the root element resolves against font-size's
+// initial value -- the reader's own setting -- so the scale moves with them.
+test('the fluid root scale is expressed in rem, not px', () => {
+  const m = /html\s*\{[^}]*font-size:\s*clamp\(([^)]*)\)/.exec(css());
+  assert.ok(m, 'site.css does not set a clamp() font-size on html');
+  const [min, , max] = m[1].split(',').map((s) => s.trim());
+  for (const [label, bound] of [['minimum', min], ['maximum', max]]) {
+    assert.ok(!/\d\s*px/.test(bound),
+      `the ${label} of the root clamp is "${bound}", which uses px. ` +
+      `A px bound ignores the reader's browser font-size setting.`);
+  }
+});
+
+// The point of the token is that it is a LENGTH. A unitless value is
+// re-multiplied by each descendant's own font-size, which is precisely the
+// per-block rhythm drift it exists to remove.
+test('--leading-body is an absolute length, not a bare multiplier', () => {
+  const v = varValue('--leading-body');
+  assert.match(v, /^[\d.]+(rem|em|px)$/,
+    `--leading-body is "${v}"; it must carry a unit to inherit as one ` +
+    `computed line box rather than being re-multiplied per element.`);
+});
+
+// Both tokens are rem-based so the fluid root moves them together. If someone
+// later pins one to px, the ratio silently drifts as the viewport widens --
+// tight lines on a desktop, loose ones on a phone, and no error anywhere.
+test('leading keeps a constant ratio to body text across the fluid range', () => {
+  const toRem = (v) => {
+    const m = /^([\d.]+)rem$/.exec(v);
+    assert.ok(m, `expected a rem value, got "${v}"`);
+    return parseFloat(m[1]);
+  };
+  const ratio = toRem(varValue('--leading-body')) / toRem(varValue('--fs-body'));
+  assert.ok(ratio >= 1.55 && ratio <= 1.8,
+    `leading:body ratio is ${ratio.toFixed(3)}, outside the 1.55-1.8 band that ` +
+    `reads comfortably for a serif at this measure`);
 });
 
 // Nothing on the site had a focus style, so keyboard navigation was invisible.
