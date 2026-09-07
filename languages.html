@@ -21,12 +21,14 @@
   <meta name="twitter:description" content="Practise French, Spanish, Portuguese, Japanese or Ukrainian. Five words a day, with spaced repetition that brings each word back before you forget it.">
   <meta name="twitter:image" content="https://katjanorstad.no/assets/og/languages.png">
   <!-- meta:end -->
-  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the two faces every
-       page renders immediately skips the stylesheet->font discovery hop.
+  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the faces THIS page
+       renders immediately skips the stylesheet->font discovery hop.
        crossorigin is required even same-origin: fonts always fetch in CORS
-       mode, and without it the preload is discarded and fetched twice. -->
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/cormorant-garamond-normal-300-latin.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
+       mode, and without it the preload is discarded and fetched twice.
+       Only faces the page can reach belong here -- a preload nothing uses
+       spends a connection on a file the browser throws away. Checked by
+       tests/typography.test.js. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/eb-garamond-normal-400-latin.woff2">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
@@ -35,7 +37,7 @@
 
 
     header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
-    h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:300; line-height:1.1; }
+    h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:400; line-height:1.1; }
     h1 em { font-style:italic; color:var(--accent); }
     .intro { margin-top:1rem; color:var(--muted); font-size: var(--fs-base); max-width:480px; }
 
@@ -60,7 +62,7 @@
       background:#eee7da; display:flex; align-items:center; justify-content:center;
       font-size:1.4rem; line-height:1.7; }
     .lang-body { flex:1; min-width:0; }
-    .lang-name { font-size: var(--fs-xl); font-weight:400; transition:color .2s; }
+    .lang-name { font-size: var(--fs-xl); font-weight:500; transition:color .2s; }
     .lang-sub { color:var(--muted); font-size: var(--fs-sm); margin-top:.15rem; }
     .lang-arrow {
       flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
@@ -69,7 +71,7 @@
     }
 
     footer { padding:1rem 0 1rem; }
-    footer p { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.1em; color:var(--muted); }
+    footer p { font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing:.1em; color:var(--muted); }
 
 
     @media (max-width:520px) {

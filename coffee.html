@@ -21,11 +21,14 @@
   <meta name="twitter:description" content="Tasting notes on 52 coffee beans from six Oslo roasters, with a map of where to find them and what each one tasted like.">
   <meta name="twitter:image" content="https://katjanorstad.no/assets/og/coffee.png">
   <!-- meta:end -->
-  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the two faces every
-       page renders immediately skips the stylesheet->font discovery hop.
+  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the faces THIS page
+       renders immediately skips the stylesheet->font discovery hop.
        crossorigin is required even same-origin: fonts always fetch in CORS
-       mode, and without it the preload is discarded and fetched twice. -->
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/cormorant-garamond-normal-300-latin.woff2">
+       mode, and without it the preload is discarded and fetched twice.
+       Only faces the page can reach belong here -- a preload nothing uses
+       spends a connection on a file the browser throws away. Checked by
+       tests/typography.test.js. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/eb-garamond-normal-400-latin.woff2">
   <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <!-- Leaflet — free, no API key -->
@@ -38,47 +41,47 @@
 
 
     header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
-    h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:300; line-height:1.1; }
+    h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:400; line-height:1.1; }
     h1 em { font-style:italic; color:var(--accent); }
     .intro { margin-top:1rem; color:var(--muted); font-size: var(--fs-base); max-width:540px; }
 
     /* QUICK STATS */
     .ambience-row { padding:.4rem 0 .2rem; opacity:0; animation:rise .9s ease forwards .15s; }
     .ambience-btn {
-      font-family:'DM Mono',monospace; font-size: var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase;
+      font-family: var(--font-ui); font-size: var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase;
       padding:.7rem 1.3rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
       background:transparent; color:var(--ink); transition:all .2s; display:inline-flex; align-items:center; gap:.55rem;
     }
     .ambience-btn:hover { border-color:var(--accent); color:var(--accent); }
     .ambience-btn.playing { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
-    .ambience-credit { font-family:'DM Mono',monospace; font-size: var(--fs-4xs); color:var(--muted); letter-spacing:.04em; margin-top:.6rem; }
+    .ambience-credit { font-family: var(--font-ui); font-size: var(--fs-4xs); color:var(--muted); letter-spacing:.04em; margin-top:.6rem; }
     .ambience-credit a { color:var(--muted); }
     .ambience-credit a:hover { color:var(--accent); }
 
     .stats-strip { display:flex; flex-wrap:wrap; gap:2.4rem; padding:1.6rem 0; border-bottom:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .2s; }
     .stat { display:flex; flex-direction:column; gap:.15rem; }
-    .stat-value { font-family:'DM Mono',monospace; font-size: var(--fs-2xl); color:var(--accent); font-weight:400; line-height:1; }
-    .stat-label { font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+    .stat-value { font-family: var(--font-mono); font-size: var(--fs-2xl); color:var(--accent); font-weight:400; line-height:1; }
+    .stat-label { font-family: var(--font-ui); font-size: var(--fs-4xs); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
 
     /* PATTERNS */
     .patterns-section { padding:1.8rem 0 1.4rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .3s; }
     .patterns-intro { color:var(--muted); font-size: var(--fs-sm); max-width:560px; margin:-.6rem 0 1.8rem; line-height:1.6; }
     .pattern-block { margin-bottom:1.9rem; }
     .pattern-block:last-child { margin-bottom:0; }
-    .pattern-block h3 { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:400; margin-bottom:.9rem; }
+    .pattern-block h3 { font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:400; margin-bottom:.9rem; }
     .pattern-empty { color:var(--muted); font-style:italic; font-size: var(--fs-sm); }
 
     .bar-list { display:flex; flex-direction:column; gap:.9rem; }
     .bar-row { display:flex; align-items:center; gap:1rem; }
     .bar-label { width:150px; flex-shrink:0; font-size: var(--fs-sm); line-height:1.3; }
-    .bar-count { display:block; font-family:'DM Mono',monospace; font-size: var(--fs-4xs); color:var(--muted); letter-spacing:.04em; margin-top:.1rem; }
+    .bar-count { display:block; font-family: var(--font-mono); font-size: var(--fs-4xs); color:var(--muted); letter-spacing:.04em; margin-top:.1rem; }
     .bar-track { flex:1; height:10px; background:var(--line); border-radius:6px; overflow:hidden; }
     .bar-fill { height:100%; width:0; border-radius:6px; transition:width 1s cubic-bezier(.2,.8,.3,1); box-shadow:inset 0 1px 1px rgba(255,255,255,.25); }
-    .bar-value { width:74px; flex-shrink:0; font-family:'DM Mono',monospace; font-size: var(--fs-2xs); color:var(--ink); text-align:right; }
+    .bar-value { width:74px; flex-shrink:0; font-family: var(--font-mono); font-size: var(--fs-2xs); color:var(--ink); text-align:right; }
 
     .tag-cloud { display:flex; flex-wrap:wrap; gap:.55rem .6rem; align-items:center; }
     .flavor-tag {
-      font-family:'DM Mono',monospace; letter-spacing:.02em;
+      font-family: var(--font-ui); letter-spacing:.02em;
       padding:.4rem .85rem; border-radius:999px; border:1px solid currentColor;
       line-height:1; white-space:nowrap; transition:transform .2s ease, box-shadow .2s ease;
     }
@@ -91,11 +94,11 @@
 
     /* MAP */
     .map-section { padding:1.4rem 0 0; opacity:0; animation:rise .9s ease forwards .3s; }
-    .section-label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.2rem; }
+    .section-label { font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.2rem; }
     #map { width:100%; height:380px; border-radius:4px; border:1px solid var(--line); }
 
     /* Leaflet popup overrides */
-    .leaflet-popup-content-wrapper { border-radius:4px; font-family:'DM Mono',monospace; font-size:11px; color:var(--ink); background:var(--bg); border:1px solid var(--line); box-shadow:none; }
+    .leaflet-popup-content-wrapper { border-radius:4px; font-family: var(--font-ui); font-size:11px; color:var(--ink); background:var(--bg); border:1px solid var(--line); box-shadow:none; }
     .leaflet-popup-tip { background:var(--bg); }
     .leaflet-popup-content { margin:10px 14px; line-height:1.5; }
     .popup-name { font-size:12px; font-weight:500; display:block; margin-bottom:4px; color:var(--accent); }
@@ -105,7 +108,7 @@
     .places-section { padding:3rem 0 1rem; opacity:0; animation:rise .9s ease forwards .5s; }
     .places-heading { display:flex; align-items:baseline; flex-wrap:wrap; gap:.7rem 1rem; margin-bottom:1.4rem; }
     .places-heading .section-label { margin-bottom:0; }
-    .places-hint { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.18em; text-transform:uppercase; color:var(--accent); font-weight:500; }
+    .places-hint { font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing:.18em; text-transform:uppercase; color:var(--accent); font-weight:500; }
 
     .place { border-bottom:1px solid var(--line); }
 
@@ -116,9 +119,9 @@
     }
     .place-trigger::-webkit-details-marker { display:none; }
     .place-left { display:flex; flex-direction:column; gap:.2rem; }
-    .place-name { font-size: var(--fs-md); font-weight:400; line-height:1.7; }
-    .place-address { font-family:'DM Mono',monospace; font-size: var(--fs-4xs); color:var(--muted); letter-spacing:.05em; }
-    .place-chevron { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); color:var(--muted); transition:transform .25s; }
+    .place-name { font-size: var(--fs-md); font-weight:500; line-height:1.7; }
+    .place-address { font-family: var(--font-ui); font-size: var(--fs-4xs); color:var(--muted); letter-spacing:.05em; }
+    .place-chevron { font-family: var(--font-ui); font-size: var(--fs-3xs); color:var(--muted); transition:transform .25s; }
     details[open] .place-chevron { transform:rotate(90deg); }
 
     .place-body { padding:0 0 1.8rem; }
@@ -135,20 +138,20 @@
     }
     .bean:hover { border-color:var(--accent); }
     .bean.fav { border-color:var(--accent); }
-    .bean-name { font-size: var(--fs-sm); font-weight:400; line-height:1.3; grid-column:1; }
+    .bean-name { font-size: var(--fs-sm); font-weight:500; line-height:1.3; grid-column:1; }
     .bean-notes { font-size: var(--fs-xs); color:var(--muted); font-style:italic; line-height:1.4; grid-column:1; }
-    .bean-score { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); color:var(--accent); white-space:nowrap; grid-column:2; grid-row:1; align-self:start; }
+    .bean-score { font-family: var(--font-mono); font-size: var(--fs-3xs); color:var(--accent); white-space:nowrap; grid-column:2; grid-row:1; align-self:start; }
     .bean-heart { font-size: var(--fs-2xs); grid-column:2; grid-row:2; color:var(--accent); text-align:right; }
 
     footer { padding:2.5rem 0; }
-    footer p { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.1em; color:var(--muted); }
+    footer p { font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing:.1em; color:var(--muted); }
 
     /* BREW GUIDE — compact, collapsed by default */
     .brew { border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin-top:.5rem; }
     .brew-trigger {
       display:flex; align-items:center; justify-content:space-between;
       padding:.9rem 0; cursor:pointer; list-style:none; user-select:none;
-      font-family:'DM Mono',monospace; font-size: var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+      font-family: var(--font-ui); font-size: var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
     }
     .brew-trigger::-webkit-details-marker { display:none; }
     .brew-steps { display:flex; flex-wrap:wrap; gap:1rem 1.4rem; padding:.2rem 0 1.2rem; }
@@ -156,13 +159,13 @@
     .brew-icon { font-size: var(--fs-md); line-height:1; flex-shrink:0; }
     .brew-icon svg { width:1.1em; height:1.1em; vertical-align:-0.15em; }
     .brew-text { font-size: var(--fs-2xs); color:var(--muted); line-height:1.35; }
-    .brew-source { font-family:'DM Mono',monospace; font-size: var(--fs-4xs); color:var(--line); letter-spacing:.04em; padding:0 0 1rem; display:block; }
+    .brew-source { font-family: var(--font-ui); font-size: var(--fs-4xs); color:var(--line); letter-spacing:.04em; padding:0 0 1rem; display:block; }
 
     /* PHOTO REVEAL — collapsed by default, click to see */
     .photo-reveal { text-align:center; padding:2.8rem 0 0; opacity:0; animation:rise .9s ease forwards .3s; }
     .photo-trigger {
       display:inline-flex; align-items:center; gap:.5rem; cursor:pointer; list-style:none; user-select:none;
-      font-family:'DM Mono',monospace; font-size: var(--fs-2xs); letter-spacing:.12em; text-transform:uppercase; color:var(--accent);
+      font-family: var(--font-ui); font-size: var(--fs-2xs); letter-spacing:.12em; text-transform:uppercase; color:var(--accent);
       padding:.6rem 1.1rem; border:1px solid var(--line); border-radius:999px; transition:border-color .2s;
     }
     .photo-trigger:hover { border-color:var(--accent); }
