@@ -45,4 +45,26 @@ function pageCss(name) {
   return out;
 }
 
-module.exports = { ROOT, pagePaths, readPage, sizeOf, pageCss };
+// The JavaScript a page actually runs: every local <script src> it loads, in
+// order, followed by its inline <script>.
+//
+// Same reasoning as pageCss. The learned dot, the SRS queue and the speech
+// code moved into assets/js/language-page.js; a test still reading the HTML
+// would find none of it. Assertions about the <script> TAG -- that a page
+// loads the engine at all, or loads it in the right order -- belong on
+// readPage, because that is a fact about the page rather than about the code.
+function pageJs(name) {
+  const src = readPage(name);
+  let out = '';
+  for (const m of src.matchAll(/<script[^>]+src="([^"]+)"[^>]*>/g)) {
+    const s = m[1];
+    if (/^(https?:)?\/\//.test(s)) continue;
+    out += fs.readFileSync(path.join(ROOT, s), 'utf8') + '\n';
+  }
+  for (const m of src.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {
+    out += m[1] + '\n';
+  }
+  return out;
+}
+
+module.exports = { ROOT, pagePaths, readPage, sizeOf, pageCss, pageJs };

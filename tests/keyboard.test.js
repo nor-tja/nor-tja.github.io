@@ -2,7 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
-const { pagePaths, readPage, pageCss } = require('./helpers');
+const { pagePaths, readPage, pageCss, pageJs } = require('./helpers');
 
 const PAGES = pagePaths().map((p) => path.basename(p));
 const LANGUAGE_PAGES = [
@@ -16,7 +16,7 @@ const LANGUAGE_PAGES = [
 // daily repetition.
 test('the learned dot is a real button on every language page', () => {
   for (const page of LANGUAGE_PAGES) {
-    const src = readPage(page);
+    const src = pageJs(page);
     assert.ok(!/createElement\('span'\);\s*\n\s*dot\./.test(src),
       `${page} still builds the learned dot as a <span>`);
     assert.match(src, /var dot = document\.createElement\('button'\)/,
@@ -30,7 +30,7 @@ test('the learned dot is a real button on every language page', () => {
 // aria-pressed a screen reader reads the same thing before and after the tap.
 test('the learned dot announces its pressed state, and keeps it in sync', () => {
   for (const page of LANGUAGE_PAGES) {
-    const src = readPage(page);
+    const src = pageJs(page);
     const sets = src.match(/dot\.setAttribute\('aria-pressed'/g) || [];
     assert.ok(sets.length >= 2,
       `${page} sets aria-pressed ${sets.length} time(s). It needs one at ` +
@@ -43,7 +43,7 @@ test('the learned dot announces its pressed state, and keeps it in sync', () => 
 // screen reader user nothing about which word they are marking.
 test('the learned dot names the word it belongs to', () => {
   for (const page of LANGUAGE_PAGES) {
-    assert.match(readPage(page), /dot\.setAttribute\('aria-label',\s*'Mark ' \+ fr/,
+    assert.match(pageJs(page), /dot\.setAttribute\('aria-label',\s*'Mark ' \+ fr/,
       `${page} must give the dot an aria-label naming its word`);
   }
 });
@@ -94,7 +94,7 @@ test('the learned dot is at least 24x24 to tap', () => {
 test('no page attaches a click listener to a non-focusable created element', () => {
   const offenders = [];
   for (const page of PAGES) {
-    const src = readPage(page);
+    const src = pageJs(page);
     for (const m of src.matchAll(
       /var (\w+) = document\.createElement\('(span|div)'\)([\s\S]{0,600}?)\1\.addEventListener\('click'/g
     )) {

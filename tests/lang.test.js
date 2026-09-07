@@ -2,9 +2,11 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
-const { pagePaths, readPage } = require('./helpers');
+const { ROOT, pagePaths, readPage, pageJs } = require('./helpers');
 
 const PAGES = pagePaths().map((p) => path.basename(p));
+const ENGINE = require('node:fs').readFileSync(
+  path.join(ROOT, 'assets/js/language-page.js'), 'utf8');
 
 // The regional subtag is not decoration: pt-PT and pt-BR differ audibly, and
 // these are the same tags each page already hands to SpeechSynthesis, so the
@@ -29,14 +31,41 @@ test('the UI language of every page is still English', () => {
   }
 });
 
-test('each language page marks its foreign text with the right tag', () => {
+// Since the engine was extracted this is two separate claims, and they fail
+// for different reasons. The engine can stop emitting the attribute at all,
+// or a page can pass the wrong tag. Asserting them together would leave one
+// of the two untested if the other happened to hold.
+test('the shared engine marks every foreign element with the page language', () => {
+  for (const cls of FOREIGN) {
+    assert.ok(ENGINE.includes(`class="${cls}" lang="' + LANG + '"`),
+      `assets/js/language-page.js does not mark .${cls} with the configured ` +
+      `language. Unmarked foreign text is read aloud with an English voice ` +
+      `on all five pages at once.`);
+  }
+});
+
+test('each language page hands the engine the right tag', () => {
   for (const [page, code] of Object.entries(LANG)) {
-    const src = readPage(page);
-    for (const cls of FOREIGN) {
-      assert.ok(src.includes(`class="${cls}" lang="${code}"`),
-        `${page} does not mark .${cls} with lang="${code}". Unmarked foreign ` +
-        `text is read aloud with an English voice.`);
-    }
+    const init = /LanguagePage\.init\(\{([\s\S]*?)words:/.exec(readPage(page));
+    assert.ok(init, `${page} does not call LanguagePage.init`);
+    assert.match(init[1], new RegExp(`lang:\\s*'${code}'`),
+      `${page} must pass lang: '${code}'. This one string sets the speech ` +
+      `voice, the voice-picker filter and the lang="" on every foreign ` +
+      `string, so getting it wrong is silent and total.`);
+  }
+});
+
+// Two pages sharing a localStorage namespace would read each other's SRS
+// queue and streak: grading a French card would mark a Spanish one learned.
+test('every language page has its own storage namespace', () => {
+  const seen = new Map();
+  for (const page of Object.keys(LANG)) {
+    const m = /prefix:\s*'([^']+)'/.exec(readPage(page));
+    assert.ok(m, `${page} does not pass a storage prefix`);
+    assert.ok(!seen.has(m[1]),
+      `${page} and ${seen.get(m[1])} both store under '${m[1]}'; they would ` +
+      `share one SRS queue and one streak`);
+    seen.set(m[1], page);
   }
 });
 
@@ -47,7 +76,7 @@ test('each language page marks its foreign text with the right tag', () => {
 // change did exactly that.
 test('the English prompt on a review card is never marked foreign', () => {
   for (const page of Object.keys(LANG)) {
-    const src = readPage(page);
+    const src = pageJs(page);
     assert.ok(!/frEl\.lang\s*=/.test(src),
       `${page} sets a lang on the review prompt element. That element is ` +
       `assigned the English gloss (frEl.textContent = en), despite its ` +

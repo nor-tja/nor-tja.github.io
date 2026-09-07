@@ -41,6 +41,7 @@
     .review-fr-answer { font-style:normal; }
   </style>
   <script src="assets/js/day-math.js"></script>
+  <script src="assets/js/language-page.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -84,505 +85,137 @@
 </div>
 
 <script>
-(function () {
-  var WORDS = [
-    ["こんにちは","konnichiwa","hello / good day","interj.","👋"],
-    ["ありがとう","arigatou","thank you","interj.","🙏"],
-    ["お願いします","onegaishimasu","please","phrase","🤲"],
-    ["さようなら","sayounara","goodbye","phrase","👋"],
-    ["はい","hai","yes","adv.","✅"],
-    ["いいえ","iie","no","adv.","❌"],
-    ["すみません","sumimasen","sorry / excuse me","interj.","🙇"],
-    ["ようこそ","youkoso","welcome","interj.","🎉"],
-    ["やあ","yaa","hi (informal)","interj.","🙋"],
-    ["またね","mata ne","see you soon","phrase","⏳"],
-    ["家","ie","the house","n.","🏠"],
-    ["猫","neko","the cat","n.","🐱"],
-    ["犬","inu","the dog","n.","🐶"],
-    ["水","mizu","the water","n.","💧"],
-    ["パン","pan","the bread","n.","🍞"],
-    ["時間","jikan","the time","n.","⏰"],
-    ["人生","jinsei","the life","n.","🌱"],
-    ["友達","tomodachi","the friend","n.","🧑‍🤝‍🧑"],
-    ["仕事","shigoto","the work","n.","💼"],
-    ["家族","kazoku","the family","n.","👨‍👩‍👧‍👦"],
-    ["日","hi","the day","n.","☀️"],
-    ["夜","yoru","the night","n.","🌙"],
-    ["学校","gakkou","the school","n.","🏫"],
-    ["車","kuruma","the car","n.","🚗"],
-    ["街","machi","the city / town","n.","🏙️"],
-    ["本","hon","the book","n.","📖"],
-    ["机","tsukue","the table / desk","n.","🪑"],
-    ["窓","mado","the window","n.","🪟"],
-    ["ドア","doa","the door","n.","🚪"],
-    ["コーヒー","koohii","the coffee","n.","☕"],
-    ["一","ichi","one","num.","1️⃣"],
-    ["二","ni","two","num.","2️⃣"],
-    ["三","san","three","num.","3️⃣"],
-    ["四","yon","four","num.","4️⃣"],
-    ["五","go","five","num.","5️⃣"],
-    ["六","roku","six","num.","6️⃣"],
-    ["七","nana","seven","num.","7️⃣"],
-    ["八","hachi","eight","num.","8️⃣"],
-    ["九","kyuu","nine","num.","9️⃣"],
-    ["十","juu","ten","num.","🔟"],
-    ["赤い","akai","red","adj.","🔴"],
-    ["青い","aoi","blue","adj.","🔵"],
-    ["緑","midori","green","n.","🟢"],
-    ["黄色い","kiiroi","yellow","adj.","🟡"],
-    ["黒い","kuroi","black","adj.","⚫"],
-    ["白い","shiroi","white","adj.","⚪"],
-    ["灰色","haiiro","grey","n.","🩶"],
-    ["オレンジ色","orenji-iro","orange","n.","🟠"],
-    ["です","desu","to be","cop.","🧍"],
-    ["持つ","motsu","to have","v.","🤲"],
-    ["行く","iku","to go","v.","🚶"],
-    ["する","suru","to do / make","v.","🛠️"],
-    ["見る","miru","to see","v.","👀"],
-    ["知る","shiru","to know","v.","🧠"],
-    ["できる","dekiru","to be able to","v.","💪"],
-    ["欲しい","hoshii","to want","adj.","🎯"],
-    ["来る","kuru","to come","v.","🏃"],
-    ["取る","toru","to take","v.","✋"],
-    ["話す","hanasu","to speak","v.","🗣️"],
-    ["食べる","taberu","to eat","v.","🍽️"],
-    ["飲む","nomu","to drink","v.","🥤"],
-    ["寝る","neru","to sleep","v.","😴"],
-    ["好き","suki","to like / love","adj.","❤️"],
-    ["大きい","ookii","big / tall","adj.","📏"],
-    ["小さい","chiisai","small","adj.","🐭"],
-    ["美しい","utsukushii","beautiful","adj.","🌟"],
-    ["かわいい","kawaii","pretty / cute","adj.","🌸"],
-    ["良い","yoi","good","adj.","👍"],
-    ["悪い","warui","bad","adj.","👎"],
-    ["幸せ","shiawase","happy","n.","😊"],
-    ["悲しい","kanashii","sad","adj.","😢"],
-    ["簡単","kantan","easy","n.","😌"],
-    ["難しい","muzukashii","difficult","adj.","😖"],
-    ["新しい","atarashii","new","adj.","✨"],
-    ["古い","furui","old","adj.","🕰️"],
-    ["今日","kyou","today","adv.","📅"],
-    ["明日","ashita","tomorrow","adv.","🌅"],
-    ["昨日","kinou","yesterday","adv.","🌇"],
-    ["今","ima","now","adv.","⏱️"],
-    ["朝","asa","the morning","n.","🌄"],
-    ["晩","ban","the evening","n.","🌆"],
-    ["週","shuu","the week","n.","🗓️"],
-    ["月","tsuki","the month / moon","n.","📆"],
-    ["年","toshi","the year","n.","🎊"],
-    ["太陽","taiyou","the sun","n.","☀️"],
-    ["チーズ","chiizu","the cheese","n.","🧀"],
-    ["ワイン","wain","the wine","n.","🍷"],
-    ["肉","niku","the meat","n.","🥩"],
-    ["野菜","yasai","the vegetable","n.","🥦"],
-    ["果物","kudamono","the fruit","n.","🍎"],
-    ["魚","sakana","the fish","n.","🐟"],
-    ["砂糖","satou","the sugar","n.","🍬"],
-    ["塩","shio","the salt","n.","🧂"],
-    ["ケーキ","keeki","the cake","n.","🎂"],
-    ["スープ","suupu","the soup","n.","🍲"],
-    ["お金","okane","the money","n.","💰"],
-    ["愛","ai","the love","n.","❤️"],
-    ["音楽","ongaku","the music","n.","🎵"],
-    ["山","yama","the mountain","n.","⛰️"],
-    ["海","umi","the sea","n.","🌊"]
-  ];
-
-  var WORD_MAP = {};
-  WORDS.forEach(function (w) { WORD_MAP[w[0]] = w; });
-
-  var PER_DAY = 5;
-  var CYCLE_LEN = Math.ceil(WORDS.length / PER_DAY);
-
-  // Each day's 5 words are always the same fixed group (grouped by theme in
-  // the list above), so the two practice sentences below can be hand-written
-  // to actually use those words together, instead of generated on the fly.
-  var PHRASE_GROUPS = [
-    [["こんにちは。コーヒーをお願いします。","Hello. A coffee, please."],["はい、ありがとう。さようなら。","Yes, thank you. Goodbye."]],
-    [["やあ!私たちの家にようこそ。","Hi! Welcome to our house."],["すみません、いいえ、結構です。またね。","Excuse me, no, that's alright. See you soon."]],
-    [["猫と犬が家で遊びます。","The cat and the dog play in the house."],["水を飲んでパンを食べます。","I drink water and eat bread."]],
-    [["家族と一緒にいると時間が早く過ぎます。","Time passes quickly when I'm with family."],["友達は仕事と人生を楽しんでいます。","My friend enjoys his job and his life."]],
-    [["日中、子供たちは車で学校に行きます。","During the day, the kids go to school by car."],["夜、この街はとても静かです。","At night, this city is very quiet."]],
-    [["本は窓の近くの机の上にあります。","The book is on the table, near the window."],["ドアを閉めてコーヒーを飲んでください。","Close the door and have a coffee."]],
-    [["一、二、三、四、五 — 数え方を習っています。","One, two, three, four, five — I'm learning to count!"],["椅子が四つと五人用の机があります。","There are four chairs and one table for five people."]],
-    [["六、七、八、九、十 — まだ数え続けます!","Six, seven, eight, nine, ten — and we keep counting!"],["お店は八時に開いて、十時に閉まります。","The shop opens at eight and closes at ten."]],
-    [["空は青くて、草は緑で、太陽は黄色いです。","The sky is blue, the grass is green and the sun is yellow."],["彼女は赤いドレスと黒い靴を履いています。","She's wearing a red dress and black shoes."]],
-    [["空は灰色ですが、私の帽子はオレンジ色です。","The sky is grey, but my hat is orange."],["私の猫は白くて、いつもおもちゃを持っています。","My cat is white and always carries a toy."]],
-    [["今日の午後、買い物をしに行くつもりです。","I'm going to go do some shopping this afternoon."],["映画を見ることができるかどうか知りません。","I don't know if I can watch a movie."]],
-    [["コーヒーが欲しいです。一緒に来て食べませんか?","I'd like a coffee. Won't you come eat with us?"],["彼女は友達と話しながらコーヒーを取るのが好きです。","She likes talking and getting a coffee with friends."]],
-    [["朝、コーヒーを飲むのが好きです。","I like drinking a coffee in the morning."],["大きい犬が小さい猫の隣で寝ています。","The big dog sleeps next to the small cat."]],
-    [["なんて美しい天気でしょう!とても幸せです。","What beautiful weather! I'm very happy."],["このかわいいケーキは良い味で、全然悪くないです!","This cute cake tastes good, not bad at all!"]],
-    [["古い友達にさようならを言うのは簡単ではありません。","It's not easy to say goodbye to an old friend."],["彼女は少し悲しいですが、新しい仕事は難しくないです。","She's a bit sad, but her new job isn't difficult."]],
-    [["昨日は雨でしたが、今日はいい天気です。","Yesterday it rained; today the weather's nice."],["今、出かけなければなりませんが、明日の朝戻ります。","I have to leave now, but I'll be back tomorrow morning."]],
-    [["今週は毎晩、太陽が輝いています。","The sun shines every evening this week."],["今月はあっという間に過ぎます。今年も同じです。","This month is going by fast; so is the year."]],
-    [["チーズと肉と野菜を食べます。","We're eating cheese, meat and vegetables."],["赤ワインは甘い果物とよく合います。","Red wine pairs well with a sweet fruit."]],
-    [["魚には少し塩が必要です。","The fish needs a bit of salt."],["このケーキは砂糖が多すぎますが、スープは完璧です。","This cake has too much sugar, but the soup is perfect."]],
-    [["お金は幸せをもたらしませんが、愛と音楽はもたらします。","Money doesn't buy happiness, but love and music do."],["今年の夏は山に行きますか、それとも海に行きますか?","Are we going to the mountains or the sea this summer?"]]
-  ];
-
-  function dayIndexFor(date) {
-    // days since epoch, using local calendar date so it flips at local midnight
-    var utcMidnight = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-    return Math.floor(utcMidnight / 86400000);
-  }
-
-  function groupIndexFor(date) {
-    return dayIndexFor(date) % CYCLE_LEN;
-  }
-
-  function todaysWords(date) {
-    var g = groupIndexFor(date);
-    return WORDS.slice(g * PER_DAY, g * PER_DAY + PER_DAY);
-  }
-
-  // ── speech — lets you pick which installed Japanese voice to use, since
-  // quality varies a lot between the system voices browsers ship with ──
-  var VOICE_KEY = 'tangoNoHi:voice';
-  var matchingVoices = [];
-  var jaVoice = null;
-  var voicePicker = document.getElementById('voicePicker');
-  var voiceSelect = document.getElementById('voiceSelect');
-
-  // ranks voices so the least robotic one is picked by default — Google's
-  // network voices first, then OS-level "Enhanced"/"Premium"/"Neural"/"Natural"
-  // voices (macOS Spoken Content downloads, Windows/Edge natural voices),
-  // then whatever's left
-  function voiceRank(v) {
-    var name = v.name || '';
-    if (/google/i.test(name)) return 3;
-    if (/neural|natural/i.test(name)) return 2;
-    if (/enhanced|premium/i.test(name)) return 1;
-    return 0;
-  }
-  function loadVoice() {
-    if (!('speechSynthesis' in window)) return;
-    var voices = speechSynthesis.getVoices();
-    matchingVoices = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf('ja') === 0; });
-    matchingVoices.sort(function (a, b) { return voiceRank(b) - voiceRank(a); });
-    if (matchingVoices.length === 0) { jaVoice = null; return; }
-
-    var savedName = null;
-    try { savedName = localStorage.getItem(VOICE_KEY); } catch (e) {}
-    jaVoice = matchingVoices.find(function (v) { return v.name === savedName; }) || matchingVoices[0];
-
-    if (voiceSelect && voiceSelect.options.length !== matchingVoices.length) {
-      voiceSelect.innerHTML = '';
-      matchingVoices.forEach(function (v) {
-        var opt = document.createElement('option');
-        opt.value = v.name;
-        opt.textContent = v.name + ' (' + v.lang + ')';
-        voiceSelect.appendChild(opt);
-      });
-    }
-    if (voiceSelect) voiceSelect.value = jaVoice.name;
-    if (voicePicker && matchingVoices.length > 1) voicePicker.style.display = 'flex';
-  }
-  if (voiceSelect) {
-    voiceSelect.addEventListener('change', function () {
-      jaVoice = matchingVoices.find(function (v) { return v.name === voiceSelect.value; }) || jaVoice;
-      try { localStorage.setItem(VOICE_KEY, voiceSelect.value); } catch (e) {}
-    });
-  }
-  if ('speechSynthesis' in window) {
-    loadVoice();
-    speechSynthesis.onvoiceschanged = loadVoice;
-  }
-
-  function speak(text, btn) {
-    if (!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ja-JP';
-    u.rate = 0.85;
-    if (jaVoice) u.voice = jaVoice;
-    if (btn) {
-      btn.classList.add('playing');
-      u.onend = function () { btn.classList.remove('playing'); };
-      u.onerror = function () { btn.classList.remove('playing'); };
-    }
-    speechSynthesis.speak(u);
-  }
-
-  // ── learned dots (per-day, stored locally) ──
-  var todayKey = 'tangoNoHi:' + DayMath.todayISO();
-  function getLearned() {
-    try { return JSON.parse(localStorage.getItem(todayKey) || '[]'); } catch (e) { return []; }
-  }
-  function toggleLearned(word) {
-    var list = getLearned();
-    var idx = list.indexOf(word);
-    if (idx === -1) list.push(word); else list.splice(idx, 1);
-    try { localStorage.setItem(todayKey, JSON.stringify(list)); } catch (e) {}
-    return list;
-  }
-
-  // ── spaced repetition review pool (persists since day one) ──
-  var SRS_KEY = 'tangoNoHi:srs';
-
-  function loadSRS() {
-    try { return JSON.parse(localStorage.getItem(SRS_KEY) || '{}'); } catch (e) { return {}; }
-  }
-
-  function saveSRS(srs) {
-    try { localStorage.setItem(SRS_KEY, JSON.stringify(srs)); } catch (e) { /* storage unavailable */ }
-  }
-
-  // Adds a word to the permanent review pool the first time it's marked —
-  // it's due for its first review immediately, so it shows up right away.
-  // Re-marking an already-tracked word never resets its existing progress.
-  function addToReview(fr) {
-    var srs = loadSRS();
-    if (!srs[fr]) {
-      srs[fr] = { interval: 0, repetitions: 0, ease: 2.5, due: DayMath.todayISO(), added: DayMath.todayISO() };
-      saveSRS(srs);
-    }
-  }
-
-  function getDueEntries(srs) {
-    srs = srs || loadSRS();
-    var today = DayMath.todayISO();
-    var list = [];
-    Object.keys(srs).forEach(function (fr) {
-      if (srs[fr].due <= today && WORD_MAP[fr]) {
-        list.push({ fr: fr, word: WORD_MAP[fr], due: srs[fr].due });
-      }
-    });
-    list.sort(function (a, b) { return a.due < b.due ? -1 : (a.due > b.due ? 1 : 0); });
-    return list;
-  }
-
-  // A simplified SM-2 (the same scheduling idea behind apps like Anki):
-  // quality < 3 ("Still learning") resets the interval back to 1 day;
-  // quality >= 3 ("Got it") grows it — 1 day, then 6, then interval*ease,
-  // with the ease factor itself nudged up or down based on how it went.
-  function gradeReview(fr, quality) {
-    var srs = loadSRS();
-    var entry = srs[fr];
-    if (!entry) return;
-
-    if (quality < 3) {
-      entry.repetitions = 0;
-      entry.interval = 1;
-    } else {
-      if (entry.repetitions === 0) entry.interval = 1;
-      else if (entry.repetitions === 1) entry.interval = 6;
-      else entry.interval = Math.round(entry.interval * entry.ease);
-      entry.repetitions += 1;
-      entry.ease = Math.max(1.3, entry.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
-    }
-    entry.due = DayMath.addDays(DayMath.todayISO(), entry.interval);
-    entry.lastReview = DayMath.todayISO();
-    srs[fr] = entry;
-    saveSRS(srs);
-    renderReview();
-  }
-
-  function renderReview() {
-    var container = document.getElementById('reviewSection');
-    if (!container) return;
-    container.innerHTML = '';
-
-    var label = document.createElement('p');
-    label.className = 'review-label';
-    label.textContent = 'Review';
-    container.appendChild(label);
-
-    var srs = loadSRS();
-    var total = Object.keys(srs).length;
-    var due = getDueEntries(srs);
-
-    var stats = document.createElement('p');
-    stats.className = 'review-stats';
-    stats.textContent = total === 0
-      ? 'Words you mark with the dot above join your review pool and start coming back here for spaced review.'
-      : due.length + ' due today · ' + total + ' word' + (total === 1 ? '' : 's') + ' in your review pool';
-    container.appendChild(stats);
-
-    if (total === 0) return;
-
-    if (due.length === 0) {
-      var empty = document.createElement('p');
-      empty.className = 'review-empty';
-      empty.textContent = 'All caught up — nothing due today.';
-      container.appendChild(empty);
-      return;
-    }
-
-    due.forEach(function (item) {
-      var fr = item.fr, w = item.word;
-      var ipa = w[1], en = w[2];
-
-      var card = document.createElement('div');
-      card.className = 'review-card';
-
-      var body = document.createElement('div');
-      body.className = 'review-body';
-      var frEl = document.createElement('p');
-      frEl.className = 'review-fr';
-      frEl.textContent = en;
-      var answerEl = document.createElement('p');
-      answerEl.className = 'review-answer';
-      answerEl.innerHTML = '<span class="review-fr-answer" lang="ja-JP">' + fr + '</span> <span class="review-ipa">' + ipa + '</span>';
-      body.appendChild(frEl);
-      body.appendChild(answerEl);
-
-      var actions = document.createElement('div');
-      actions.className = 'review-actions';
-
-      var revealBtn = document.createElement('button');
-      revealBtn.className = 'review-btn';
-      revealBtn.textContent = 'Show answer';
-      revealBtn.addEventListener('click', function () {
-        answerEl.classList.add('shown');
-        actions.innerHTML = '';
-
-        var pbtn = document.createElement('button');
-        pbtn.className = 'review-play';
-        pbtn.setAttribute('aria-label', 'Play pronunciation of ' + fr);
-        pbtn.innerHTML = '🔊';
-        pbtn.addEventListener('click', function () { speak(fr, pbtn); });
-
-        var againBtn = document.createElement('button');
-        againBtn.className = 'review-btn again';
-        againBtn.textContent = 'Still learning';
-        againBtn.addEventListener('click', function () { gradeReview(fr, 2); });
-
-        var goodBtn = document.createElement('button');
-        goodBtn.className = 'review-btn good';
-        goodBtn.textContent = 'Got it';
-        goodBtn.addEventListener('click', function () { gradeReview(fr, 4); });
-
-        actions.appendChild(pbtn);
-        actions.appendChild(againBtn);
-        actions.appendChild(goodBtn);
-      });
-      actions.appendChild(revealBtn);
-
-      card.appendChild(body);
-      card.appendChild(actions);
-      container.appendChild(card);
-    });
-  }
-
-  function updateStreak() {
-    try {
-      var todayStr = DayMath.todayISO();
-      var last = localStorage.getItem('tangoNoHi:lastPracticed');
-      var streak = parseInt(localStorage.getItem('tangoNoHi:streak') || '0', 10);
-      var learnedToday = getLearned().length > 0;
-      if (learnedToday && last !== todayStr) {
-        var yesterday = DayMath.addDays(DayMath.todayISO(), -1);
-        streak = (last === yesterday) ? streak + 1 : 1;
-        localStorage.setItem('tangoNoHi:streak', String(streak));
-        localStorage.setItem('tangoNoHi:lastPracticed', todayStr);
-      }
-      var el = document.getElementById('streakLine');
-      if (streak > 0) {
-        el.textContent = '🔥 ' + streak + '-day streak';
-        el.classList.add('visible');
-      }
-    } catch (e) { /* localStorage unavailable — skip streak */ }
-  }
-
-  function render() {
-    var now = new Date();
-    document.getElementById('dateLine').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-    var words = todaysWords(now);
-    var learned = getLearned();
-    var container = document.getElementById('words');
-    container.innerHTML = '';
-
-    if (!('speechSynthesis' in window)) {
-      var notice = document.createElement('p');
-      notice.className = 'no-speech';
-      notice.textContent = "Your browser doesn't support spoken pronunciation — try Chrome or Safari for audio.";
-      container.appendChild(notice);
-    }
-
-    words.forEach(function (w) {
-      var fr = w[0], ipa = w[1], en = w[2], pos = w[3], icon = w[4];
-      var card = document.createElement('div');
-      card.className = 'word-card';
-
-      var btn = document.createElement('button');
-      btn.className = 'play-btn';
-      btn.setAttribute('aria-label', 'Play pronunciation of ' + fr);
-      btn.innerHTML = '🔊';
-      btn.addEventListener('click', function () { speak(fr, btn); });
-
-      var body = document.createElement('div');
-      body.className = 'word-body';
-      body.innerHTML =
-        '<div class="word-top"><span class="word-fr" lang="ja-JP">' + fr + '</span><span class="word-icon" aria-hidden="true">' + (icon || '') + '</span><span class="word-pos">' + pos + '</span></div>' +
-        '<div class="word-ipa">' + ipa + '</div>' +
-        '<div class="word-en">' + en + '</div>';
-
-      // A real <button>, not a <span>: the dot is the only way to record a
-      // word, and as a span it was unreachable by keyboard and invisible to
-      // screen readers. aria-pressed carries the on/off state, which a class
-      // name alone cannot express.
-      var dot = document.createElement('button');
-      dot.type = 'button';
-      var dotOn = learned.indexOf(fr) !== -1;
-      dot.className = 'learned-dot' + (dotOn ? ' on' : '');
-      dot.setAttribute('aria-pressed', dotOn ? 'true' : 'false');
-      dot.setAttribute('aria-label', 'Mark ' + fr + ' as practiced today');
-      dot.title = 'Mark as practiced today';
-      dot.addEventListener('click', function () {
-        var list = toggleLearned(fr);
-        var isOn = list.indexOf(fr) !== -1;
-        dot.classList.toggle('on', isOn);
-        dot.setAttribute('aria-pressed', isOn ? 'true' : 'false');
-        if (isOn) {
-          addToReview(fr);
-          renderReview();
-        }
-        updateStreak();
-      });
-
-      card.appendChild(btn);
-      card.appendChild(body);
-      card.appendChild(dot);
-      container.appendChild(card);
-    });
-
-    var phrasesContainer = document.getElementById('phrases');
-    phrasesContainer.innerHTML = '';
-    var label = document.createElement('p');
-    label.className = 'phrases-label';
-    label.textContent = 'Try them in a sentence';
-    phrasesContainer.appendChild(label);
-
-    var sentences = PHRASE_GROUPS[groupIndexFor(now)] || [];
-    sentences.forEach(function (pair) {
-      var exampleFr = pair[0], exampleEn = pair[1];
-
-      var item = document.createElement('div');
-      item.className = 'phrase-item';
-
-      var pbtn = document.createElement('button');
-      pbtn.className = 'phrase-play';
-      pbtn.setAttribute('aria-label', 'Play pronunciation of: ' + exampleFr);
-      pbtn.innerHTML = '🔊';
-      pbtn.addEventListener('click', function () { speak(exampleFr, pbtn); });
-
-      var text = document.createElement('div');
-      text.innerHTML =
-        '<p class="phrase-fr" lang="ja-JP">' + exampleFr + '</p>' +
-        '<p class="phrase-en">' + exampleEn + '</p>';
-
-      item.appendChild(pbtn);
-      item.appendChild(text);
-      phrasesContainer.appendChild(item);
-    });
-
-    renderReview();
-    updateStreak();
-  }
-
-  render();
-})();
+LanguagePage.init({
+  prefix: 'tangoNoHi',
+  lang: 'ja-JP',
+  words: [
+      ["こんにちは","konnichiwa","hello / good day","interj.","👋"],
+      ["ありがとう","arigatou","thank you","interj.","🙏"],
+      ["お願いします","onegaishimasu","please","phrase","🤲"],
+      ["さようなら","sayounara","goodbye","phrase","👋"],
+      ["はい","hai","yes","adv.","✅"],
+      ["いいえ","iie","no","adv.","❌"],
+      ["すみません","sumimasen","sorry / excuse me","interj.","🙇"],
+      ["ようこそ","youkoso","welcome","interj.","🎉"],
+      ["やあ","yaa","hi (informal)","interj.","🙋"],
+      ["またね","mata ne","see you soon","phrase","⏳"],
+      ["家","ie","the house","n.","🏠"],
+      ["猫","neko","the cat","n.","🐱"],
+      ["犬","inu","the dog","n.","🐶"],
+      ["水","mizu","the water","n.","💧"],
+      ["パン","pan","the bread","n.","🍞"],
+      ["時間","jikan","the time","n.","⏰"],
+      ["人生","jinsei","the life","n.","🌱"],
+      ["友達","tomodachi","the friend","n.","🧑‍🤝‍🧑"],
+      ["仕事","shigoto","the work","n.","💼"],
+      ["家族","kazoku","the family","n.","👨‍👩‍👧‍👦"],
+      ["日","hi","the day","n.","☀️"],
+      ["夜","yoru","the night","n.","🌙"],
+      ["学校","gakkou","the school","n.","🏫"],
+      ["車","kuruma","the car","n.","🚗"],
+      ["街","machi","the city / town","n.","🏙️"],
+      ["本","hon","the book","n.","📖"],
+      ["机","tsukue","the table / desk","n.","🪑"],
+      ["窓","mado","the window","n.","🪟"],
+      ["ドア","doa","the door","n.","🚪"],
+      ["コーヒー","koohii","the coffee","n.","☕"],
+      ["一","ichi","one","num.","1️⃣"],
+      ["二","ni","two","num.","2️⃣"],
+      ["三","san","three","num.","3️⃣"],
+      ["四","yon","four","num.","4️⃣"],
+      ["五","go","five","num.","5️⃣"],
+      ["六","roku","six","num.","6️⃣"],
+      ["七","nana","seven","num.","7️⃣"],
+      ["八","hachi","eight","num.","8️⃣"],
+      ["九","kyuu","nine","num.","9️⃣"],
+      ["十","juu","ten","num.","🔟"],
+      ["赤い","akai","red","adj.","🔴"],
+      ["青い","aoi","blue","adj.","🔵"],
+      ["緑","midori","green","n.","🟢"],
+      ["黄色い","kiiroi","yellow","adj.","🟡"],
+      ["黒い","kuroi","black","adj.","⚫"],
+      ["白い","shiroi","white","adj.","⚪"],
+      ["灰色","haiiro","grey","n.","🩶"],
+      ["オレンジ色","orenji-iro","orange","n.","🟠"],
+      ["です","desu","to be","cop.","🧍"],
+      ["持つ","motsu","to have","v.","🤲"],
+      ["行く","iku","to go","v.","🚶"],
+      ["する","suru","to do / make","v.","🛠️"],
+      ["見る","miru","to see","v.","👀"],
+      ["知る","shiru","to know","v.","🧠"],
+      ["できる","dekiru","to be able to","v.","💪"],
+      ["欲しい","hoshii","to want","adj.","🎯"],
+      ["来る","kuru","to come","v.","🏃"],
+      ["取る","toru","to take","v.","✋"],
+      ["話す","hanasu","to speak","v.","🗣️"],
+      ["食べる","taberu","to eat","v.","🍽️"],
+      ["飲む","nomu","to drink","v.","🥤"],
+      ["寝る","neru","to sleep","v.","😴"],
+      ["好き","suki","to like / love","adj.","❤️"],
+      ["大きい","ookii","big / tall","adj.","📏"],
+      ["小さい","chiisai","small","adj.","🐭"],
+      ["美しい","utsukushii","beautiful","adj.","🌟"],
+      ["かわいい","kawaii","pretty / cute","adj.","🌸"],
+      ["良い","yoi","good","adj.","👍"],
+      ["悪い","warui","bad","adj.","👎"],
+      ["幸せ","shiawase","happy","n.","😊"],
+      ["悲しい","kanashii","sad","adj.","😢"],
+      ["簡単","kantan","easy","n.","😌"],
+      ["難しい","muzukashii","difficult","adj.","😖"],
+      ["新しい","atarashii","new","adj.","✨"],
+      ["古い","furui","old","adj.","🕰️"],
+      ["今日","kyou","today","adv.","📅"],
+      ["明日","ashita","tomorrow","adv.","🌅"],
+      ["昨日","kinou","yesterday","adv.","🌇"],
+      ["今","ima","now","adv.","⏱️"],
+      ["朝","asa","the morning","n.","🌄"],
+      ["晩","ban","the evening","n.","🌆"],
+      ["週","shuu","the week","n.","🗓️"],
+      ["月","tsuki","the month / moon","n.","📆"],
+      ["年","toshi","the year","n.","🎊"],
+      ["太陽","taiyou","the sun","n.","☀️"],
+      ["チーズ","chiizu","the cheese","n.","🧀"],
+      ["ワイン","wain","the wine","n.","🍷"],
+      ["肉","niku","the meat","n.","🥩"],
+      ["野菜","yasai","the vegetable","n.","🥦"],
+      ["果物","kudamono","the fruit","n.","🍎"],
+      ["魚","sakana","the fish","n.","🐟"],
+      ["砂糖","satou","the sugar","n.","🍬"],
+      ["塩","shio","the salt","n.","🧂"],
+      ["ケーキ","keeki","the cake","n.","🎂"],
+      ["スープ","suupu","the soup","n.","🍲"],
+      ["お金","okane","the money","n.","💰"],
+      ["愛","ai","the love","n.","❤️"],
+      ["音楽","ongaku","the music","n.","🎵"],
+      ["山","yama","the mountain","n.","⛰️"],
+      ["海","umi","the sea","n.","🌊"]
+  ],
+  // Each day serves one fixed group of five words, so these two practice
+  // sentences are hand-written to actually use that group together rather
+  // than generated. Group N here pairs with words N*5 .. N*5+4 above.
+  phrases: [
+      [["こんにちは。コーヒーをお願いします。","Hello. A coffee, please."],["はい、ありがとう。さようなら。","Yes, thank you. Goodbye."]],
+      [["やあ!私たちの家にようこそ。","Hi! Welcome to our house."],["すみません、いいえ、結構です。またね。","Excuse me, no, that's alright. See you soon."]],
+      [["猫と犬が家で遊びます。","The cat and the dog play in the house."],["水を飲んでパンを食べます。","I drink water and eat bread."]],
+      [["家族と一緒にいると時間が早く過ぎます。","Time passes quickly when I'm with family."],["友達は仕事と人生を楽しんでいます。","My friend enjoys his job and his life."]],
+      [["日中、子供たちは車で学校に行きます。","During the day, the kids go to school by car."],["夜、この街はとても静かです。","At night, this city is very quiet."]],
+      [["本は窓の近くの机の上にあります。","The book is on the table, near the window."],["ドアを閉めてコーヒーを飲んでください。","Close the door and have a coffee."]],
+      [["一、二、三、四、五 — 数え方を習っています。","One, two, three, four, five — I'm learning to count!"],["椅子が四つと五人用の机があります。","There are four chairs and one table for five people."]],
+      [["六、七、八、九、十 — まだ数え続けます!","Six, seven, eight, nine, ten — and we keep counting!"],["お店は八時に開いて、十時に閉まります。","The shop opens at eight and closes at ten."]],
+      [["空は青くて、草は緑で、太陽は黄色いです。","The sky is blue, the grass is green and the sun is yellow."],["彼女は赤いドレスと黒い靴を履いています。","She's wearing a red dress and black shoes."]],
+      [["空は灰色ですが、私の帽子はオレンジ色です。","The sky is grey, but my hat is orange."],["私の猫は白くて、いつもおもちゃを持っています。","My cat is white and always carries a toy."]],
+      [["今日の午後、買い物をしに行くつもりです。","I'm going to go do some shopping this afternoon."],["映画を見ることができるかどうか知りません。","I don't know if I can watch a movie."]],
+      [["コーヒーが欲しいです。一緒に来て食べませんか?","I'd like a coffee. Won't you come eat with us?"],["彼女は友達と話しながらコーヒーを取るのが好きです。","She likes talking and getting a coffee with friends."]],
+      [["朝、コーヒーを飲むのが好きです。","I like drinking a coffee in the morning."],["大きい犬が小さい猫の隣で寝ています。","The big dog sleeps next to the small cat."]],
+      [["なんて美しい天気でしょう!とても幸せです。","What beautiful weather! I'm very happy."],["このかわいいケーキは良い味で、全然悪くないです!","This cute cake tastes good, not bad at all!"]],
+      [["古い友達にさようならを言うのは簡単ではありません。","It's not easy to say goodbye to an old friend."],["彼女は少し悲しいですが、新しい仕事は難しくないです。","She's a bit sad, but her new job isn't difficult."]],
+      [["昨日は雨でしたが、今日はいい天気です。","Yesterday it rained; today the weather's nice."],["今、出かけなければなりませんが、明日の朝戻ります。","I have to leave now, but I'll be back tomorrow morning."]],
+      [["今週は毎晩、太陽が輝いています。","The sun shines every evening this week."],["今月はあっという間に過ぎます。今年も同じです。","This month is going by fast; so is the year."]],
+      [["チーズと肉と野菜を食べます。","We're eating cheese, meat and vegetables."],["赤ワインは甘い果物とよく合います。","Red wine pairs well with a sweet fruit."]],
+      [["魚には少し塩が必要です。","The fish needs a bit of salt."],["このケーキは砂糖が多すぎますが、スープは完璧です。","This cake has too much sugar, but the soup is perfect."]],
+      [["お金は幸せをもたらしませんが、愛と音楽はもたらします。","Money doesn't buy happiness, but love and music do."],["今年の夏は山に行きますか、それとも海に行きますか?","Are we going to the mountains or the sea this summer?"]]
+  ]
+});
 </script>
 </body>
 </html>
