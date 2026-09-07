@@ -24,40 +24,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #f5f2ed;
-      --ink: #1a1814;
-      --muted: #7a7570;
-      --accent: #9a2a2a;
-      --line: #d8d3cc;
-      --amber-1: #f8d9ae;
-      --amber-2: #f2a355;
-      --amber-3: #b8460f;
-      --blue-1: #dde4ee;
-      --blue-2: #6b83a8;
-      --blue-3: #1b2a4e;
-    }
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: 18px;
-      line-height: 1.7;
-      min-height: 100vh;
-    }
+    :root { --amber-1:#f8d9ae; --amber-2:#f2a355; --amber-3:#b8460f; --blue-1:#dde4ee; --blue-2:#6b83a8; --blue-3:#1b2a4e; }
+    body { font-size:var(--fs-body); line-height:var(--leading-body); }
     .wrap { max-width: 640px; margin: 0 auto; padding: 0 2rem 4rem; }
 
-    .back { display:inline-flex; align-items:center; gap:.4rem; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:1.8rem 0 0; transition:color .2s; }
-    .back:hover { color:var(--accent); }
 
     header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; text-align:center; }
-    .eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
     h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:300; line-height:1.1; }
     h1 em { font-style:italic; color:var(--accent); }
-    .intro { margin-top:1rem; color:var(--muted); font-size:1rem; max-width:440px; margin-left:auto; margin-right:auto; }
+    .intro { margin-top:1rem; color:var(--muted); font-size: var(--fs-base); max-width:440px; margin-left:auto; margin-right:auto; }
 
     /* ── HOURGLASS ── */
     .glass-section { padding:2.6rem 0 1rem; display:flex; flex-direction:column; align-items:center; opacity:0; animation:rise .9s ease forwards .25s; }
@@ -94,16 +71,15 @@
     .time-display {
       margin-top: 1.2rem;
       font-family: 'DM Mono', monospace;
-      font-size: 1.6rem;
+      font-size: var(--fs-3xl);
       font-weight: 400;
       letter-spacing: .04em;
       color: var(--ink);
-      font-variant-numeric: tabular-nums;
-    }
+      font-variant-numeric: tabular-nums; line-height:1.7; }
     .mode-label {
       margin-top: .4rem;
       font-family: 'DM Mono', monospace;
-      font-size: .68rem;
+      font-size: var(--fs-2xs);
       letter-spacing: .18em;
       text-transform: uppercase;
       color: var(--accent);
@@ -123,7 +99,7 @@
     }
     .daily-reset:hover { color:var(--accent); }
     .daily-hourglasses { display:flex; flex-wrap:wrap; justify-content:center; gap:.25rem .3rem; margin-bottom:.55rem; }
-    .daily-hourglasses span { font-size:.85rem; line-height:1; opacity:.9; }
+    .daily-hourglasses span { font-size: var(--fs-sm); line-height:1; opacity:.9; }
     .daily-text {
       font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase;
       color:var(--muted);
@@ -132,7 +108,7 @@
     /* ── CONTROLS ── */
     .controls { display:flex; gap:.9rem; margin-top:1.8rem; }
     .btn {
-      font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
+      font-family:'DM Mono',monospace; font-size: var(--fs-2xs); letter-spacing:.12em; text-transform:uppercase;
       padding:.75rem 1.6rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
       background:transparent; color:var(--ink); transition: all .2s;
     }
@@ -141,7 +117,7 @@
     .btn.primary:hover { background:#6f1e1e; border-color:#6f1e1e; color:#fdf9f2; }
     .btn:active { transform: translateY(1px); }
 
-    .btn-chevron { display:inline-block; font-size:.68rem; margin-left:.3rem; transition:transform .25s; }
+    .btn-chevron { display:inline-block; font-size: var(--fs-2xs); margin-left:.3rem; transition:transform .25s; }
     #paletteToggle.open .btn-chevron { transform:rotate(90deg); }
 
     .palette-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
@@ -172,13 +148,13 @@
 
     .ambience-toggle {
       margin-top:1.5rem; display:inline-flex; align-items:center; gap:.55rem;
-      cursor:pointer; user-select:none; font-family:'DM Mono',monospace; font-size:.65rem;
+      cursor:pointer; user-select:none; font-family:'DM Mono',monospace; font-size: var(--fs-3xs);
       letter-spacing:.12em; text-transform:uppercase; color:var(--muted); transition:color .2s;
       background:none; border:none; padding:0;
     }
     .ambience-toggle-wrap { display:flex; justify-content:center; }
     .ambience-toggle:hover, .ambience-toggle.open { color:var(--accent); }
-    .ambience-chevron { font-size:.7rem; transition:transform .25s; display:inline-block; }
+    .ambience-chevron { font-size: var(--fs-2xs); transition:transform .25s; display:inline-block; }
     .ambience-toggle.open .ambience-chevron { transform:rotate(90deg); }
 
     .ambience-panel {
@@ -199,14 +175,14 @@
 
     .ambience-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
     .ambience-chip {
-      font-family:'DM Mono',monospace; font-size:.66rem; letter-spacing:.05em; text-transform:uppercase;
+      font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.05em; text-transform:uppercase;
       padding:.7rem .8rem; border-radius:999px; cursor:pointer; border:1px solid var(--line);
       background:transparent; color:var(--ink); transition:all .2s; display:inline-flex; align-items:center;
       justify-content:center; gap:.5rem;
     }
     .ambience-chip:hover { border-color:var(--accent); color:var(--accent); }
     .ambience-chip.playing { background:var(--accent); border-color:var(--accent); color:#fdf9f2; }
-    .chip-icon { font-size:.9rem; }
+    .chip-icon { font-size: var(--fs-sm); }
     .ambience-chip.playing .chip-icon { animation:chipPulse 1.7s ease-in-out infinite; }
     @keyframes chipPulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
 
@@ -241,7 +217,7 @@
     }
     .postit textarea {
       width:100%; height:155px; border:none; background:transparent; resize:none;
-      font-family:'Cormorant Garamond', serif; font-size:1.08rem; line-height:1.7;
+      font-family:'Cormorant Garamond', serif; font-size: var(--fs-md); line-height:1.7;
       color:#5c5133; outline:none;
     }
     .postit textarea::placeholder { color:#9c9270; font-style:italic; }
@@ -251,7 +227,7 @@
     .settings-trigger {
       display:flex; align-items:center; justify-content:space-between;
       padding:1.1rem 0; cursor:pointer; list-style:none; user-select:none;
-      font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+      font-family:'DM Mono',monospace; font-size: var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
     }
     .settings-trigger::-webkit-details-marker { display:none; }
     .settings-chevron { color:var(--muted); transition:transform .25s; }
@@ -259,24 +235,23 @@
 
     .settings-body { padding:.3rem 0 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.4rem 1.6rem; }
     .field { display:flex; flex-direction:column; gap:.5rem; }
-    .field label { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+    .field label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
     .field input {
       font-family:'DM Mono',monospace; font-size:.95rem; color:var(--ink);
       background:transparent; border:1px solid var(--line); border-radius:2px;
       padding:.55rem .7rem; width:100%; transition:border-color .2s;
     }
     .field input:focus { outline:none; border-color:var(--accent); }
-    .settings-note { grid-column:1 / -1; font-size:.78rem; color:var(--muted); font-style:italic; }
+    .settings-note { grid-column:1 / -1; font-size: var(--fs-xs); color:var(--muted); font-style:italic; }
 
-    footer { padding:3rem 0 1rem; text-align:center; }
-    footer p { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; color:var(--muted); }
+    footer { padding:3rem 0 1rem; }
+    footer p { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.1em; color:var(--muted); }
 
-    @keyframes rise { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
     @media (max-width:600px) {
       .wrap { padding:0 1.2rem 3rem; }
       header { padding:2rem 0 1.5rem; }
-      .time-display { font-size:1.3rem; }
+      .time-display { font-size: var(--fs-xl); }
       .glass-stage { width:calc(130px * var(--glass-scale)); height:calc(322px * var(--glass-scale)); }
       .settings-body { grid-template-columns:1fr; }
     }

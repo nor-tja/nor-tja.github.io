@@ -154,6 +154,16 @@ for (const [slug, meta] of Object.entries(PAGES)) {
     '$1 defer$2'
   );
 
+  // 8. Link the shared stylesheet immediately before the page's own <style>.
+  //    Order matters: site.css first means a page rule of equal specificity
+  //    still wins, so the inline blocks keep overriding the shared ones.
+  //
+  //    The removal runs first and unconditionally, so a re-run replaces the
+  //    link rather than stacking a second copy — same reason the meta block
+  //    is fenced by markers.
+  src = src.replace(/[ \t]*<link rel="stylesheet" href="assets\/css\/site\.css">\n?/g, '');
+  src = src.replace(/([ \t]*)<style>/, '$1<link rel="stylesheet" href="assets/css/site.css">\n$1<style>');
+
   if (src !== before) {
     fs.writeFileSync(file, src);
     changed++;

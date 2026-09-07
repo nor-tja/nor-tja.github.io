@@ -24,20 +24,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#9a2a2a; --line:#d8d3cc; }
-    body { background:var(--bg); color:var(--ink); font-family:'Cormorant Garamond',serif; font-weight:300; font-size:18px; line-height:1.7; min-height:100vh; }
+    body { font-size:var(--fs-body); line-height:var(--leading-body); }
     .wrap { max-width:640px; margin:0 auto; padding:0 2rem 4rem; }
 
-    .back { display:inline-flex; align-items:center; gap:.4rem; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:1.8rem 0 0; transition:color .2s; }
-    .back:hover { color:var(--accent); }
 
     header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
-    .eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
     h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:300; line-height:1.1; }
     h1 em { font-style:italic; color:var(--accent); }
-    .intro { margin-top:1rem; color:var(--muted); font-size:1rem; max-width:480px; }
+    .intro { margin-top:1rem; color:var(--muted); font-size: var(--fs-base); max-width:480px; }
 
     .lang-list { padding:2.2rem 0; display:flex; flex-direction:column; }
     .lang-card {
@@ -52,32 +48,30 @@
     .lang-card:nth-of-type(3){ animation-delay:.4s; }
     .lang-card:nth-of-type(4){ animation-delay:.5s; }
     .lang-card:nth-of-type(5){ animation-delay:.6s; }
-    .lang-card:hover .lang-name { color:var(--accent); }
+    .lang-card:hover .lang-name { color:var(--accent); line-height:1.7; }
     .lang-card:hover .lang-arrow { transform:translateX(4px); border-color:var(--accent); color:var(--accent); }
 
     .lang-flag {
       flex-shrink:0; width:46px; height:46px; border-radius:50%;
       background:#eee7da; display:flex; align-items:center; justify-content:center;
-      font-size:1.4rem;
-    }
+      font-size:1.4rem; line-height:1.7; }
     .lang-body { flex:1; min-width:0; }
-    .lang-name { font-size:1.35rem; font-weight:400; transition:color .2s; }
-    .lang-sub { color:var(--muted); font-size:.9rem; margin-top:.15rem; }
+    .lang-name { font-size: var(--fs-xl); font-weight:400; transition:color .2s; }
+    .lang-sub { color:var(--muted); font-size: var(--fs-sm); margin-top:.15rem; }
     .lang-arrow {
       flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
       display:flex; align-items:center; justify-content:center; color:var(--muted);
-      font-size:1rem; transition:all .2s;
+      font-size: var(--fs-base); transition:all .2s;
     }
 
-    footer { padding:1rem 0 1rem; text-align:center; }
-    footer p { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; color:var(--muted); }
+    footer { padding:1rem 0 1rem; }
+    footer p { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.1em; color:var(--muted); }
 
-    @keyframes rise { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
     @media (max-width:520px) {
       .wrap { padding:0 1.2rem 3rem; }
-      .lang-name { font-size:1.15rem; }
-      .lang-flag { width:40px; height:40px; font-size:1.2rem; }
+      .lang-name { font-size: var(--fs-md); }
+      .lang-flag { width:40px; height:40px; font-size: var(--fs-lg); }
     }
   </style>
 </head>

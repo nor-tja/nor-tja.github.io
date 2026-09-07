@@ -24,30 +24,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#9a2a2a; --line:#d8d3cc; }
-    body { background:var(--bg); color:var(--ink); font-family:'Cormorant Garamond',serif; font-weight:300; font-size:18px; line-height:1.7; min-height:100vh; }
+    body { font-size:var(--fs-body); line-height:var(--leading-body); }
     .wrap { max-width:640px; margin:0 auto; padding:0 2rem 4rem; }
 
-    .back { display:inline-flex; align-items:center; gap:.4rem; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:1.8rem 0 0; transition:color .2s; }
-    .back:hover { color:var(--accent); }
 
     header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
-    .eyebrow { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
     h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:300; line-height:1.1; }
     h1 em { font-style:italic; color:var(--accent); }
-    .intro { margin-top:1rem; color:var(--muted); font-size:1rem; max-width:480px; }
-    .date-line { margin-top:.9rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+    .intro { margin-top:1rem; color:var(--muted); font-size: var(--fs-base); max-width:480px; }
+    .date-line { margin-top:.9rem; font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
 
-    .streak { margin-top:1.2rem; display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); opacity:0; transition:opacity .3s; }
+    .streak { margin-top:1.2rem; display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.08em; text-transform:uppercase; color:var(--accent); opacity:0; transition:opacity .3s; }
 
-    .voice-tip { margin-top:.8rem; font-size:.8rem; font-style:italic; color:var(--muted); max-width:440px; line-height:1.5; }
+    .voice-tip { margin-top:.8rem; font-size: var(--fs-xs); font-style:italic; color:var(--muted); max-width:440px; line-height:1.5; }
     .voice-tip strong { font-style:normal; color:var(--ink); font-weight:500; }
     .streak.visible { opacity:1; }
 
     .voice-picker { margin-top:.9rem; display:none; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
-    .voice-picker select { font-family:'Cormorant Garamond',serif; font-size:.85rem; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:.3rem .5rem; max-width:230px; }
+    .voice-picker select { font-family:'Cormorant Garamond',serif; font-size: var(--fs-sm); background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:.3rem .5rem; max-width:230px; }
 
     .words { padding:2.2rem 0; display:flex; flex-direction:column; }
     .word-card {
@@ -64,14 +60,14 @@
     .word-icon {
       display:inline-flex; align-items:center; justify-content:center;
       width:30px; height:30px; border-radius:7px; align-self:center;
-      background:#eee7da; font-size:1.05rem; line-height:1;
+      background:#eee7da; font-size: var(--fs-base); line-height:1;
     }
 
     .play-btn {
       flex-shrink:0; width:44px; height:44px; border-radius:50%;
       border:1px solid var(--line); background:transparent; cursor:pointer;
       display:flex; align-items:center; justify-content:center;
-      color:var(--accent); font-size:1.1rem; transition:all .2s;
+      color:var(--accent); font-size: var(--fs-md); transition:all .2s;
     }
     .play-btn:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
     .play-btn:active { transform:scale(.94); }
@@ -79,34 +75,35 @@
 
     .word-body { flex:1; min-width:0; }
     .word-top { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
-    .word-fr { font-size:1.5rem; font-weight:400; }
+    .word-fr { font-size: var(--fs-2xl); font-weight:400; line-height:1.7; }
     .word-pos { font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:.15rem .4rem; }
-    .word-ipa { font-family:'DM Mono',monospace; font-size:.8rem; color:var(--accent); margin-top:.25rem; }
-    .word-en { font-style:italic; color:var(--muted); font-size:.98rem; margin-top:.15rem; }
+    .word-ipa { font-family:'DM Mono',monospace; font-size: var(--fs-xs); color:var(--accent); margin-top:.25rem; }
+    .word-en { font-style:italic; color:var(--muted); font-size: var(--fs-base); margin-top:.15rem; }
 
     .learned-dot {
       flex-shrink:0; width:9px; height:9px; border-radius:50%;
-      border:1px solid var(--line); cursor:pointer; transition:background .25s,border-color .25s;
+      border:1px solid var(--line); background:none; padding:0; appearance:none; -webkit-appearance:none;
+      cursor:pointer; transition:background .25s,border-color .25s;
     }
     .learned-dot.on { background:var(--accent); border-color:var(--accent); }
 
-    .no-speech { font-size:.85rem; color:var(--muted); font-style:italic; padding:1rem 0; }
+    .no-speech { font-size: var(--fs-sm); color:var(--muted); font-style:italic; padding:1rem 0; }
 
     .review-section { padding:.4rem 0 1.6rem; }
-    .review-label { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
-    .review-stats { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); margin-bottom:1.1rem; line-height:1.6; }
-    .review-empty { font-size:.9rem; color:var(--muted); font-style:italic; padding:.6rem 0 1.2rem; }
+    .review-label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
+    .review-stats { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); color:var(--muted); margin-bottom:1.1rem; line-height:1.6; }
+    .review-empty { font-size: var(--fs-sm); color:var(--muted); font-style:italic; padding:.6rem 0 1.2rem; }
     .review-card { display:flex; align-items:center; gap:.8rem; padding:1rem 0; border-bottom:1px solid var(--line); }
     .review-card:last-child { border-bottom:none; }
     .review-play { flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:.95rem; transition:all .2s; }
     .review-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
     .review-play.playing { background:var(--accent); color:#fdf9f2; }
     .review-body { flex:1; min-width:0; }
-    .review-fr { font-size:1.15rem; }
+    .review-fr { font-size: var(--fs-md); line-height:1.7; }
     .review-answer { margin-top:.3rem; display:none; }
     .review-answer.shown { display:block; }
-    .review-fr-answer { font-style:italic; font-size:1.15rem; }
-    .review-ipa { font-family:'DM Mono',monospace; font-size:.78rem; color:var(--accent); margin-left:.5rem; }
+    .review-fr-answer { font-style:italic; font-size: var(--fs-md); line-height:1.7; }
+    .review-ipa { font-family:'DM Mono',monospace; font-size: var(--fs-xs); color:var(--accent); margin-left:.5rem; }
     .review-actions { flex-shrink:0; display:flex; gap:.5rem; }
     .review-btn {
       font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase;
@@ -117,36 +114,35 @@
     .review-btn.again:hover { border-color:#6f1e1e; color:#6f1e1e; }
 
     .phrases { padding:.4rem 0 1.6rem; }
-    .phrases-label { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.2rem; }
+    .phrases-label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.2rem; }
     .phrase-item { display:flex; align-items:flex-start; gap:.9rem; padding:1rem 0; border-bottom:1px solid var(--line); }
     .phrase-item:last-child { border-bottom:none; }
-    .phrase-play { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:.9rem; transition:all .2s; margin-top:.1rem; }
+    .phrase-play { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size: var(--fs-sm); transition:all .2s; margin-top:.1rem; }
     .phrase-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
     .phrase-play.playing { background:var(--accent); color:#fdf9f2; }
-    .phrase-fr { font-size:1.08rem; }
-    .phrase-en { font-style:italic; color:var(--muted); font-size:.85rem; margin-top:.2rem; }
+    .phrase-fr { font-size: var(--fs-md); }
+    .phrase-en { font-style:italic; color:var(--muted); font-size: var(--fs-sm); margin-top:.2rem; }
 
     .settings { margin-top:1rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .8s; }
     .settings-trigger {
       display:flex; align-items:center; justify-content:space-between;
       padding:1.1rem 0; cursor:pointer; list-style:none; user-select:none;
-      font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+      font-family:'DM Mono',monospace; font-size: var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
     }
     .settings-trigger::-webkit-details-marker { display:none; }
     .settings-chevron { color:var(--muted); transition:transform .25s; }
     details[open] .settings-chevron { transform:rotate(90deg); }
-    .settings-body { padding:.2rem 0 2rem; font-size:.85rem; color:var(--muted); line-height:1.6; }
+    .settings-body { padding:.2rem 0 2rem; font-size: var(--fs-sm); color:var(--muted); line-height:1.6; }
     .settings-body p + p { margin-top:.6rem; }
 
-    footer { padding:1rem 0 1rem; text-align:center; }
-    footer p { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; color:var(--muted); }
+    footer { padding:1rem 0 1rem; }
+    footer p { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.1em; color:var(--muted); }
 
-    @keyframes rise { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
     @media (max-width:520px) {
       .wrap { padding:0 1.2rem 3rem; }
-      .word-fr { font-size:1.3rem; }
-      .word-icon { width:26px; height:26px; font-size:.9rem; border-radius:6px; }
+      .word-fr { font-size: var(--fs-xl); }
+      .word-icon { width:26px; height:26px; font-size: var(--fs-sm); border-radius:6px; }
       .play-btn { width:38px; height:38px; }
       .review-card { flex-wrap:wrap; }
       .review-play { width:32px; height:32px; }
@@ -534,7 +530,7 @@
       frEl.textContent = en;
       var answerEl = document.createElement('p');
       answerEl.className = 'review-answer';
-      answerEl.innerHTML = '<span class="review-fr-answer">' + fr + '</span> <span class="review-ipa">' + ipa + '</span>';
+      answerEl.innerHTML = '<span class="review-fr-answer" lang="pt-PT">' + fr + '</span> <span class="review-ipa">' + ipa + '</span>';
       body.appendChild(frEl);
       body.appendChild(answerEl);
 
@@ -626,17 +622,26 @@
       var body = document.createElement('div');
       body.className = 'word-body';
       body.innerHTML =
-        '<div class="word-top"><span class="word-fr">' + fr + '</span><span class="word-icon" aria-hidden="true">' + (icon || '') + '</span><span class="word-pos">' + pos + '</span></div>' +
+        '<div class="word-top"><span class="word-fr" lang="pt-PT">' + fr + '</span><span class="word-icon" aria-hidden="true">' + (icon || '') + '</span><span class="word-pos">' + pos + '</span></div>' +
         '<div class="word-ipa">' + ipa + '</div>' +
         '<div class="word-en">' + en + '</div>';
 
-      var dot = document.createElement('span');
-      dot.className = 'learned-dot' + (learned.indexOf(fr) !== -1 ? ' on' : '');
+      // A real <button>, not a <span>: the dot is the only way to record a
+      // word, and as a span it was unreachable by keyboard and invisible to
+      // screen readers. aria-pressed carries the on/off state, which a class
+      // name alone cannot express.
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      var dotOn = learned.indexOf(fr) !== -1;
+      dot.className = 'learned-dot' + (dotOn ? ' on' : '');
+      dot.setAttribute('aria-pressed', dotOn ? 'true' : 'false');
+      dot.setAttribute('aria-label', 'Mark ' + fr + ' as practiced today');
       dot.title = 'Mark as practiced today';
       dot.addEventListener('click', function () {
         var list = toggleLearned(fr);
         var isOn = list.indexOf(fr) !== -1;
         dot.classList.toggle('on', isOn);
+        dot.setAttribute('aria-pressed', isOn ? 'true' : 'false');
         if (isOn) {
           addToReview(fr);
           renderReview();
@@ -672,7 +677,7 @@
 
       var text = document.createElement('div');
       text.innerHTML =
-        '<p class="phrase-fr">' + exampleFr + '</p>' +
+        '<p class="phrase-fr" lang="pt-PT">' + exampleFr + '</p>' +
         '<p class="phrase-en">' + exampleEn + '</p>';
 
       item.appendChild(pbtn);
