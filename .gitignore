@@ -1,3 +1,7 @@
 .DS_Store
 .superpowers/
 .claude/
+
+# Raw audio sources. Only the encoded ambience-*.mp3 loops are published;
+# the originals downloaded from Freesound are kept locally, not shipped.
+*.wav

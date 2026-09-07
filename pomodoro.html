@@ -63,10 +63,15 @@
     /* ── HOURGLASS ── */
     .glass-section { padding:2.6rem 0 1rem; display:flex; flex-direction:column; align-items:center; opacity:0; animation:rise .9s ease forwards .25s; }
 
+    /* Base size at --glass-scale:1. The scale itself is set from JS and tracks
+       the focus length, so these two numbers set the whole range rather than
+       one size: at the default 25 minutes the scale is ~0.905, which puts the
+       glass at 145 x 358. Keep the 200:495 ratio, which matches the SVG's
+       210x520 viewBox -- diverging from it letterboxes the drawing. */
     .glass-stage {
       --glass-scale: 1;
-      width: calc(200px * var(--glass-scale));
-      height: calc(495px * var(--glass-scale));
+      width: calc(160px * var(--glass-scale));
+      height: calc(396px * var(--glass-scale));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -273,7 +278,7 @@
       .wrap { padding:0 1.2rem 3rem; }
       header { padding:2rem 0 1.5rem; }
       .time-display { font-size:1.3rem; }
-      .glass-stage { width:calc(145px * var(--glass-scale)); height:calc(359px * var(--glass-scale)); }
+      .glass-stage { width:calc(130px * var(--glass-scale)); height:calc(322px * var(--glass-scale)); }
       .settings-body { grid-template-columns:1fr; }
     }
   </style>
@@ -389,18 +394,23 @@
         <button class="ambience-chip" id="cafeBtn"><span class="chip-icon">☕</span><span class="chip-label">Café</span></button>
         <button class="ambience-chip" id="forestBtn"><span class="chip-icon">🌲</span><span class="chip-label">Forest</span></button>
         <button class="ambience-chip" id="wavesBtn"><span class="chip-icon">🌊</span><span class="chip-label">Ocean waves</span></button>
+        <button class="ambience-chip" id="fireBtn"><span class="chip-icon">🔥</span><span class="chip-label">Fireplace</span></button>
       </div>
       <audio id="cafeAudio" loop preload="none" src="ambience-coffee.mp3"></audio>
       <audio id="forestAudio" loop preload="none" src="ambience-forest.mp3"></audio>
       <audio id="wavesAudio" loop preload="none" src="ambience-waves.mp3"></audio>
-      <!-- The ocean recording is CC BY 4.0, which requires credit naming the
-           author, the work, the source and the licence. The other two are CC0
-           and require nothing; they are credited as a courtesy. -->
+      <audio id="fireAudio" loop preload="none" src="ambience-fire.mp3"></audio>
+      <!-- The ocean and fireplace recordings are CC BY 4.0, which requires
+           credit naming the author, the work, the source and the licence. The
+           other two are CC0 and require nothing; they are credited as a
+           courtesy. Enforced by tests/assets.test.js. -->
       <p class="ambience-credit">
         Field recordings from Freesound:
         <a href="https://freesound.org/s/689957/" target="_blank" rel="noopener">Café</a> by Matias44 (CC0),
         <a href="https://freesound.org/s/121965/" target="_blank" rel="noopener">Forest</a> by nfsgit (CC0),
         <a href="https://freesound.org/s/400632/" target="_blank" rel="noopener">Ocean waves</a> by InspectorJ
+        (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>),
+        <a href="https://freesound.org/s/18766/" target="_blank" rel="noopener">Chimney fire</a> by reinsamba
         (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>)
       </p>
     </div>
@@ -1249,7 +1259,8 @@
     var tracks = [
       { btn: $('cafeBtn'), audio: $('cafeAudio'), volume: 0.55 },
       { btn: $('forestBtn'), audio: $('forestAudio'), volume: 1 },
-      { btn: $('wavesBtn'), audio: $('wavesAudio'), volume: 0.35 }
+      { btn: $('wavesBtn'), audio: $('wavesAudio'), volume: 0.35 },
+      { btn: $('fireBtn'), audio: $('fireAudio'), volume: 0.5 }
     ];
 
     var FADE_SEC = 1.5; // fade window at each end of the loop, so the seam isn't an audible jump
