@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjZjVmMmVkIi8+CiAgPHRleHQgeD0iMTYiIHk9IjIzIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjQwMCIgCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzlhMmEyYSIgbGV0dGVyLXNwYWNpbmc9IjEiPktOPC90ZXh0Pgo8L3N2Zz4K" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <script src="assets/js/snake-logic.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg:#f5f2ed; --ink:#1a1814; --muted:#7a7570; --accent:#9a2a2a; --line:#d8d3cc; }
@@ -162,7 +163,7 @@
   const bestEl = document.getElementById('best');
   const msgEl = document.getElementById('msg');
 
-  let best = Number(localStorage.getItem('kn-snake-best') || 0);
+  let best = SnakeLogic.readBest();
   bestEl.textContent = best;
 
   let snake, dir, nextDir, food, score, running, paused, speed, timer;
@@ -214,8 +215,9 @@
   function step() {
     dir = nextDir;
     const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+    const willGrow = head.x === food.x && head.y === food.y;
 
-    if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || snake.some(s => s.x === head.x && s.y === head.y)) {
+    if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows || SnakeLogic.selfCollides(snake, head, willGrow)) {
       return gameOver();
     }
 
@@ -236,7 +238,7 @@
     clearTimeout(timer);
     if (score > best) {
       best = score;
-      localStorage.setItem('kn-snake-best', best);
+      SnakeLogic.writeBest(best);
       bestEl.textContent = best;
       msgEl.textContent = 'New best — press a key to retry';
     } else {
@@ -258,7 +260,7 @@
   }
 
   function setDir(nx, ny) {
-    if (dir.x === -nx && dir.y === -ny) return;
+    if (!SnakeLogic.canTurn(nextDir, {x: nx, y: ny})) return;
     nextDir = { x: nx, y: ny };
     if (!running) {
       if (score > 0 || snake.length !== 3) reset();
@@ -280,6 +282,9 @@
           paused = !paused;
           msgEl.textContent = paused ? 'Paused' : '';
           if (!paused) loop();
+        } else {
+          reset();
+          start();
         }
         e.preventDefault();
         break;
