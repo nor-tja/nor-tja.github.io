@@ -56,6 +56,26 @@ test('no unreferenced audio files are shipped', () => {
     `Wire them up or delete them.`);
 });
 
+// The credit line is maintained by hand while the chips are added in markup,
+// so the two drift apart silently: a fifth recording ships uncredited and
+// nothing objects. Counting Freesound links against <audio> elements catches
+// that, and is the only automatic link between the two.
+test('every ambience recording on a page has a Freesound credit beside it', () => {
+  eachPage((name, src) => {
+    const players = (src.match(/<audio[^>]+src="ambience-[^"]+"/g) || []).length;
+    if (!players) return;
+    // Freesound serves the same page at two URL shapes and the site uses both:
+    // the short /s/<id>/ on pomodoro, the long /people/<user>/sounds/<id>/ on
+    // coffee. Counting only one shape reports a missing credit that is there.
+    const credits = (src.match(
+      /freesound\.org\/(?:s\/\d+|people\/[^/"]+\/sounds\/\d+)\//g) || []).length;
+    assert.equal(credits, players,
+      `${name} plays ${players} ambience recording(s) but links ${credits} ` +
+      `Freesound page(s). Every recording names where it came from, CC0 or ` +
+      `not -- that is how the licence stays checkable later.`);
+  });
+});
+
 // Attribution for CC BY material is a licence condition, not a nicety: use
 // without credit is simply unlicensed use. Unlike the two CC0 recordings,
 // these cannot ship without naming their author.

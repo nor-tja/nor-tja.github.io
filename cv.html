@@ -21,9 +21,13 @@
   <meta name="twitter:description" content="Curriculum vitae of Katja Norstad, a data scientist based in Oslo working with data since 2012.">
   <meta name="twitter:image" content="https://katjanorstad.no/assets/og/cv.png">
   <!-- meta:end -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the two faces every
+       page renders immediately skips the stylesheet->font discovery hop.
+       crossorigin is required even same-origin: fonts always fetch in CORS
+       mode, and without it the preload is discarded and fetched twice. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/cormorant-garamond-normal-300-latin.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
+  <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
     html { scroll-behavior: smooth; }
@@ -76,8 +80,8 @@
     }
     .job-title { font-size: var(--fs-md); font-weight: 400; }
     .job-period { font-family: 'DM Mono', monospace; font-size: var(--fs-3xs); letter-spacing: 0.05em; color: var(--muted); white-space: nowrap; }
-    .job-company { font-style: italic; color: var(--muted); font-size: 0.95rem; margin-bottom: 0.6rem; }
-    .job-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.6; }
+    .job-company { font-style: italic; color: var(--muted); font-size: var(--fs-base); margin-bottom: 0.6rem; }
+    .job-desc { font-size: var(--fs-base); color: var(--muted); line-height: 1.6; }
     .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem 3rem; }
     .skill-group-label { font-family: 'DM Mono', monospace; font-size: var(--fs-3xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); margin-bottom: 0.4rem; }
     .skill-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
@@ -218,7 +222,18 @@
       </div>
     </section>
 
-    <footer><p>© 2026 Katja Norstad &nbsp;·&nbsp; Oslo, Norway</p></footer>
+    <footer>
+    <nav class="sitenav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <span aria-current="page">CV</span>
+      <a href="resources.html">Resources</a>
+      <a href="coffee.html">Coffee</a>
+      <a href="pomodoro.html">Pomodoro</a>
+      <a href="languages.html">Languages</a>
+      <a href="snake.html">Snake</a>
+    </nav>
+      <p>© 2026 Katja Norstad &nbsp;·&nbsp; Oslo, Norway</p>
+    </footer>
   </div>
 </body>
 </html>

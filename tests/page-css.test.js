@@ -2,7 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
-const { pagePaths, readPage } = require('./helpers');
+const { pagePaths, readPage, pageCss } = require('./helpers');
 
 const PAGES = pagePaths().map((p) => path.basename(p));
 
@@ -56,14 +56,14 @@ const FOOTER_PADDING = {
 
 test('footer padding is unchanged on every page', () => {
   for (const [page, expected] of Object.entries(FOOTER_PADDING)) {
-    const decls = declarations(extractRule(readPage(page), 'footer'));
+    const decls = declarations(extractRule(pageCss(page), 'footer'));
     assert.equal(decls['padding'], expected,
       `${page} footer padding should still be "${expected}"`);
   }
 });
 
 test('index.html still has no footer rule', () => {
-  assert.equal(extractRule(readPage('index.html'), 'footer'), null,
+  assert.equal(extractRule(pageCss('index.html'), 'footer'), null,
     'index.html never had a footer rule; it should not acquire one');
 });
 
@@ -86,7 +86,7 @@ const WRAP_MAX_WIDTH = {
 
 test('.wrap max-width is unchanged on every page', () => {
   for (const [page, expected] of Object.entries(WRAP_MAX_WIDTH)) {
-    const decls = declarations(extractRule(readPage(page), '.wrap'));
+    const decls = declarations(extractRule(pageCss(page), '.wrap'));
     assert.equal(decls['max-width'], expected,
       `${page} .wrap max-width should still be "${expected}"`);
   }
@@ -94,8 +94,9 @@ test('.wrap max-width is unchanged on every page', () => {
 
 // --- extraction actually removed the duplicates ---------------------------
 
-// Grows to every page in the next task. Without a list like this the pilot
-// page cannot be asserted separately from the eleven not yet migrated.
+// All twelve, now that the migration is finished. Kept as an explicit list
+// rather than pagePaths(): a new page should have to be added here by hand,
+// which is the moment someone notices it has not been migrated.
 const MIGRATED = [
   'coffee.html', 'cv.html', 'index.html', 'japanese.html', 'languages.html',
   'mots-du-jour.html', 'pomodoro.html', 'portuguese.html', 'resources.html',
@@ -106,7 +107,7 @@ const PALETTE_VARS = ['--bg', '--ink', '--muted', '--accent', '--line'];
 
 test('migrated pages define no palette variables locally', () => {
   for (const page of MIGRATED) {
-    const src = readPage(page);
+    const src = pageCss(page);
     for (const v of PALETTE_VARS) {
       assert.ok(!new RegExp(`${v}\\s*:`).test(src),
         `${page} still defines ${v} locally, shadowing site.css`);
@@ -123,7 +124,7 @@ const KEYFRAMES_EXCEPT = ['cv.html'];
 
 test('migrated pages define no duplicated furniture', () => {
   for (const page of MIGRATED) {
-    const src = readPage(page);
+    const src = pageCss(page);
     for (const sel of ['.back', '.back:hover']) {
       assert.equal(extractRule(src, sel), null,
         `${page} still defines ${sel} locally; the extraction added the link ` +
@@ -145,7 +146,7 @@ test('migrated pages define no duplicated furniture', () => {
 test('no migrated page re-declares the shared half of .eyebrow', () => {
   const SHARED = ['font-family', 'font-size', 'letter-spacing', 'text-transform', 'color'];
   for (const page of MIGRATED) {
-    const rule = extractRule(readPage(page), '.eyebrow');
+    const rule = extractRule(pageCss(page), '.eyebrow');
     if (rule === null) continue;
     const decls = declarations(rule);
     for (const p of SHARED) {
@@ -158,7 +159,7 @@ test('no migrated page re-declares the shared half of .eyebrow', () => {
 
 test('migrated pages keep only their own footer padding', () => {
   for (const page of MIGRATED) {
-    const rule = extractRule(readPage(page), 'footer');
+    const rule = extractRule(pageCss(page), 'footer');
     // index.html has no footer element at all; a separate test pins that.
     if (rule === null) continue;
     const decls = declarations(rule);
@@ -170,7 +171,7 @@ test('migrated pages keep only their own footer padding', () => {
 
 test('migrated pages keep only the non-universal half of body', () => {
   for (const page of MIGRATED) {
-    const decls = declarations(extractRule(readPage(page), 'body'));
+    const decls = declarations(extractRule(pageCss(page), 'body'));
     for (const p of ['background', 'color', 'font-family', 'font-weight', 'min-height']) {
       assert.equal(decls[p], undefined,
         `${page} still sets body ${p}; that moved to site.css`);
@@ -191,15 +192,25 @@ test('every page links the shared stylesheet', () => {
 
 // Order is load-bearing. site.css must come FIRST so that a page rule with the
 // same specificity still wins; reverse them and every inline override dies.
-test('site.css is linked before the page\'s own <style>', () => {
+test('site.css is linked before whatever a page overrides it with', () => {
   for (const page of PAGES) {
     const src = readPage(page);
     const link = src.indexOf(LINK);
-    const style = src.indexOf('<style>');
-    assert.ok(link !== -1 && style !== -1, `${page} is missing the link or <style>`);
-    assert.ok(link < style,
-      `${page} links site.css AFTER its <style> block; inline rules would ` +
-      `stop overriding the shared ones`);
+    // A page contributes its own rules either through a page-level stylesheet
+    // (the five language pages) or an inline <style> (the other seven).
+    // Demanding a <style> would have quietly excused the language pages from
+    // this check the moment their CSS moved into a file.
+    const own = [
+      src.indexOf('<link rel="stylesheet" href="assets/css/language-page.css">'),
+      src.indexOf('<style>'),
+    ].filter((i) => i !== -1);
+    assert.ok(link !== -1, `${page} is missing the site.css link`);
+    assert.ok(own.length,
+      `${page} has neither a page stylesheet nor a <style>; it contributes ` +
+      `no rules of its own, which is almost certainly a mistake`);
+    assert.ok(link < Math.min(...own),
+      `${page} links site.css AFTER its own rules; equal-specificity ` +
+      `overrides would stop winning`);
   }
 });
 
@@ -215,7 +226,7 @@ test('no page links the shared stylesheet twice', () => {
 // 18px into site.css would have resized every unsized child on those two.
 test('index.html and snake.html still set no body font-size', () => {
   for (const page of ['index.html', 'snake.html']) {
-    const decls = declarations(extractRule(readPage(page), 'body'));
+    const decls = declarations(extractRule(pageCss(page), 'body'));
     assert.equal(decls['font-size'], undefined,
       `${page} deliberately has no body font-size; it must not acquire one`);
   }
@@ -240,7 +251,7 @@ test('pages using the length leading protect their oversized text', () => {
   // line-height; a false negative ships overlapping text.
   const offenders = [];
   for (const page of PAGES) {
-    const src = readPage(page);
+    const src = pageCss(page);
     const body = extractRule(src, 'body');
     if (!body || !/var\(--leading-body\)/.test(declarations(body)['line-height'] || '')) continue;
 

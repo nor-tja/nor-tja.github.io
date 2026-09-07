@@ -21,9 +21,13 @@
   <meta name="twitter:description" content="A pomodoro timer shaped like an hourglass. Twenty-five minute focus sessions, short breaks, and a long break every fourth round.">
   <meta name="twitter:image" content="https://katjanorstad.no/assets/og/pomodoro.png">
   <!-- meta:end -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the two faces every
+       page renders immediately skips the stylesheet->font discovery hop.
+       crossorigin is required even same-origin: fonts always fetch in CORS
+       mode, and without it the preload is discarded and fetched twice. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/cormorant-garamond-normal-300-latin.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
+  <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
     :root { --amber-1:#f8d9ae; --amber-2:#f2a355; --amber-3:#b8460f; --blue-1:#dde4ee; --blue-2:#6b83a8; --blue-3:#1b2a4e; }
@@ -93,7 +97,7 @@
 
     .daily-summary { margin-top:1.8rem; text-align:center; max-width:320px; }
     .daily-reset {
-      margin-top:.5rem; font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em;
+      margin-top:.5rem; font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.08em;
       text-transform:uppercase; color:var(--muted); background:none; border:none; cursor:pointer;
       text-decoration:underline; text-underline-offset:2px; padding:0; transition:color .2s;
     }
@@ -101,7 +105,7 @@
     .daily-hourglasses { display:flex; flex-wrap:wrap; justify-content:center; gap:.25rem .3rem; margin-bottom:.55rem; }
     .daily-hourglasses span { font-size: var(--fs-sm); line-height:1; opacity:.9; }
     .daily-text {
-      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase;
+      font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.08em; text-transform:uppercase;
       color:var(--muted);
     }
 
@@ -130,13 +134,13 @@
     .swatch-dots { display:flex; gap:.35rem; }
     .swatch-dot { width:16px; height:16px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.08); }
     .swatch-label {
-      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.03em;
+      font-family:'DM Mono',monospace; font-size: var(--fs-4xs); letter-spacing:.03em;
       text-transform:uppercase; color:var(--muted); text-align:center; line-height:1.3;
     }
     .palette-swatch:hover .swatch-label { color:var(--accent); }
 
     .palette-shuffle {
-      display:block; margin:1rem auto 0; font-family:'DM Mono',monospace; font-size:.6rem;
+      display:block; margin:1rem auto 0; font-family:'DM Mono',monospace; font-size: var(--fs-4xs);
       letter-spacing:.08em; text-transform:uppercase; color:var(--muted); background:none; border:none;
       cursor:pointer; text-decoration:underline; text-underline-offset:2px; transition:color .2s;
     }
@@ -167,7 +171,7 @@
     .ambience-panel.open { max-height:400px; opacity:1; margin-top:1.1rem; }
 
     .ambience-credit {
-      font-family:'DM Mono',monospace; font-size:.58rem; line-height:1.7;
+      font-family:'DM Mono',monospace; font-size: var(--fs-4xs); line-height:1.7;
       color:var(--muted); letter-spacing:.04em; margin-top:.9rem; text-align:center;
     }
     .ambience-credit a { color:var(--muted); }
@@ -237,7 +241,7 @@
     .field { display:flex; flex-direction:column; gap:.5rem; }
     .field label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
     .field input {
-      font-family:'DM Mono',monospace; font-size:.95rem; color:var(--ink);
+      font-family:'DM Mono',monospace; font-size: var(--fs-base); color:var(--ink);
       background:transparent; border:1px solid var(--line); border-radius:2px;
       padding:.55rem .7rem; width:100%; transition:border-color .2s;
     }
@@ -381,7 +385,7 @@
       <p class="ambience-credit">
         Field recordings from Freesound:
         <a href="https://freesound.org/s/689957/" target="_blank" rel="noopener">Café</a> by Matias44 (CC0),
-        <a href="https://freesound.org/s/121965/" target="_blank" rel="noopener">Forest</a> by nfsgit (CC0),
+        <a href="https://freesound.org/s/838024/" target="_blank" rel="noopener">Forest</a> by bruno.auzet (CC0),
         <a href="https://freesound.org/s/400632/" target="_blank" rel="noopener">Ocean waves</a> by InspectorJ
         (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>),
         <a href="https://freesound.org/s/18766/" target="_blank" rel="noopener">Chimney fire</a> by reinsamba
@@ -422,7 +426,18 @@
     </div>
   </details>
 
-  <footer><p>© 2026 Katja Norstad</p></footer>
+  <footer>
+    <nav class="sitenav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="cv.html">CV</a>
+      <a href="resources.html">Resources</a>
+      <a href="coffee.html">Coffee</a>
+      <span aria-current="page">Pomodoro</span>
+      <a href="languages.html">Languages</a>
+      <a href="snake.html">Snake</a>
+    </nav>
+    <p>© 2026 Katja Norstad</p>
+  </footer>
 </div>
 
 <script>

@@ -21,135 +21,17 @@
   <meta name="twitter:description" content="Five Ukrainian words a day, with spaced repetition that brings each word back just before you would have forgotten it.">
   <meta name="twitter:image" content="https://katjanorstad.no/assets/og/ukrainian.png">
   <!-- meta:end -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <!-- Self-hosted; see tools/fetch-fonts.js. Preloading the two faces every
+       page renders immediately skips the stylesheet->font discovery hop.
+       crossorigin is required even same-origin: fonts always fetch in CORS
+       mode, and without it the preload is discarded and fetched twice. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/cormorant-garamond-normal-300-latin.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/dm-mono-normal-400-latin.woff2">
+  <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/site.css">
-  <style>
-    body { font-size:var(--fs-body); line-height:var(--leading-body); }
-    .wrap { max-width:640px; margin:0 auto; padding:0 2rem 4rem; }
-
-
-    header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; }
-    h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:300; line-height:1.1; }
-    h1 em { font-style:italic; color:var(--accent); }
-    .intro { margin-top:1rem; color:var(--muted); font-size: var(--fs-base); max-width:480px; }
-    .date-line { margin-top:.9rem; font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
-
-    .streak { margin-top:1.2rem; display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.08em; text-transform:uppercase; color:var(--accent); opacity:0; transition:opacity .3s; }
-
-    .voice-tip { margin-top:.8rem; font-size: var(--fs-xs); font-style:italic; color:var(--muted); max-width:440px; line-height:1.5; }
-    .voice-tip strong { font-style:normal; color:var(--ink); font-weight:500; }
-    .streak.visible { opacity:1; }
-
-    .voice-picker { margin-top:.9rem; display:none; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
-    .voice-picker select { font-family:'Cormorant Garamond',serif; font-size: var(--fs-sm); background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:.3rem .5rem; max-width:230px; }
-
-    .words { padding:2.2rem 0; display:flex; flex-direction:column; }
-    .word-card {
-      display:flex; align-items:center; gap:1.1rem;
-      padding:1.5rem 0; border-bottom:1px solid var(--line);
-      opacity:0; animation:rise .8s ease forwards;
-    }
-    .word-card:nth-of-type(1){ animation-delay:.25s; }
-    .word-card:nth-of-type(2){ animation-delay:.35s; }
-    .word-card:nth-of-type(3){ animation-delay:.45s; }
-    .word-card:nth-of-type(4){ animation-delay:.55s; }
-    .word-card:nth-of-type(5){ animation-delay:.65s; }
-
-    .word-icon {
-      display:inline-flex; align-items:center; justify-content:center;
-      width:30px; height:30px; border-radius:7px; align-self:center;
-      background:#eee7da; font-size: var(--fs-base); line-height:1;
-    }
-
-    .play-btn {
-      flex-shrink:0; width:44px; height:44px; border-radius:50%;
-      border:1px solid var(--line); background:transparent; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      color:var(--accent); font-size: var(--fs-md); transition:all .2s;
-    }
-    .play-btn:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
-    .play-btn:active { transform:scale(.94); }
-    .play-btn.playing { background:var(--accent); color:#fdf9f2; }
-
-    .word-body { flex:1; min-width:0; }
-    .word-top { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; }
-    .word-fr { font-size: var(--fs-2xl); font-weight:400; line-height:1.7; }
-    .word-pos { font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:.15rem .4rem; }
-    .word-ipa { font-family:'DM Mono',monospace; font-size: var(--fs-xs); color:var(--accent); margin-top:.25rem; }
-    .word-en { font-style:italic; color:var(--muted); font-size: var(--fs-base); margin-top:.15rem; }
-
-    .learned-dot {
-      flex-shrink:0; width:9px; height:9px; border-radius:50%;
-      border:1px solid var(--line); background:none; padding:0; appearance:none; -webkit-appearance:none;
-      cursor:pointer; transition:background .25s,border-color .25s;
-    }
-    .learned-dot.on { background:var(--accent); border-color:var(--accent); }
-
-    .no-speech { font-size: var(--fs-sm); color:var(--muted); font-style:italic; padding:1rem 0; }
-
-    .review-section { padding:.4rem 0 1.6rem; }
-    .review-label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
-    .review-stats { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); color:var(--muted); margin-bottom:1.1rem; line-height:1.6; }
-    .review-empty { font-size: var(--fs-sm); color:var(--muted); font-style:italic; padding:.6rem 0 1.2rem; }
-    .review-card { display:flex; align-items:center; gap:.8rem; padding:1rem 0; border-bottom:1px solid var(--line); }
-    .review-card:last-child { border-bottom:none; }
-    .review-play { flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:.95rem; transition:all .2s; }
-    .review-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
-    .review-play.playing { background:var(--accent); color:#fdf9f2; }
-    .review-body { flex:1; min-width:0; }
-    .review-fr { font-size: var(--fs-md); line-height:1.7; }
-    .review-answer { margin-top:.3rem; display:none; }
-    .review-answer.shown { display:block; }
-    .review-fr-answer { font-style:italic; font-size: var(--fs-md); line-height:1.7; }
-    .review-ipa { font-family:'DM Mono',monospace; font-size: var(--fs-xs); color:var(--accent); margin-left:.5rem; }
-    .review-actions { flex-shrink:0; display:flex; gap:.5rem; }
-    .review-btn {
-      font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase;
-      padding:.5rem .75rem; border-radius:2px; cursor:pointer; border:1px solid var(--line);
-      background:transparent; color:var(--ink); transition:all .2s; white-space:nowrap;
-    }
-    .review-btn:hover { border-color:var(--accent); color:var(--accent); }
-    .review-btn.again:hover { border-color:#6f1e1e; color:#6f1e1e; }
-
-    .phrases { padding:.4rem 0 1.6rem; }
-    .phrases-label { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.2rem; }
-    .phrase-item { display:flex; align-items:flex-start; gap:.9rem; padding:1rem 0; border-bottom:1px solid var(--line); }
-    .phrase-item:last-child { border-bottom:none; }
-    .phrase-play { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size: var(--fs-sm); transition:all .2s; margin-top:.1rem; }
-    .phrase-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
-    .phrase-play.playing { background:var(--accent); color:#fdf9f2; }
-    .phrase-fr { font-size: var(--fs-md); }
-    .phrase-en { font-style:italic; color:var(--muted); font-size: var(--fs-sm); margin-top:.2rem; }
-
-    .settings { margin-top:1rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .8s; }
-    .settings-trigger {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:1.1rem 0; cursor:pointer; list-style:none; user-select:none;
-      font-family:'DM Mono',monospace; font-size: var(--fs-2xs); letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
-    }
-    .settings-trigger::-webkit-details-marker { display:none; }
-    .settings-chevron { color:var(--muted); transition:transform .25s; }
-    details[open] .settings-chevron { transform:rotate(90deg); }
-    .settings-body { padding:.2rem 0 2rem; font-size: var(--fs-sm); color:var(--muted); line-height:1.6; }
-    .settings-body p + p { margin-top:.6rem; }
-
-    footer { padding:1rem 0 1rem; }
-    footer p { font-family:'DM Mono',monospace; font-size: var(--fs-3xs); letter-spacing:.1em; color:var(--muted); }
-
-
-    @media (max-width:520px) {
-      .wrap { padding:0 1.2rem 3rem; }
-      .word-fr { font-size: var(--fs-xl); }
-      .word-icon { width:26px; height:26px; font-size: var(--fs-sm); border-radius:6px; }
-      .play-btn { width:38px; height:38px; }
-      .review-card { flex-wrap:wrap; }
-      .review-play { width:32px; height:32px; }
-      .review-actions { width:100%; margin-top:.6rem; flex-wrap:wrap; }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/language-page.css">
   <script src="assets/js/day-math.js"></script>
+  <script src="assets/js/language-page.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -189,509 +71,152 @@
     </div>
   </details>
 
-  <footer><p>© 2026 Katja Norstad</p></footer>
+  <footer>
+    <nav class="sitenav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="cv.html">CV</a>
+      <a href="resources.html">Resources</a>
+      <a href="coffee.html">Coffee</a>
+      <a href="pomodoro.html">Pomodoro</a>
+      <a href="languages.html">Languages</a>
+      <a href="snake.html">Snake</a>
+    </nav>
+    <p>© 2026 Katja Norstad</p>
+  </footer>
 </div>
 
 <script>
-(function () {
-  var WORDS = [
-    ["добрий день","dóbryi den'","hello / good day","phrase","👋"],
-    ["дякую","dyákuyu","thank you","interj.","🙏"],
-    ["будь ласка","bud' láska","please","phrase","🤲"],
-    ["до побачення","do pobáchennya","goodbye","phrase","👋"],
-    ["так","tak","yes","adv.","✅"],
-    ["ні","ni","no","adv.","❌"],
-    ["вибачте","výbachte","sorry / excuse me","interj.","🙇"],
-    ["ласкаво просимо","laskávo prósymo","welcome","phrase","🎉"],
-    ["привіт","pryvít","hi (informal)","interj.","🙋"],
-    ["до зустрічі","do zústrichi","see you soon","phrase","⏳"],
-    ["дім","dim","the house","n.","🏠"],
-    ["кіт","kit","the cat","n.","🐱"],
-    ["собака","sobáka","the dog","n.","🐶"],
-    ["вода","vodá","the water","n.","💧"],
-    ["хліб","khlib","the bread","n.","🍞"],
-    ["час","chas","the time","n.","⏰"],
-    ["життя","zhyttyá","the life","n.","🌱"],
-    ["друг","druh","the friend","n.","🧑‍🤝‍🧑"],
-    ["робота","robóta","the work","n.","💼"],
-    ["сім'я","simjá","the family","n.","👨‍👩‍👧‍👦"],
-    ["день","den'","the day","n.","☀️"],
-    ["ніч","nich","the night","n.","🌙"],
-    ["школа","shkóla","the school","n.","🏫"],
-    ["машина","mashýna","the car","n.","🚗"],
-    ["місто","místo","the city","n.","🏙️"],
-    ["книга","knýha","the book","n.","📖"],
-    ["стіл","stil","the table","n.","🪑"],
-    ["вікно","viknó","the window","n.","🪟"],
-    ["двері","dvéri","the door","n.","🚪"],
-    ["кава","káva","the coffee","n.","☕"],
-    ["один","odýn","one","num.","1️⃣"],
-    ["два","dva","two","num.","2️⃣"],
-    ["три","try","three","num.","3️⃣"],
-    ["чотири","chotýry","four","num.","4️⃣"],
-    ["п'ять","pyat'","five","num.","5️⃣"],
-    ["шість","shist'","six","num.","6️⃣"],
-    ["сім","sim","seven","num.","7️⃣"],
-    ["вісім","vísim","eight","num.","8️⃣"],
-    ["дев'ять","dévyat'","nine","num.","9️⃣"],
-    ["десять","désyat'","ten","num.","🔟"],
-    ["червоний","chervónyi","red","adj.","🔴"],
-    ["синій","sýniy","blue","adj.","🔵"],
-    ["зелений","zelényi","green","adj.","🟢"],
-    ["жовтий","zhóvtyi","yellow","adj.","🟡"],
-    ["чорний","chórnyi","black","adj.","⚫"],
-    ["білий","bílyi","white","adj.","⚪"],
-    ["сірий","síryi","grey","adj.","🩶"],
-    ["помаранчевий","pomaránchevyi","orange","adj.","🟠"],
-    ["бути","búty","to be","v.","🧍"],
-    ["мати","máty","to have","v.","🤲"],
-    ["йти","yty","to go","v.","🚶"],
-    ["робити","robýty","to do / make","v.","🛠️"],
-    ["бачити","báchyty","to see","v.","👀"],
-    ["знати","znáty","to know","v.","🧠"],
-    ["могти","mohtý","to be able to","v.","💪"],
-    ["хотіти","khotíty","to want","v.","🎯"],
-    ["приходити","prykhódyty","to come","v.","🏃"],
-    ["брати","bráty","to take","v.","✋"],
-    ["говорити","hovorýty","to speak","v.","🗣️"],
-    ["їсти","yísty","to eat","v.","🍽️"],
-    ["пити","pýty","to drink","v.","🥤"],
-    ["спати","spáty","to sleep","v.","😴"],
-    ["любити","lyubýty","to love / like","v.","❤️"],
-    ["великий","velýkyi","big / tall","adj.","📏"],
-    ["маленький","malén'kyi","small","adj.","🐭"],
-    ["гарний","hárnyi","beautiful","adj.","🌟"],
-    ["красивий","krasývyi","pretty","adj.","🌸"],
-    ["добрий","dóbryi","good","adj.","👍"],
-    ["поганий","pohányi","bad","adj.","👎"],
-    ["щасливий","shchaslývyi","happy","adj.","😊"],
-    ["сумний","sumnýi","sad","adj.","😢"],
-    ["легкий","léhkyi","easy","adj.","😌"],
-    ["важкий","vazhkýi","difficult","adj.","😖"],
-    ["новий","novýi","new","adj.","✨"],
-    ["старий","starýi","old","adj.","🕰️"],
-    ["сьогодні","s'ohódni","today","adv.","📅"],
-    ["завтра","závtra","tomorrow","adv.","🌅"],
-    ["вчора","vchóra","yesterday","adv.","🌇"],
-    ["зараз","záraz","now","adv.","⏱️"],
-    ["ранок","ránok","the morning","n.","🌄"],
-    ["вечір","véchir","the evening","n.","🌆"],
-    ["тиждень","týzhden'","the week","n.","🗓️"],
-    ["місяць","mísyats'","the month / moon","n.","📆"],
-    ["рік","rik","the year","n.","🎊"],
-    ["сонце","sóntse","the sun","n.","☀️"],
-    ["сир","syr","the cheese","n.","🧀"],
-    ["вино","vynó","the wine","n.","🍷"],
-    ["м'ясо","myáso","the meat","n.","🥩"],
-    ["овоч","óvoch","the vegetable","n.","🥦"],
-    ["фрукт","frukt","the fruit","n.","🍎"],
-    ["риба","rýba","the fish","n.","🐟"],
-    ["цукор","tsúkor","the sugar","n.","🍬"],
-    ["сіль","sil'","the salt","n.","🧂"],
-    ["торт","tort","the cake","n.","🎂"],
-    ["суп","sup","the soup","n.","🍲"],
-    ["гроші","hróshi","the money","n.","💰"],
-    ["любов","lyubóv","the love","n.","❤️"],
-    ["музика","múzyka","the music","n.","🎵"],
-    ["гора","horá","the mountain","n.","⛰️"],
-    ["море","móre","the sea","n.","🌊"]
-  ];
-
-  var WORD_MAP = {};
-  WORDS.forEach(function (w) { WORD_MAP[w[0]] = w; });
-
-  var PER_DAY = 5;
-  var CYCLE_LEN = Math.ceil(WORDS.length / PER_DAY);
-
-  // Each day's 5 words are always the same fixed group (grouped by theme in
-  // the list above), so the two practice sentences below can be hand-written
-  // to actually use those words together, instead of generated on the fly.
-  var PHRASE_GROUPS = [
-    [["Добрий день! Каву, будь ласка.","Hello! A coffee, please."],["Так, дуже дякую, до побачення!","Yes, thank you very much, goodbye!"]],
-    [["Привіт! Ласкаво просимо до нас.","Hi! Welcome to our place."],["Вибачте, ні, дякую, до зустрічі!","Excuse me, no thank you, see you soon!"]],
-    [["Кіт і собака граються в домі.","The cat and the dog are playing in the house."],["Я п'ю воду і їм хліб.","I drink water and eat bread."]],
-    [["Час минає швидко, коли ти з сім'єю.","Time passes quickly when you're with family."],["Мій друг любить свою роботу і своє життя в Києві.","My friend loves his job and his life in Kyiv."]],
-    [["Вдень діти їдуть до школи на машині.","During the day, the kids go to school by car."],["Вночі це місто дуже спокійне.","At night, this city is very quiet."]],
-    [["Книга лежить на столі, біля вікна.","The book is on the table, near the window."],["Зачини двері і випий кави.","Close the door and have a coffee."]],
-    [["Один, два, три, чотири, п'ять — я вчуся рахувати!","One, two, three, four, five — I'm learning to count!"],["Є чотири стільці і один стіл на п'ятьох.","There are four chairs and one table for five people."]],
-    [["Шість, сім, вісім, дев'ять, десять — і рахуємо далі!","Six, seven, eight, nine, ten — and we keep counting!"],["Магазин відкривається о восьмій і закривається о десятій.","The shop opens at eight and closes at ten."]],
-    [["Небо синє, трава зелена, а сонце жовте.","The sky is blue, the grass is green and the sun is yellow."],["Вона носить червону сукню і чорні туфлі.","She's wearing a red dress and black shoes."]],
-    [["Учора небо було сірим, але сьогодні я маю помаранчеву шапку.","Yesterday the sky was grey, but today I have an orange hat."],["Мій кіт білий і дуже гарний.","My cat is white and very lovely."]],
-    [["Я збираюся йти робити покупки сьогодні вдень.","I'm going to go do some shopping this afternoon."],["Не знаю, чи можу я прийти побачити тебе.","I don't know if I can come see you."]],
-    [["Хочеш прийти поїсти з нами?","Do you want to come eat with us?"],["Вона любить говорити і брати каву з друзями.","She likes talking and having a coffee with friends."]],
-    [["Я люблю пити каву вранці.","I like drinking a coffee in the morning."],["Великий собака спить біля маленького кота.","The big dog sleeps next to the small cat."]],
-    [["Яка гарна погода! Я дуже щасливий.","What beautiful weather! I'm very happy."],["Цей красивий торт має добрий смак, зовсім не поганий!","This pretty cake tastes good, not bad at all!"]],
-    [["Нелегко прощатися зі старим другом.","It's not easy to say goodbye to an old friend."],["Вона трохи сумна, але її нова робота не важка.","She's a bit sad, but her new job isn't difficult."]],
-    [["Учора йшов дощ; сьогодні гарна погода.","Yesterday it rained; today the weather's nice."],["Мені треба йти зараз, але я повернуся завтра вранці.","I have to leave now, but I'll be back tomorrow morning."]],
-    [["Сонце світить щовечора цього тижня.","The sun shines every evening this week."],["Цей місяць минає швидко; рік теж.","This month is going by fast; so is the year."]],
-    [["Ми їмо сир, м'ясо і овочі.","We're eating cheese, meat and vegetables."],["Червоне вино добре поєднується із солодким фруктом.","Red wine pairs well with a sweet fruit."]],
-    [["Рибі потрібно трохи солі.","The fish needs a bit of salt."],["У цьому торті забагато цукру, але суп ідеальний.","This cake has too much sugar, but the soup is perfect."]],
-    [["Гроші не приносять щастя, а любов і музика — так.","Money doesn't buy happiness, but love and music do."],["Поїдемо в гори чи на море цього літа?","Are we going to the mountains or the sea this summer?"]]
-  ];
-
-  function dayIndexFor(date) {
-    // days since epoch, using local calendar date so it flips at local midnight
-    var utcMidnight = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-    return Math.floor(utcMidnight / 86400000);
-  }
-
-  function groupIndexFor(date) {
-    return dayIndexFor(date) % CYCLE_LEN;
-  }
-
-  function todaysWords(date) {
-    var g = groupIndexFor(date);
-    return WORDS.slice(g * PER_DAY, g * PER_DAY + PER_DAY);
-  }
-
-  // ── speech — lets you pick which installed Ukrainian voice to use, since
-  // quality varies a lot between the system voices browsers ship with ──
-  var VOICE_KEY = 'slovoDnya:voice';
-  var matchingVoices = [];
-  var ukVoice = null;
-  var voicePicker = document.getElementById('voicePicker');
-  var voiceSelect = document.getElementById('voiceSelect');
-
-  // ranks voices so the least robotic one is picked by default — Google's
-  // network voices first, then OS-level "Enhanced"/"Premium"/"Neural"/"Natural"
-  // voices (macOS Spoken Content downloads, Windows/Edge natural voices),
-  // then whatever's left
-  function voiceRank(v) {
-    var name = v.name || '';
-    if (/google/i.test(name)) return 3;
-    if (/neural|natural/i.test(name)) return 2;
-    if (/enhanced|premium/i.test(name)) return 1;
-    return 0;
-  }
-  function loadVoice() {
-    if (!('speechSynthesis' in window)) return;
-    var voices = speechSynthesis.getVoices();
-    matchingVoices = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf('uk') === 0; });
-    matchingVoices.sort(function (a, b) { return voiceRank(b) - voiceRank(a); });
-    if (matchingVoices.length === 0) { ukVoice = null; return; }
-
-    var savedName = null;
-    try { savedName = localStorage.getItem(VOICE_KEY); } catch (e) {}
-    ukVoice = matchingVoices.find(function (v) { return v.name === savedName; }) || matchingVoices[0];
-
-    if (voiceSelect && voiceSelect.options.length !== matchingVoices.length) {
-      voiceSelect.innerHTML = '';
-      matchingVoices.forEach(function (v) {
-        var opt = document.createElement('option');
-        opt.value = v.name;
-        opt.textContent = v.name + ' (' + v.lang + ')';
-        voiceSelect.appendChild(opt);
-      });
-    }
-    if (voiceSelect) voiceSelect.value = ukVoice.name;
-    if (voicePicker && matchingVoices.length > 1) voicePicker.style.display = 'flex';
-  }
-  if (voiceSelect) {
-    voiceSelect.addEventListener('change', function () {
-      ukVoice = matchingVoices.find(function (v) { return v.name === voiceSelect.value; }) || ukVoice;
-      try { localStorage.setItem(VOICE_KEY, voiceSelect.value); } catch (e) {}
-    });
-  }
-  if ('speechSynthesis' in window) {
-    loadVoice();
-    speechSynthesis.onvoiceschanged = loadVoice;
-  }
-
-  function speak(text, btn) {
-    if (!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = 'uk-UA';
-    u.rate = 0.85;
-    if (ukVoice) u.voice = ukVoice;
-    if (btn) {
-      btn.classList.add('playing');
-      u.onend = function () { btn.classList.remove('playing'); };
-      u.onerror = function () { btn.classList.remove('playing'); };
-    }
-    speechSynthesis.speak(u);
-  }
-
-  // ── learned dots (per-day, stored locally) ──
-  var todayKey = 'slovoDnya:' + DayMath.todayISO();
-  function getLearned() {
-    try { return JSON.parse(localStorage.getItem(todayKey) || '[]'); } catch (e) { return []; }
-  }
-  function toggleLearned(word) {
-    var list = getLearned();
-    var idx = list.indexOf(word);
-    if (idx === -1) list.push(word); else list.splice(idx, 1);
-    try { localStorage.setItem(todayKey, JSON.stringify(list)); } catch (e) {}
-    return list;
-  }
-
-  // ── spaced repetition review pool (persists since day one) ──
-  var SRS_KEY = 'slovoDnya:srs';
-
-  function loadSRS() {
-    try { return JSON.parse(localStorage.getItem(SRS_KEY) || '{}'); } catch (e) { return {}; }
-  }
-
-  function saveSRS(srs) {
-    try { localStorage.setItem(SRS_KEY, JSON.stringify(srs)); } catch (e) { /* storage unavailable */ }
-  }
-
-  // Adds a word to the permanent review pool the first time it's marked —
-  // it's due for its first review immediately, so it shows up right away.
-  // Re-marking an already-tracked word never resets its existing progress.
-  function addToReview(fr) {
-    var srs = loadSRS();
-    if (!srs[fr]) {
-      srs[fr] = { interval: 0, repetitions: 0, ease: 2.5, due: DayMath.todayISO(), added: DayMath.todayISO() };
-      saveSRS(srs);
-    }
-  }
-
-  function getDueEntries(srs) {
-    srs = srs || loadSRS();
-    var today = DayMath.todayISO();
-    var list = [];
-    Object.keys(srs).forEach(function (fr) {
-      if (srs[fr].due <= today && WORD_MAP[fr]) {
-        list.push({ fr: fr, word: WORD_MAP[fr], due: srs[fr].due });
-      }
-    });
-    list.sort(function (a, b) { return a.due < b.due ? -1 : (a.due > b.due ? 1 : 0); });
-    return list;
-  }
-
-  // A simplified SM-2 (the same scheduling idea behind apps like Anki):
-  // quality < 3 ("Still learning") resets the interval back to 1 day;
-  // quality >= 3 ("Got it") grows it — 1 day, then 6, then interval*ease,
-  // with the ease factor itself nudged up or down based on how it went.
-  function gradeReview(fr, quality) {
-    var srs = loadSRS();
-    var entry = srs[fr];
-    if (!entry) return;
-
-    if (quality < 3) {
-      entry.repetitions = 0;
-      entry.interval = 1;
-    } else {
-      if (entry.repetitions === 0) entry.interval = 1;
-      else if (entry.repetitions === 1) entry.interval = 6;
-      else entry.interval = Math.round(entry.interval * entry.ease);
-      entry.repetitions += 1;
-      entry.ease = Math.max(1.3, entry.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
-    }
-    entry.due = DayMath.addDays(DayMath.todayISO(), entry.interval);
-    entry.lastReview = DayMath.todayISO();
-    srs[fr] = entry;
-    saveSRS(srs);
-    renderReview();
-  }
-
-  function renderReview() {
-    var container = document.getElementById('reviewSection');
-    if (!container) return;
-    container.innerHTML = '';
-
-    var label = document.createElement('p');
-    label.className = 'review-label';
-    label.textContent = 'Review';
-    container.appendChild(label);
-
-    var srs = loadSRS();
-    var total = Object.keys(srs).length;
-    var due = getDueEntries(srs);
-
-    var stats = document.createElement('p');
-    stats.className = 'review-stats';
-    stats.textContent = total === 0
-      ? 'Words you mark with the dot above join your review pool and start coming back here for spaced review.'
-      : due.length + ' due today · ' + total + ' word' + (total === 1 ? '' : 's') + ' in your review pool';
-    container.appendChild(stats);
-
-    if (total === 0) return;
-
-    if (due.length === 0) {
-      var empty = document.createElement('p');
-      empty.className = 'review-empty';
-      empty.textContent = 'All caught up — nothing due today.';
-      container.appendChild(empty);
-      return;
-    }
-
-    due.forEach(function (item) {
-      var fr = item.fr, w = item.word;
-      var ipa = w[1], en = w[2];
-
-      var card = document.createElement('div');
-      card.className = 'review-card';
-
-      var body = document.createElement('div');
-      body.className = 'review-body';
-      var frEl = document.createElement('p');
-      frEl.className = 'review-fr';
-      frEl.textContent = en;
-      var answerEl = document.createElement('p');
-      answerEl.className = 'review-answer';
-      answerEl.innerHTML = '<span class="review-fr-answer" lang="uk-UA">' + fr + '</span> <span class="review-ipa">' + ipa + '</span>';
-      body.appendChild(frEl);
-      body.appendChild(answerEl);
-
-      var actions = document.createElement('div');
-      actions.className = 'review-actions';
-
-      var revealBtn = document.createElement('button');
-      revealBtn.className = 'review-btn';
-      revealBtn.textContent = 'Show answer';
-      revealBtn.addEventListener('click', function () {
-        answerEl.classList.add('shown');
-        actions.innerHTML = '';
-
-        var pbtn = document.createElement('button');
-        pbtn.className = 'review-play';
-        pbtn.setAttribute('aria-label', 'Play pronunciation of ' + fr);
-        pbtn.innerHTML = '🔊';
-        pbtn.addEventListener('click', function () { speak(fr, pbtn); });
-
-        var againBtn = document.createElement('button');
-        againBtn.className = 'review-btn again';
-        againBtn.textContent = 'Still learning';
-        againBtn.addEventListener('click', function () { gradeReview(fr, 2); });
-
-        var goodBtn = document.createElement('button');
-        goodBtn.className = 'review-btn good';
-        goodBtn.textContent = 'Got it';
-        goodBtn.addEventListener('click', function () { gradeReview(fr, 4); });
-
-        actions.appendChild(pbtn);
-        actions.appendChild(againBtn);
-        actions.appendChild(goodBtn);
-      });
-      actions.appendChild(revealBtn);
-
-      card.appendChild(body);
-      card.appendChild(actions);
-      container.appendChild(card);
-    });
-  }
-
-  function updateStreak() {
-    try {
-      var todayStr = DayMath.todayISO();
-      var last = localStorage.getItem('slovoDnya:lastPracticed');
-      var streak = parseInt(localStorage.getItem('slovoDnya:streak') || '0', 10);
-      var learnedToday = getLearned().length > 0;
-      if (learnedToday && last !== todayStr) {
-        var yesterday = DayMath.addDays(DayMath.todayISO(), -1);
-        streak = (last === yesterday) ? streak + 1 : 1;
-        localStorage.setItem('slovoDnya:streak', String(streak));
-        localStorage.setItem('slovoDnya:lastPracticed', todayStr);
-      }
-      var el = document.getElementById('streakLine');
-      if (streak > 0) {
-        el.textContent = '🔥 ' + streak + '-day streak';
-        el.classList.add('visible');
-      }
-    } catch (e) { /* localStorage unavailable — skip streak */ }
-  }
-
-  function render() {
-    var now = new Date();
-    document.getElementById('dateLine').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-    var words = todaysWords(now);
-    var learned = getLearned();
-    var container = document.getElementById('words');
-    container.innerHTML = '';
-
-    if (!('speechSynthesis' in window)) {
-      var notice = document.createElement('p');
-      notice.className = 'no-speech';
-      notice.textContent = "Your browser doesn't support spoken pronunciation — try Chrome or Safari for audio.";
-      container.appendChild(notice);
-    }
-
-    words.forEach(function (w) {
-      var fr = w[0], ipa = w[1], en = w[2], pos = w[3], icon = w[4];
-      var card = document.createElement('div');
-      card.className = 'word-card';
-
-      var btn = document.createElement('button');
-      btn.className = 'play-btn';
-      btn.setAttribute('aria-label', 'Play pronunciation of ' + fr);
-      btn.innerHTML = '🔊';
-      btn.addEventListener('click', function () { speak(fr, btn); });
-
-      var body = document.createElement('div');
-      body.className = 'word-body';
-      body.innerHTML =
-        '<div class="word-top"><span class="word-fr" lang="uk-UA">' + fr + '</span><span class="word-icon" aria-hidden="true">' + (icon || '') + '</span><span class="word-pos">' + pos + '</span></div>' +
-        '<div class="word-ipa">' + ipa + '</div>' +
-        '<div class="word-en">' + en + '</div>';
-
-      // A real <button>, not a <span>: the dot is the only way to record a
-      // word, and as a span it was unreachable by keyboard and invisible to
-      // screen readers. aria-pressed carries the on/off state, which a class
-      // name alone cannot express.
-      var dot = document.createElement('button');
-      dot.type = 'button';
-      var dotOn = learned.indexOf(fr) !== -1;
-      dot.className = 'learned-dot' + (dotOn ? ' on' : '');
-      dot.setAttribute('aria-pressed', dotOn ? 'true' : 'false');
-      dot.setAttribute('aria-label', 'Mark ' + fr + ' as practiced today');
-      dot.title = 'Mark as practiced today';
-      dot.addEventListener('click', function () {
-        var list = toggleLearned(fr);
-        var isOn = list.indexOf(fr) !== -1;
-        dot.classList.toggle('on', isOn);
-        dot.setAttribute('aria-pressed', isOn ? 'true' : 'false');
-        if (isOn) {
-          addToReview(fr);
-          renderReview();
-        }
-        updateStreak();
-      });
-
-      card.appendChild(btn);
-      card.appendChild(body);
-      card.appendChild(dot);
-      container.appendChild(card);
-    });
-
-    var phrasesContainer = document.getElementById('phrases');
-    phrasesContainer.innerHTML = '';
-    var label = document.createElement('p');
-    label.className = 'phrases-label';
-    label.textContent = 'Try them in a sentence';
-    phrasesContainer.appendChild(label);
-
-    var sentences = PHRASE_GROUPS[groupIndexFor(now)] || [];
-    sentences.forEach(function (pair) {
-      var exampleFr = pair[0], exampleEn = pair[1];
-
-      var item = document.createElement('div');
-      item.className = 'phrase-item';
-
-      var pbtn = document.createElement('button');
-      pbtn.className = 'phrase-play';
-      pbtn.setAttribute('aria-label', 'Play pronunciation of: ' + exampleFr);
-      pbtn.innerHTML = '🔊';
-      pbtn.addEventListener('click', function () { speak(exampleFr, pbtn); });
-
-      var text = document.createElement('div');
-      text.innerHTML =
-        '<p class="phrase-fr" lang="uk-UA">' + exampleFr + '</p>' +
-        '<p class="phrase-en">' + exampleEn + '</p>';
-
-      item.appendChild(pbtn);
-      item.appendChild(text);
-      phrasesContainer.appendChild(item);
-    });
-
-    renderReview();
-    updateStreak();
-  }
-
-  render();
-})();
+LanguagePage.init({
+  prefix: 'slovoDnya',
+  lang: 'uk-UA',
+  words: [
+      ["добрий день","dóbryi den'","hello / good day","phrase","👋"],
+      ["дякую","dyákuyu","thank you","interj.","🙏"],
+      ["будь ласка","bud' láska","please","phrase","🤲"],
+      ["до побачення","do pobáchennya","goodbye","phrase","👋"],
+      ["так","tak","yes","adv.","✅"],
+      ["ні","ni","no","adv.","❌"],
+      ["вибачте","výbachte","sorry / excuse me","interj.","🙇"],
+      ["ласкаво просимо","laskávo prósymo","welcome","phrase","🎉"],
+      ["привіт","pryvít","hi (informal)","interj.","🙋"],
+      ["до зустрічі","do zústrichi","see you soon","phrase","⏳"],
+      ["дім","dim","the house","n.","🏠"],
+      ["кіт","kit","the cat","n.","🐱"],
+      ["собака","sobáka","the dog","n.","🐶"],
+      ["вода","vodá","the water","n.","💧"],
+      ["хліб","khlib","the bread","n.","🍞"],
+      ["час","chas","the time","n.","⏰"],
+      ["життя","zhyttyá","the life","n.","🌱"],
+      ["друг","druh","the friend","n.","🧑‍🤝‍🧑"],
+      ["робота","robóta","the work","n.","💼"],
+      ["сім'я","simjá","the family","n.","👨‍👩‍👧‍👦"],
+      ["день","den'","the day","n.","☀️"],
+      ["ніч","nich","the night","n.","🌙"],
+      ["школа","shkóla","the school","n.","🏫"],
+      ["машина","mashýna","the car","n.","🚗"],
+      ["місто","místo","the city","n.","🏙️"],
+      ["книга","knýha","the book","n.","📖"],
+      ["стіл","stil","the table","n.","🪑"],
+      ["вікно","viknó","the window","n.","🪟"],
+      ["двері","dvéri","the door","n.","🚪"],
+      ["кава","káva","the coffee","n.","☕"],
+      ["один","odýn","one","num.","1️⃣"],
+      ["два","dva","two","num.","2️⃣"],
+      ["три","try","three","num.","3️⃣"],
+      ["чотири","chotýry","four","num.","4️⃣"],
+      ["п'ять","pyat'","five","num.","5️⃣"],
+      ["шість","shist'","six","num.","6️⃣"],
+      ["сім","sim","seven","num.","7️⃣"],
+      ["вісім","vísim","eight","num.","8️⃣"],
+      ["дев'ять","dévyat'","nine","num.","9️⃣"],
+      ["десять","désyat'","ten","num.","🔟"],
+      ["червоний","chervónyi","red","adj.","🔴"],
+      ["синій","sýniy","blue","adj.","🔵"],
+      ["зелений","zelényi","green","adj.","🟢"],
+      ["жовтий","zhóvtyi","yellow","adj.","🟡"],
+      ["чорний","chórnyi","black","adj.","⚫"],
+      ["білий","bílyi","white","adj.","⚪"],
+      ["сірий","síryi","grey","adj.","🩶"],
+      ["помаранчевий","pomaránchevyi","orange","adj.","🟠"],
+      ["бути","búty","to be","v.","🧍"],
+      ["мати","máty","to have","v.","🤲"],
+      ["йти","yty","to go","v.","🚶"],
+      ["робити","robýty","to do / make","v.","🛠️"],
+      ["бачити","báchyty","to see","v.","👀"],
+      ["знати","znáty","to know","v.","🧠"],
+      ["могти","mohtý","to be able to","v.","💪"],
+      ["хотіти","khotíty","to want","v.","🎯"],
+      ["приходити","prykhódyty","to come","v.","🏃"],
+      ["брати","bráty","to take","v.","✋"],
+      ["говорити","hovorýty","to speak","v.","🗣️"],
+      ["їсти","yísty","to eat","v.","🍽️"],
+      ["пити","pýty","to drink","v.","🥤"],
+      ["спати","spáty","to sleep","v.","😴"],
+      ["любити","lyubýty","to love / like","v.","❤️"],
+      ["великий","velýkyi","big / tall","adj.","📏"],
+      ["маленький","malén'kyi","small","adj.","🐭"],
+      ["гарний","hárnyi","beautiful","adj.","🌟"],
+      ["красивий","krasývyi","pretty","adj.","🌸"],
+      ["добрий","dóbryi","good","adj.","👍"],
+      ["поганий","pohányi","bad","adj.","👎"],
+      ["щасливий","shchaslývyi","happy","adj.","😊"],
+      ["сумний","sumnýi","sad","adj.","😢"],
+      ["легкий","léhkyi","easy","adj.","😌"],
+      ["важкий","vazhkýi","difficult","adj.","😖"],
+      ["новий","novýi","new","adj.","✨"],
+      ["старий","starýi","old","adj.","🕰️"],
+      ["сьогодні","s'ohódni","today","adv.","📅"],
+      ["завтра","závtra","tomorrow","adv.","🌅"],
+      ["вчора","vchóra","yesterday","adv.","🌇"],
+      ["зараз","záraz","now","adv.","⏱️"],
+      ["ранок","ránok","the morning","n.","🌄"],
+      ["вечір","véchir","the evening","n.","🌆"],
+      ["тиждень","týzhden'","the week","n.","🗓️"],
+      ["місяць","mísyats'","the month / moon","n.","📆"],
+      ["рік","rik","the year","n.","🎊"],
+      ["сонце","sóntse","the sun","n.","☀️"],
+      ["сир","syr","the cheese","n.","🧀"],
+      ["вино","vynó","the wine","n.","🍷"],
+      ["м'ясо","myáso","the meat","n.","🥩"],
+      ["овоч","óvoch","the vegetable","n.","🥦"],
+      ["фрукт","frukt","the fruit","n.","🍎"],
+      ["риба","rýba","the fish","n.","🐟"],
+      ["цукор","tsúkor","the sugar","n.","🍬"],
+      ["сіль","sil'","the salt","n.","🧂"],
+      ["торт","tort","the cake","n.","🎂"],
+      ["суп","sup","the soup","n.","🍲"],
+      ["гроші","hróshi","the money","n.","💰"],
+      ["любов","lyubóv","the love","n.","❤️"],
+      ["музика","múzyka","the music","n.","🎵"],
+      ["гора","horá","the mountain","n.","⛰️"],
+      ["море","móre","the sea","n.","🌊"]
+  ],
+  // Each day serves one fixed group of five words, so these two practice
+  // sentences are hand-written to actually use that group together rather
+  // than generated. Group N here pairs with words N*5 .. N*5+4 above.
+  phrases: [
+      [["Добрий день! Каву, будь ласка.","Hello! A coffee, please."],["Так, дуже дякую, до побачення!","Yes, thank you very much, goodbye!"]],
+      [["Привіт! Ласкаво просимо до нас.","Hi! Welcome to our place."],["Вибачте, ні, дякую, до зустрічі!","Excuse me, no thank you, see you soon!"]],
+      [["Кіт і собака граються в домі.","The cat and the dog are playing in the house."],["Я п'ю воду і їм хліб.","I drink water and eat bread."]],
+      [["Час минає швидко, коли ти з сім'єю.","Time passes quickly when you're with family."],["Мій друг любить свою роботу і своє життя в Києві.","My friend loves his job and his life in Kyiv."]],
+      [["Вдень діти їдуть до школи на машині.","During the day, the kids go to school by car."],["Вночі це місто дуже спокійне.","At night, this city is very quiet."]],
+      [["Книга лежить на столі, біля вікна.","The book is on the table, near the window."],["Зачини двері і випий кави.","Close the door and have a coffee."]],
+      [["Один, два, три, чотири, п'ять — я вчуся рахувати!","One, two, three, four, five — I'm learning to count!"],["Є чотири стільці і один стіл на п'ятьох.","There are four chairs and one table for five people."]],
+      [["Шість, сім, вісім, дев'ять, десять — і рахуємо далі!","Six, seven, eight, nine, ten — and we keep counting!"],["Магазин відкривається о восьмій і закривається о десятій.","The shop opens at eight and closes at ten."]],
+      [["Небо синє, трава зелена, а сонце жовте.","The sky is blue, the grass is green and the sun is yellow."],["Вона носить червону сукню і чорні туфлі.","She's wearing a red dress and black shoes."]],
+      [["Учора небо було сірим, але сьогодні я маю помаранчеву шапку.","Yesterday the sky was grey, but today I have an orange hat."],["Мій кіт білий і дуже гарний.","My cat is white and very lovely."]],
+      [["Я збираюся йти робити покупки сьогодні вдень.","I'm going to go do some shopping this afternoon."],["Не знаю, чи можу я прийти побачити тебе.","I don't know if I can come see you."]],
+      [["Хочеш прийти поїсти з нами?","Do you want to come eat with us?"],["Вона любить говорити і брати каву з друзями.","She likes talking and having a coffee with friends."]],
+      [["Я люблю пити каву вранці.","I like drinking a coffee in the morning."],["Великий собака спить біля маленького кота.","The big dog sleeps next to the small cat."]],
+      [["Яка гарна погода! Я дуже щасливий.","What beautiful weather! I'm very happy."],["Цей красивий торт має добрий смак, зовсім не поганий!","This pretty cake tastes good, not bad at all!"]],
+      [["Нелегко прощатися зі старим другом.","It's not easy to say goodbye to an old friend."],["Вона трохи сумна, але її нова робота не важка.","She's a bit sad, but her new job isn't difficult."]],
+      [["Учора йшов дощ; сьогодні гарна погода.","Yesterday it rained; today the weather's nice."],["Мені треба йти зараз, але я повернуся завтра вранці.","I have to leave now, but I'll be back tomorrow morning."]],
+      [["Сонце світить щовечора цього тижня.","The sun shines every evening this week."],["Цей місяць минає швидко; рік теж.","This month is going by fast; so is the year."]],
+      [["Ми їмо сир, м'ясо і овочі.","We're eating cheese, meat and vegetables."],["Червоне вино добре поєднується із солодким фруктом.","Red wine pairs well with a sweet fruit."]],
+      [["Рибі потрібно трохи солі.","The fish needs a bit of salt."],["У цьому торті забагато цукру, але суп ідеальний.","This cake has too much sugar, but the soup is perfect."]],
+      [["Гроші не приносять щастя, а любов і музика — так.","Money doesn't buy happiness, but love and music do."],["Поїдемо в гори чи на море цього літа?","Are we going to the mountains or the sea this summer?"]]
+  ]
+});
 </script>
 </body>
 </html>
