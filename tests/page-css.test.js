@@ -92,6 +92,38 @@ test('.wrap max-width is unchanged on every page', () => {
   }
 });
 
+// --- shared stylesheet is linked ------------------------------------------
+
+const LINK = '<link rel="stylesheet" href="assets/css/site.css">';
+
+test('every page links the shared stylesheet', () => {
+  for (const page of PAGES) {
+    assert.ok(readPage(page).includes(LINK),
+      `${page} does not link ${LINK}`);
+  }
+});
+
+// Order is load-bearing. site.css must come FIRST so that a page rule with the
+// same specificity still wins; reverse them and every inline override dies.
+test('site.css is linked before the page\'s own <style>', () => {
+  for (const page of PAGES) {
+    const src = readPage(page);
+    const link = src.indexOf(LINK);
+    const style = src.indexOf('<style>');
+    assert.ok(link !== -1 && style !== -1, `${page} is missing the link or <style>`);
+    assert.ok(link < style,
+      `${page} links site.css AFTER its <style> block; inline rules would ` +
+      `stop overriding the shared ones`);
+  }
+});
+
+test('no page links the shared stylesheet twice', () => {
+  for (const page of PAGES) {
+    const n = readPage(page).split(LINK).length - 1;
+    assert.equal(n, 1, `${page} links site.css ${n} times, expected exactly 1`);
+  }
+});
+
 // body font-size is set on 10 of 12 pages. index and snake omit it on purpose:
 // index is a centred flex illustration, snake sizes its own board. Promoting
 // 18px into site.css would have resized every unsized child on those two.
