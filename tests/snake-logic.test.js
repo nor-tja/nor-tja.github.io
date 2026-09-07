@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const { canTurn, selfCollides, readBest, writeBest } = require('../assets/js/snake-logic.js');
+const { readPage } = require('./helpers');
 
 const UP = { x: 0, y: -1 }, DOWN = { x: 0, y: 1 };
 const LEFT = { x: -1, y: 0 }, RIGHT = { x: 1, y: 0 };
@@ -79,4 +80,28 @@ test('module survives when storage property access throws (Safari private browsi
       delete globalThis.localStorage;
     }
   }
+});
+
+// Regression guard for the real defect, which lived at the CALL SITE and not in
+// this module. snake.html originally read localStorage unguarded at IIFE scope;
+// the first attempt at a fix moved the try/catch into readBest() but still wrote
+// `readBest(window.localStorage)`, so the property access was still evaluated
+// outside the guard. In Safari private browsing, Chrome with cookies blocked, or
+// a sandboxed iframe, that access throws SecurityError and the whole IIFE dies —
+// the game never initialises.
+//
+// A unit test on this module cannot catch that: readBest() with no argument
+// returns 0 whether or not the bug is present. The invariant has to be asserted
+// against the page source. All storage access goes through snake-logic.js, which
+// guards the property access, so the page itself must never name localStorage.
+test('snake.html never references localStorage directly', () => {
+  const src = readPage('snake.html');
+  const hits = src.match(/localStorage/g) || [];
+  assert.equal(
+    hits.length, 0,
+    `snake.html references localStorage ${hits.length}x. Even as an argument ` +
+    `(readBest(window.localStorage)) the property access is evaluated outside ` +
+    `the guard and throws in Safari private browsing. Use SnakeLogic.readBest() ` +
+    `/ writeBest(score) and let the module resolve storage inside its try/catch.`
+  );
 });
