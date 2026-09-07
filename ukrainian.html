@@ -530,7 +530,7 @@
       frEl.textContent = en;
       var answerEl = document.createElement('p');
       answerEl.className = 'review-answer';
-      answerEl.innerHTML = '<span class="review-fr-answer">' + fr + '</span> <span class="review-ipa">' + ipa + '</span>';
+      answerEl.innerHTML = '<span class="review-fr-answer" lang="uk-UA">' + fr + '</span> <span class="review-ipa">' + ipa + '</span>';
       body.appendChild(frEl);
       body.appendChild(answerEl);
 
@@ -622,7 +622,7 @@
       var body = document.createElement('div');
       body.className = 'word-body';
       body.innerHTML =
-        '<div class="word-top"><span class="word-fr">' + fr + '</span><span class="word-icon" aria-hidden="true">' + (icon || '') + '</span><span class="word-pos">' + pos + '</span></div>' +
+        '<div class="word-top"><span class="word-fr" lang="uk-UA">' + fr + '</span><span class="word-icon" aria-hidden="true">' + (icon || '') + '</span><span class="word-pos">' + pos + '</span></div>' +
         '<div class="word-ipa">' + ipa + '</div>' +
         '<div class="word-en">' + en + '</div>';
 
@@ -668,7 +668,7 @@
 
       var text = document.createElement('div');
       text.innerHTML =
-        '<p class="phrase-fr">' + exampleFr + '</p>' +
+        '<p class="phrase-fr" lang="uk-UA">' + exampleFr + '</p>' +
         '<p class="phrase-en">' + exampleEn + '</p>';
 
       item.appendChild(pbtn);
