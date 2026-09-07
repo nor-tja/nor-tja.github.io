@@ -1,0 +1,96 @@
+/* Shared foundation for katjanorstad.no.
+ *
+ * Linked immediately BEFORE each page's own <style> block, so a page rule of
+ * equal specificity still wins. Only rules proven identical (or with an
+ * identical shared half) across all 12 pages live here.
+ *
+ * Deliberately NOT here, because measurement showed they differ for real:
+ *   .wrap            4 layout widths: 860 / 780 / 640 / 520px
+ *   footer padding   4 values
+ *   body font-size   set on 10 of 12; index and snake omit it on purpose
+ * See docs/superpowers/specs/2026-09-07-design-refinement-design.md
+ */
+
+:root {
+  --bg: #f5f2ed;
+  --ink: #1a1814;
+  --muted: #6e6963;
+  --accent: #9a2a2a;
+  --line: #d8d3cc;
+
+  /* One scale replacing 47 ad-hoc font-size values. Headings keep their
+     clamp() rules and are not tokenised. */
+  --fs-3xs: .65rem;
+  --fs-2xs: .7rem;
+  --fs-xs: .8rem;
+  --fs-sm: .875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.1rem;
+  --fs-lg: 1.2rem;
+  --fs-xl: 1.3rem;
+  --fs-2xl: 1.5rem;
+  --fs-3xl: 1.6rem;
+  --fs-body: 18px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* The universal core only. font-size and line-height stay on the pages that
+   set them, because index.html and snake.html deliberately do not. */
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  min-height: 100vh;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-family: 'DM Mono', monospace;
+  font-size: var(--fs-3xs);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 1.8rem 0 0;
+  transition: color .2s;
+}
+.back:hover { color: var(--accent); }
+
+.eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: var(--fs-2xs);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+/* text-align is unanimous across all 11 pages with a footer; padding is not. */
+footer { text-align: center; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Durations collapse to .01ms rather than `animation: none`. Elements that
+   start at opacity:0 are revealed BY the animation; disabling it outright
+   would leave them invisible for exactly the users who asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
