@@ -16,7 +16,7 @@
 - **JPEG only, no WebP.** `sips` can read WebP but only *write* JPEG (`sips --formats` marks only `public.jpeg` Writable), and `cwebp` is not installed. WebP is deferred to a follow-up gated on `brew install webp`; it would save roughly a further 30KB on one image.
 - **Palette (unchanged this phase):** `--bg:#f5f2ed`, `--ink:#1a1814`, `--muted:#7a7570`, `--accent:#9a2a2a`, `--line:#d8d3cc`. The `--muted` contrast fix is Phase 3.
 - **Fonts:** Cormorant Garamond + DM Mono, via Google Fonts.
-- **Run all tests with:** `node --test tests/`
+- **Run all tests with:** `node --test` (bare, from the repo root — it auto-discovers `tests/*.test.js`). Not `node --test tests/`: on Node 26 a positional directory is resolved as a module and fails with `MODULE_NOT_FOUND`.
 - **Commit after every task.** Never `git add -A` — stage explicit paths.
 
 ---
