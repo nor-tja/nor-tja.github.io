@@ -39,24 +39,47 @@ colour.
 ### Shared rules are not textually identical
 
 An early assumption — that the shared furniture could be lifted verbatim — was
-checked and found false. The rules fall into two formatting styles:
+checked and found false. Each candidate rule was extracted from all 12 pages by
+brace-matching, normalised (whitespace collapsed, declarations sorted), and
+grouped. Results:
 
-- `.back`, `.eyebrow`, `@keyframes rise`: minified one-liners on the language /
-  coffee / pomodoro / resources pages, expanded multi-line on `cv` and `snake`.
-  **Semantically equivalent**; safe to unify.
-- `footer`: splits into two halves. `text-align: center` is **unanimous** across
-  all 11 pages that have a footer rule. `padding` is **genuinely different** and
-  has no majority worth calling a default:
+| Rule | Distinct meanings | Verdict |
+|---|---|---|
+| `:root` — the 5 palette vars | **1** across all 12 | **extract** |
+| `.back` | **1** (3 spellings: `0.65rem`/`.65rem`, `'DM Mono', monospace`/`'DM Mono',monospace`) | **extract** |
+| `.back:hover` | **1** across 11 | **extract** |
+| `.eyebrow` | **2** — 10 pages agree; `cv` adds `animation:rise`, `opacity:0`, `margin-bottom:1.4rem` | extract the common rule; **`cv` keeps an override** |
+| `@keyframes rise` | **2** — `translateY(16px)` on 11, **`18px` on `cv`** | extract the 16px form; **`cv` keeps its own** |
+| `body` | **4** — but 5 declarations are universal | **extract only the universal core** |
+| `footer` | `text-align:center` unanimous; `padding` splits 4 ways | **extract `text-align` only** |
+| `.wrap` | **4 real layout widths** | **stays local — not shared at all** |
 
-  | Padding | Pages |
-  |---|---|
-  | `1rem 0 1rem` | `languages`, `mots-du-jour`, `japanese`, `spanish`, `portuguese`, `ukrainian` (6) |
-  | `2.5rem 0` | `cv`, `coffee`, `resources` (3) |
-  | `3rem 0 1rem` | `pomodoro` (1) |
-  | `3rem 0 0` | `snake` (1) |
+Three of these were assumed shared and are not:
 
-- `index.html` has none of this furniture: no `.back`, no `.eyebrow`, no `footer`
-  rule.
+- **`.wrap` is not shared.** `max-width` is `860px` (coffee, resources),
+  `780px` (cv), `640px` (7 language/pomodoro pages), `520px` (snake), and
+  padding varies too (`0 2rem` / `0 2rem 4rem` / `0 2rem 3rem`). Only
+  `margin: 0 auto` is common, which is not worth a shared rule. Extracting
+  `.wrap` would have changed the column width of nine pages.
+- **`cv.html`'s `@keyframes rise` travels 18px, not 16px.** Keyframes cannot be
+  partially overridden — a local `@keyframes rise` replaces the shared one
+  wholesale — so `cv` simply keeps its own copy.
+- **`pomodoro.html`'s `:root` carries 6 extra variables** (`--amber-1/2/3`,
+  `--blue-1/2/3`) for its hourglass. Its 5 palette vars match everyone else's.
+  The extra six stay local; the `no-local-palette` test must therefore assert on
+  the 5 palette names specifically, not on "`:root` is absent".
+
+`footer` padding distribution, for the record:
+
+| Padding | Pages |
+|---|---|
+| `1rem 0 1rem` | `languages`, `mots-du-jour`, `japanese`, `spanish`, `portuguese`, `ukrainian` (6) |
+| `2.5rem 0` | `cv`, `coffee`, `resources` (3) |
+| `3rem 0 1rem` | `pomodoro` (1) |
+| `3rem 0 0` | `snake` (1) |
+
+`index.html` is the outlier throughout: no `.back`, no `.eyebrow`, no `footer`,
+no `.wrap`, and a `body` that is a centred flex container rather than a document.
 
 Extraction must therefore compare semantics, not bytes — and must split rules
 that are only *partly* shared, rather than forcing a default onto a property
@@ -85,19 +108,30 @@ that genuinely varies.
 
 ### 1. `assets/css/site.css`
 
-A single stylesheet linked by all 12 pages, holding **only** what is genuinely
-shared:
+A single stylesheet linked by all 12 pages, holding **only** what the
+measurement above proved is genuinely shared:
 
-- the `:root` palette and the new `--fs-*` type tokens
-- `*, *::before, *::after { box-sizing }` reset
-- base `body` and `.wrap`
-- `.back`, `.eyebrow`
+- the 5 `:root` palette vars and the 11 new `--fs-*` type tokens
+- `*, *::before, *::after { box-sizing: border-box }`
+- `body` — **the universal core only**: `background`, `color`, `font-family`,
+  `font-weight`, `min-height`
+- `.back`, `.back:hover`, `.eyebrow`
 - `footer { text-align: center; }` — the unanimous half only
-- `@keyframes rise`
+- `@keyframes rise` — the `translateY(16px)` form
 - `:focus-visible` rules
 - the `prefers-reduced-motion` block
 
-Page-specific layout stays in each page's inline `<style>`.
+Everything else stays in each page's inline `<style>`, including four things
+that look shared but are not: `.wrap`, `footer` padding, `body`'s
+`font-size`/`line-height`, and the per-page overrides for `cv`'s `.eyebrow` and
+`@keyframes rise`.
+
+**Why `body`'s `font-size: 18px; line-height: 1.7` stays local.** Ten pages set
+it; `index` and `snake` deliberately do not. Promoting it to `site.css` would
+newly apply 18px and 1.7 to those two pages, resizing every child that has no
+explicit size — a visible change on two pages, which contradicts goal 5. The
+cost of leaving it is two duplicated declarations on ten pages. That is the
+cheaper error.
 
 **Link placement.** Immediately before the page's first `<style>` tag, so inline
 rules still win on specificity ties. Inserted idempotently by extending
@@ -279,10 +313,11 @@ to be broken; that is the specific failure mode being guarded against here.
 |---|---|
 | `contrast` | `--muted` vs `--bg` ≥ 4.5:1, **computed from the hex values** via WCAG relative luminance — not a string comparison against `#6e6963`, which would pass for any wrong-but-expected colour |
 | `type-scale` | Every `font-size` in every page resolves to a `--fs-*` token, except the five named exclusions above — which are asserted **individually and by exact selector**, so removing one from the page does not silently widen the exemption |
-| `no-local-palette` | No page redefines `--bg`/`--ink`/`--muted`/`--accent`/`--line` in its own `<style>` |
-| `footer-padding` | Each page's `footer` padding still equals the value recorded in the table above — the specific regression that a shared-default footer would have caused |
+| `no-local-palette` | No page redefines the **5 palette names** `--bg`/`--ink`/`--muted`/`--accent`/`--line` in its own `<style>`. Asserted per-name, not as "`:root` is absent" — `pomodoro.html` legitimately keeps `--amber-1/2/3` and `--blue-1/2/3` |
+| `footer-padding` | Each page's `footer` padding still equals the value recorded in the table above — the specific regression a shared-default footer would have caused |
+| `wrap-widths` | `.wrap` `max-width` is still `860px` on coffee/resources, `780px` on cv, `640px` on the 7 language+pomodoro pages, `520px` on snake. Pins the nine-page column-width regression that extracting `.wrap` would have caused |
 | `stylesheet-linked` | All 12 pages link `assets/css/site.css`, and it precedes the inline `<style>` |
-| `no-duplicate-furniture` | No page still defines `.back`, `.eyebrow` or `@keyframes rise` in its own `<style>`. Without this, extraction could "succeed" while every page kept its copy — the link added, nothing actually deduplicated |
+| `no-duplicate-furniture` | No page still defines `.back` or `.back:hover` locally, and no page but `cv.html` defines `.eyebrow` or `@keyframes rise`. Without this, extraction could "succeed" while every page kept its copy — the link added, nothing actually deduplicated. The two `cv` exemptions are named explicitly, so they cannot silently widen |
 | `focus-visible` | `site.css` defines a `:focus-visible` rule with a visible outline |
 | `reduced-motion` | `site.css` contains a `prefers-reduced-motion` block, and it does **not** use `animation: none` |
 | `lang-attrs` | Target-language text on the five language pages carries the correct `lang` |
