@@ -329,3 +329,40 @@ test('the site nav is furniture, not content, and sits outside main', () => {
       `to be what you skip TO; it must not contain the nav you are skipping.`);
   }
 });
+
+// The eight interactive pages carry a <noscript> note saying what will not
+// work. Written straight after <main>, it landed above the <h1>: with
+// JavaScript off, the first thing on the page was a caveat about a page you
+// had not been told the name of yet.
+test('the no-JS note comes after the heading it is a caveat about', () => {
+  for (const page of PAGES) {
+    const src = readPage(page);
+    const note = src.indexOf('<noscript');
+    if (note === -1) continue;
+    const h1 = src.indexOf('<h1');
+    assert.ok(h1 !== -1, `${page} has a no-JS note but no <h1>`);
+    assert.ok(note > h1,
+      `${page} shows its no-JS note before the <h1>, so a reader with ` +
+      `JavaScript off is told what is missing before being told what the ` +
+      `page is`);
+  }
+});
+
+// Placing the note at the top also made its copy wrong, because the copy
+// describes what is missing by pointing at it. coffee.html said "the four
+// figures above" with nothing above it at all.
+//
+// The other false claim in that batch -- "there is nothing below this line",
+// on five pages that render a static "How this works" section below the line
+// -- is not reachable by a regex and was fixed by rewriting the sentence. The
+// general lesson is the one this test can hold: after the header, everything
+// the note is about is below it, so a note that says "above" is wrong.
+test('the no-JS notes do not point at things that are not there', () => {
+  for (const page of PAGES) {
+    const m = /<noscript>([\s\S]*?)<\/noscript>/.exec(readPage(page));
+    if (!m) continue;
+    assert.ok(!/\babove\b/i.test(m[1]),
+      `${page}'s no-JS note points "above" itself, where there is nothing ` +
+      `but the page heading`);
+  }
+});
