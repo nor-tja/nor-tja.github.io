@@ -80,7 +80,12 @@ const WRAP_MAX_WIDTH = {
   'portuguese.html': '640px',
   'spanish.html': '640px',
   'ukrainian.html': '640px',
-  'snake.html': '520px',
+  // Was 520, the only page narrower than the rest, which left the shared
+  // seven-item footer nav 448px to fit ~500px of links: SNAKE wrapped onto a
+  // line of its own here and nowhere else on the site. Now 640 like the other
+  // seven. The board did not grow with it -- see .board-frame's max-width in
+  // snake.html, which pins the canvas to the 448 it always drew at.
+  'snake.html': '640px',
   // index.html has no .wrap.
 };
 

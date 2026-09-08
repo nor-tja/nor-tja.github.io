@@ -34,7 +34,18 @@
   <script src="assets/js/snake-logic.js"></script>
   <link rel="stylesheet" href="assets/css/site.css">
   <style>
-    .wrap { max-width: 520px; margin: 0 auto; padding: 0 2rem 3rem; }
+    /* 640 to match languages.html, the other narrow page, rather than the 520
+       this used to be. The footer nav is shared furniture and does not know
+       what page it is on: seven items need about 500px, and 520 minus 2rem of
+       padding each side left 448, so SNAKE alone dropped to a second line here
+       and nowhere else. Measured by rendering the nav at 448/528/568/628 --
+       448 wraps, 528 fits by a hair, 568 fits with room.
+
+       The board does not grow with it. The canvas is width:100%, so the column
+       width WAS the board size; .board-frame is capped at the 448 it has
+       always drawn at so the game looks exactly as it did. Widening the column
+       was to fix the footer, not to resize the game. */
+    .wrap { max-width: 640px; margin: 0 auto; padding: 0 2rem 3rem; }
 
     header {
       padding: 2rem 0 2.4rem;
@@ -47,6 +58,8 @@
       opacity: 0; animation: rise .9s ease forwards .3s;
     }
     .board-frame {
+      max-width: 448px;
+      margin: 0 auto;
       border: 1px solid var(--line);
       border-radius: 4px;
       padding: 14px;
@@ -130,7 +143,11 @@
 <body>
 <div class="wrap">
   <a href="index.html" class="back">← Back</a>
+  <main>
 
+  <noscript>
+    <p class="noscript-note">The game runs in the browser, so with JavaScript turned off the board below stays empty.</p>
+  </noscript>
   <header>
     <p class="eyebrow">A small diversion</p>
     <h1>Snake, for <em>old time's sake</em></h1>
@@ -138,13 +155,20 @@
 
   <section class="board-section">
     <div class="board-frame">
-      <canvas id="game" width="220" height="220"></canvas>
+      <!-- A canvas with no label announces itself as the word "canvas" and
+           nothing else. The game is unavoidably visual, so this does not make
+           it playable without sight; it makes it identifiable, which is the
+           difference between "there is a game here I cannot play" and an
+           unexplained blank. Score and best are real text in .hud below, and
+           #msg is a live region so "Game over" is actually spoken. -->
+      <canvas id="game" width="220" height="220"
+              aria-label="Snake game board"></canvas>
       <div class="hud">
         <span>Score: <span id="score" class="accent">0</span></span>
         <span>Best: <span id="best" class="accent">0</span></span>
       </div>
     </div>
-    <p class="msg" id="msg">Press an arrow key or tap a button to start</p>
+    <p class="msg" id="msg" role="status" aria-live="polite">Press an arrow key or tap a button to start</p>
     <div class="pad">
       <button id="up" aria-label="Up">↑</button>
       <button id="left" aria-label="Left">←</button>
@@ -154,6 +178,7 @@
     <p class="hint">Arrow keys / WASD to play · Space to pause</p>
   </section>
 
+  </main>
   <footer>
     <nav class="sitenav" aria-label="Site">
       <a href="index.html">Home</a>

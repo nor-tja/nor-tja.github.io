@@ -257,6 +257,26 @@ footer { text-align: center; }
   border-radius: 2px;
 }
 
+/* Four of these pages are the tool, not a description of the tool: the word
+   lists, the timer, the board and the coffee figures are all built in the
+   browser. With scripting off they do not degrade, they just stop -- a
+   heading and then nothing. There is no build step here and no server, so
+   the content cannot be pre-rendered into the HTML; the honest fix is to say
+   so rather than leave someone looking at a blank page wondering whether it
+   is still loading. Not on cv/resources/languages/index: those are written
+   out in HTML and read the same either way. */
+.noscript-note {
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--ink);
+  background: #efe9df;
+  border-left: 3px solid var(--accent);
+  padding: .9rem 1.1rem;
+  margin: 1.5rem 0;
+  border-radius: 2px;
+}
+
 /* Durations collapse to .01ms rather than `animation: none`. Elements that
    start at opacity:0 are revealed BY the animation; disabling it outright
    would leave them invisible for exactly the users who asked for less motion. */
