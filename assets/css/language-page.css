@@ -33,7 +33,7 @@
     .streak.visible { opacity:1; }
 
     .voice-picker { margin-top:.9rem; display:none; align-items:center; gap:.5rem; font-family: var(--font-ui); font-size: var(--fs-4xs); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
-    .voice-picker select { font-family: var(--font-serif); font-size: var(--fs-sm); background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:2px; padding:.3rem .5rem; max-width:230px; }
+    .voice-picker select { font-family: var(--font-serif); font-size: var(--fs-sm); background:var(--bg); color:var(--ink); border:1px solid var(--line-strong); border-radius:2px; padding:.3rem .5rem; max-width:230px; }
 
     .words { padding:2.2rem 0; display:flex; flex-direction:column; }
     .word-card {
@@ -85,7 +85,7 @@
 
     .learned-dot {
       position:relative; flex-shrink:0; width:9px; height:9px; border-radius:50%;
-      border:1px solid var(--line); background:none; padding:0; appearance:none; -webkit-appearance:none;
+      border:1px solid var(--line-strong); background:none; padding:0; appearance:none; -webkit-appearance:none;
       cursor:pointer; transition:background .25s,border-color .25s;
     }
     /* The ring stays 9px; this invisible overlay is the thing you actually
@@ -106,7 +106,7 @@
     .review-empty { font-size: var(--fs-sm); color:var(--muted); font-style:italic; padding:.6rem 0 1.2rem; }
     .review-card { display:flex; align-items:center; gap:.8rem; padding:1rem 0; border-bottom:1px solid var(--line); }
     .review-card:last-child { border-bottom:none; }
-    .review-play { flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size: var(--fs-base); transition:all .2s; }
+    .review-play { flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--line-strong); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size: var(--fs-base); transition:all .2s; }
     .review-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
     .review-play.playing { background:var(--accent); color:#fdf9f2; }
     .review-body { flex:1; min-width:0; }
@@ -118,7 +118,7 @@
     .review-actions { flex-shrink:0; display:flex; gap:.5rem; }
     .review-btn {
       font-family: var(--font-ui); font-size: var(--fs-4xs); letter-spacing:.06em; text-transform:uppercase;
-      padding:.5rem .75rem; border-radius:999px; cursor:pointer; border:1px solid var(--line);
+      padding:.5rem .75rem; border-radius:999px; cursor:pointer; border:1px solid var(--line-strong);
       background:transparent; color:var(--ink); transition:all .2s; white-space:nowrap;
     }
     .review-btn:hover { border-color:var(--accent); color:var(--accent); }
@@ -128,7 +128,7 @@
     .phrases-label { font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:1.2rem; }
     .phrase-item { display:flex; align-items:flex-start; gap:.9rem; padding:1rem 0; border-bottom:1px solid var(--line); }
     .phrase-item:last-child { border-bottom:none; }
-    .phrase-play { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size: var(--fs-sm); transition:all .2s; margin-top:.1rem; }
+    .phrase-play { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1px solid var(--line-strong); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size: var(--fs-sm); transition:all .2s; margin-top:.1rem; }
     .phrase-play:hover { border-color:var(--accent); background:var(--accent); color:#fdf9f2; }
     .phrase-play.playing { background:var(--accent); color:#fdf9f2; }
     .phrase-fr { font-size: var(--fs-md); }
