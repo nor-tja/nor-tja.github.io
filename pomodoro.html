@@ -355,6 +355,7 @@
   let isRunning = false;
   let flipped = false;          // false = amber on top (focus), true = blue on top (break)
   let timerId = null;
+  let transitionId = null;      // the 550ms flip; held so Reset can cancel it
   let audioCtx = null;
   let endTime = null;           // wall-clock ms timestamp the current session ends at (only meaningful while running)
 
@@ -1012,7 +1013,13 @@
     flipped = !flipped;
     rotor.classList.toggle('flipped', flipped);
 
-    setTimeout(() => {
+    // Held so reset() can cancel it. Without the handle this fires 550ms later
+    // no matter what happened in between, and what happens in between is
+    // exactly when someone reaches for Reset: the pling has gone, the glass is
+    // turning, and they decide against the break. Reset would draw Focus 25:00
+    // and then this would quietly replace it with the break half a second on.
+    transitionId = setTimeout(() => {
+      transitionId = null;
       cycle.finishTransition();
       startSession(upcoming, true);
       if (isRunning) timerId = setInterval(tick, 250);
@@ -1065,6 +1072,8 @@
 
   function reset() {
     pause();
+    clearTimeout(transitionId);
+    transitionId = null;
     flipped = false;
     rotor.classList.remove('flipped');
     cycle.reset();

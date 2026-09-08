@@ -232,14 +232,24 @@
     draw();
   }
 
+  // Returns false when the board is full, which is the win. See pickFood in
+  // assets/js/snake-logic.js for why the placing moved out of here.
   function placeFood() {
-    while (true) {
-      const f = { x: Math.floor(Math.random() * cols), y: Math.floor(Math.random() * rows) };
-      if (!snake.some(s => s.x === f.x && s.y === f.y)) {
-        food = f;
-        return;
-      }
+    const f = SnakeLogic.pickFood(snake, cols, rows, Math.random);
+    if (!f) return false;
+    food = f;
+    return true;
+  }
+
+  function win() {
+    running = false;
+    clearTimeout(timer);
+    if (score > best) {
+      best = score;
+      SnakeLogic.writeBest(best);
+      bestEl.textContent = best;
     }
+    msgEl.textContent = 'You filled the board — press a key to play again';
   }
 
   function start() {
@@ -273,7 +283,7 @@
       score += 10;
       scoreEl.textContent = score;
       if (speed > 70) speed -= 3;
-      placeFood();
+      if (!placeFood()) return win();
     } else {
       snake.pop();
     }
