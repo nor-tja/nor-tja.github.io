@@ -65,29 +65,53 @@
   var voicePicker = document.getElementById('voicePicker');
   var voiceSelect = document.getElementById('voiceSelect');
 
-  // ranks voices so the least robotic one is picked by default — Google's
-  // network voices first, then OS-level "Enhanced"/"Premium"/"Neural"/"Natural"
-  // voices (macOS Spoken Content downloads, Windows/Edge natural voices),
-  // then whatever's left
+  // Ranks voices so the least robotic one is picked by default. Nobody arrives
+  // at a vocabulary page wanting to audition four French voices first, and the
+  // good ones are never the default: on a Mac the stock choice is a compact
+  // voice from the 2000s while the Premium download sits one tier up, and in
+  // Chrome the best voice on offer is Google's.
+  //
+  //   3  Google. Chrome's, and the reason this ranking exists.
+  //   2  "Neural"/"Natural" -- Edge's online voices, Windows 11's local ones.
+  //   1  "Enhanced"/"Premium" -- the macOS Spoken Content downloads.
+  //   1  anything else the browser reports as non-local, since a voice worth
+  //      the round trip is generally worth more than a compact local one.
+  //   0  the rest.
   function voiceRank(v) {
     var name = v.name || '';
     if (/google/i.test(name)) return 3;
     if (/neural|natural/i.test(name)) return 2;
     if (/enhanced|premium/i.test(name)) return 1;
+    if (v.localService === false) return 1;
     return 0;
+  }
+  // Quality first, accent second. A Québécois voice that sounds like a person
+  // beats a Parisian one that sounds like a station announcement -- but with
+  // quality equal, a French page should sound French. Nothing decided this
+  // before: equal ranks kept getVoices() order, and on a stock Mac that order
+  // hands a fr-FR page Amélie, who is fr-CA.
+  function voiceScore(v) {
+    var exact = (v.lang || '').toLowerCase().replace('_', '-') === LANG.toLowerCase();
+    return voiceRank(v) * 2 + (exact ? 1 : 0);
   }
   function loadVoice() {
     if (!('speechSynthesis' in window)) return;
     var voices = speechSynthesis.getVoices();
     matchingVoices = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf(VOICE_PREFIX) === 0; });
-    matchingVoices.sort(function (a, b) { return voiceRank(b) - voiceRank(a); });
+    matchingVoices.sort(function (a, b) { return voiceScore(b) - voiceScore(a); });
     if (matchingVoices.length === 0) { activeVoice = null; return; }
 
     var savedName = null;
     try { savedName = localStorage.getItem(VOICE_KEY); } catch (e) {}
     activeVoice = matchingVoices.find(function (v) { return v.name === savedName; }) || matchingVoices[0];
 
-    if (voiceSelect && voiceSelect.options.length !== matchingVoices.length) {
+    // Rebuild on the names, not the count. Chrome revises this list after
+    // load, and a revision that swaps one voice for another leaves the count
+    // alone -- so a count check would keep a dropdown listing voices that no
+    // longer exist, and the assignment below would silently blank it.
+    var listed = [];
+    for (var i = 0; voiceSelect && i < voiceSelect.options.length; i++) listed.push(voiceSelect.options[i].value);
+    if (voiceSelect && listed.join('\n') !== matchingVoices.map(function (v) { return v.name; }).join('\n')) {
       voiceSelect.innerHTML = '';
       matchingVoices.forEach(function (v) {
         var opt = document.createElement('option');
@@ -110,19 +134,45 @@
     speechSynthesis.onvoiceschanged = loadVoice;
   }
 
-  function speak(text, btn) {
-    if (!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel();
+  // The best voice for a page is often Google's, and Google's voices are
+  // synthesised on Google's servers. On a train they simply fail: the button
+  // flashes, nothing is said, and the reason goes to a console the visitor is
+  // not looking at. So a failure retries once with the best voice that lives
+  // on the machine.
+  //
+  // Only once, and only for real failures. speak() calls cancel() first, which
+  // fires an error on whatever was already talking -- retrying that would
+  // start a second voice over the top of the one just asked for.
+  var DEAD_ENDS = { interrupted: 1, canceled: 1, cancelled: 1 };
+  function bestLocalVoice(notThis) {
+    return matchingVoices.find(function (v) {
+      return v !== notThis && v.localService !== false;
+    }) || null;
+  }
+  function utter(text, voice, btn, mayRetry) {
     var u = new SpeechSynthesisUtterance(text);
-    u.lang = LANG;
+    // Ask for the language the chosen voice actually speaks. Handing an engine
+    // a fr-CA voice inside a fr-FR utterance is a contradiction, and some
+    // engines resolve it by discarding the voice.
+    u.lang = (voice && voice.lang) || LANG;
     u.rate = 0.85;
-    if (activeVoice) u.voice = activeVoice;
+    if (voice) u.voice = voice;
     if (btn) {
       btn.classList.add('playing');
       u.onend = function () { btn.classList.remove('playing'); };
-      u.onerror = function () { btn.classList.remove('playing'); };
     }
+    u.onerror = function (e) {
+      if (btn) btn.classList.remove('playing');
+      if (!mayRetry || (e && DEAD_ENDS[e.error])) return;
+      var local = bestLocalVoice(voice);
+      if (local) utter(text, local, btn, false);
+    };
     speechSynthesis.speak(u);
+  }
+  function speak(text, btn) {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    utter(text, activeVoice, btn, true);
   }
 
   // ── learned dots (per-day, stored locally) ──

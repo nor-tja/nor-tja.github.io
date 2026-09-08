@@ -1,10 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const fs = require('node:fs');
-const path = require('node:path');
-const vm = require('node:vm');
-const { ROOT, readPage } = require('./helpers');
+const { PAGES, loadPage } = require('./dom-harness');
 
 // Every other test in this suite reads the code as text. This one runs it.
 //
@@ -15,103 +12,8 @@ const { ROOT, readPage } = require('./helpers');
 // this repo would ever see it. A grep-based test cannot find that class of
 // bug. Neither can it find a typo'd property on a real DOM object.
 //
-// The stub below is deliberately small: enough DOM for the engine to complete
-// a render and run its click handlers, and no more. It is not a browser, and
-// it is not trying to be. It answers one question -- does this code execute?
-
-const PAGES = {
-  'mots-du-jour.html': 'motsDuJour',
-  'spanish.html': 'palabrasDelDia',
-  'portuguese.html': 'palavrasDoDia',
-  'japanese.html': 'tangoNoHi',
-  'ukrainian.html': 'slovoDnya',
-};
-
-function makeDom() {
-  const created = [];
-  function el(tag) {
-    const n = {
-      tagName: String(tag).toUpperCase(),
-      children: [], style: {}, dataset: {}, handlers: {},
-      className: '', id: '', textContent: '', innerHTML: '', value: '',
-      type: '', disabled: false, hidden: false, lang: '', title: '', href: '',
-      // A real <select> exposes .options; the voice picker reads its length.
-      options: [], selectedIndex: -1,
-      classList: {
-        _s: new Set(),
-        add(...c) { c.forEach((x) => this._s.add(x)); },
-        remove(...c) { c.forEach((x) => this._s.delete(x)); },
-        toggle(c, f) { const on = f === undefined ? !this._s.has(c) : f; if (on) this._s.add(c); else this._s.delete(c); return on; },
-        contains(c) { return this._s.has(c); },
-      },
-      appendChild(c) { this.children.push(c); if (c.tagName === 'OPTION') this.options.push(c); return c; },
-      insertBefore(c) { this.children.unshift(c); return c; },
-      removeChild(c) { this.children = this.children.filter((x) => x !== c); return c; },
-      remove() {},
-      addEventListener(t, fn) { (this.handlers[t] = this.handlers[t] || []).push(fn); },
-      removeEventListener() {},
-      setAttribute(k, v) { this[k] = v; },
-      getAttribute(k) { return this[k] === undefined ? null : this[k]; },
-      removeAttribute(k) { delete this[k]; },
-      querySelector() { return null; },
-      querySelectorAll() { return []; },
-      closest() { return null; },
-      focus() {}, blur() {},
-      getBoundingClientRect() { return { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 }; },
-    };
-    created.push(n);
-    return n;
-  }
-  const byId = new Map();
-  // Every id the engine looks up resolves, so the run takes the fully
-  // populated path instead of bailing out early on a null.
-  const document = {
-    getElementById(id) { if (!byId.has(id)) byId.set(id, el('div')); return byId.get(id); },
-    createElement: el,
-    querySelector() { return null; },
-    querySelectorAll() { return []; },
-    addEventListener() {},
-    body: el('body'),
-    documentElement: el('html'),
-  };
-  return { document, created, byId };
-}
-
-function loadPage(page) {
-  const { document, created, byId } = makeDom();
-  const store = new Map();
-  const sandbox = {
-    document,
-    localStorage: {
-      getItem: (k) => (store.has(k) ? store.get(k) : null),
-      setItem: (k, v) => store.set(k, String(v)),
-      removeItem: (k) => store.delete(k),
-    },
-    speechSynthesis: {
-      getVoices: () => [
-        { name: 'A', lang: 'fr-FR' }, { name: 'B', lang: 'es-ES' },
-        { name: 'C', lang: 'pt-PT' }, { name: 'D', lang: 'ja-JP' },
-        { name: 'E', lang: 'uk-UA' },
-      ],
-      speak() {}, cancel() {}, onvoiceschanged: null,
-    },
-    SpeechSynthesisUtterance: function (t) { this.text = t; },
-    console, setTimeout, clearTimeout, setInterval, clearInterval,
-  };
-  sandbox.window = sandbox;
-  sandbox.globalThis = sandbox;
-
-  const ctx = vm.createContext(sandbox);
-  const html = readPage(page);
-  // Load exactly what the page loads, in the page's own order. If the tags are
-  // ordered wrongly this throws here, which is the point.
-  for (const m of html.matchAll(/<script[^>]+src="([^"]+)"[^>]*>/g)) {
-    vm.runInContext(fs.readFileSync(path.join(ROOT, m[1]), 'utf8'), ctx, { filename: m[1] });
-  }
-  vm.runInContext(/<script>([\s\S]*?)<\/script>/.exec(html)[1], ctx, { filename: page });
-
-  return { store, created, byId };
-}
+// The DOM stub and the loader moved to ./dom-harness once the voice tests
+// needed them too. Same stub, same deliberate smallness.
 
 test('every language page loads and renders without throwing', () => {
   for (const page of Object.keys(PAGES)) {
