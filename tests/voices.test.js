@@ -162,23 +162,142 @@ test('the dropdown follows the voice list even when its length does not change',
   assert.deepEqual(select.options.map((o) => o.value), ['Thomas', 'Amélie']);
 
   voices.length = 0;
-  voices.push(v('Google français', 'fr-FR', { localService: false }), v('Jacques', 'fr-FR'));
+  voices.push(v('Google français', 'fr-FR', { localService: false }), v('Audrey', 'fr-FR'));
   page.synth.onvoiceschanged();
 
-  assert.deepEqual(select.options.map((o) => o.value), ['Google français', 'Jacques'],
+  assert.deepEqual(select.options.map((o) => o.value), ['Google français', 'Audrey'],
     'the dropdown still lists voices the browser has dropped');
   assert.equal(select.value, 'Google français', 'the dropdown shows a different voice than the one that will speak');
+});
+
+// --- Eloquence ---------------------------------------------------------------
+//
+// macOS bundles Eloquence, the DECtalk-descended formant synthesiser Apple
+// added in Ventura for accessibility users who want speed and bite rather
+// than naturalness. It is a robot, deliberately, and it is enormous: 112 of
+// the 187 voices on the machine this was written on are Eloquence, including
+// 16 of the 19 French ones and 16 of the 19 Spanish.
+//
+// None of that shows up in the ranking, because Eloquence voices are plain
+// local voices with plain names. They score exactly what Thomas and Mónica
+// score, so which one wins is decided by getVoices() order -- luck. And they
+// filled the picker: nineteen French voices, sixteen of them robots.
+//
+// Chrome hid all of this, because Google's network voices outrank everything
+// and win before the tie is ever reached. Safari has no Google voices. That
+// is why this was only ever wrong in Safari.
+//
+// The roster is a closed set of nine names, verified against all 112 entries.
+const ROBOTS = ['Eddy', 'Flo', 'Grandma', 'Grandpa', 'Jacques', 'Reed', 'Rocko',
+                'Sandy', 'Shelley'];
+
+test('a robot does not win the tie just by being first in the list', () => {
+  const spoken = speakOnce(loadPage(PAGE, {
+    voices: [v('Eddy', 'fr-FR'), v('Thomas', 'fr-FR')],
+  }));
+  assert.equal(spoken.voice && spoken.voice.name, 'Thomas',
+    'Eddy is Eloquence and Thomas is a real voice, but they score the same, ' +
+    'so the sort just kept whichever getVoices() happened to list first');
+});
+
+// Eight of the nine are obviously silly and one is not. Jacques reads like a
+// perfectly ordinary French voice and is com.apple.eloquence.fr-FR.Jacques.
+// A rule built on how the names look would let him through.
+test('the ordinary-sounding robot is demoted too', () => {
+  const spoken = speakOnce(loadPage(PAGE, {
+    voices: [v('Jacques', 'fr-FR'), v('Thomas', 'fr-FR')],
+  }));
+  assert.equal(spoken.voice && spoken.voice.name, 'Thomas',
+    'Jacques is Eloquence with a human-sounding name');
+});
+
+test('every one of the nine is demoted, not just the ones that look silly', () => {
+  for (const robot of ROBOTS) {
+    const spoken = speakOnce(loadPage(PAGE, {
+      voices: [v(robot, 'fr-FR'), v('Thomas', 'fr-FR')],
+    }));
+    assert.equal(spoken.voice && spoken.voice.name, 'Thomas',
+      `${robot} outranked a real voice`);
+  }
+});
+
+// The roster is a list of nine names Apple chose, which means it is a list
+// Apple can add to. voiceURI carries com.apple.eloquence.* and does not care
+// what the voice is called, so it catches the tenth name before anyone
+// notices there is one. Written without proof that Safari populates voiceURI
+// -- if it does not, the name list above still does the work, and this costs
+// one regex against an empty string.
+test('a robot is caught by its identifier even under an unfamiliar name', () => {
+  const spoken = speakOnce(loadPage(PAGE, {
+    voices: [
+      { name: 'Bertrand', lang: 'fr-FR', localService: true,
+        voiceURI: 'com.apple.eloquence.fr-FR.Bertrand' },
+      v('Thomas', 'fr-FR'),
+    ],
+  }));
+  assert.equal(spoken.voice && spoken.voice.name, 'Thomas',
+    'an Eloquence voice under a name not on the list outranked a real voice');
+});
+
+// The complaint that started this. A stock Mac offers three real French voices
+// and sixteen robots; the picker listed all nineteen, in an order that put
+// robots above Amélie. Hiding them is the same rule as demoting them -- the
+// ranking and the dropdown read the same list -- so this is not a second
+// mechanism, it is the same one seen from the page.
+test('the picker offers the real voices, not sixteen robots', () => {
+  const page = loadPage(PAGE, {
+    voices: [
+      v('Amélie (Premium)', 'fr-CA'), v('Amélie', 'fr-CA'), v('Thomas', 'fr-FR'),
+      ...ROBOTS.map((n) => v(n, 'fr-FR')),
+      ...ROBOTS.map((n) => v(n, 'fr-CA')),
+    ],
+  });
+  const listed = page.byId.get('voiceSelect').options.map((o) => o.value);
+  assert.deepEqual(listed, ['Amélie (Premium)', 'Thomas', 'Amélie'],
+    'the picker still offers robots while real voices are installed');
+});
+
+// The other half of that rule, and the reason it is a demotion rather than a
+// deletion. Nothing guarantees a language has a real voice at all -- and a
+// page that says nothing is worse than a page that says it badly.
+test('a language served only by robots still speaks', () => {
+  const page = loadPage(PAGE, { voices: ROBOTS.map((n) => v(n, 'fr-FR')) });
+  const spoken = speakOnce(page);
+  assert.ok(spoken && spoken.voice,
+    'with only Eloquence installed the page went silent instead of using it');
+  assert.equal(page.byId.get('voiceSelect').options.length, ROBOTS.length,
+    'the picker hid every voice there was');
+});
+
+// Not a fix -- a check that the advice attached to this is true. With quality
+// ranked above region, a fr-FR page prefers a Canadian Premium voice to a
+// French compact one, which is what Safari has been doing. Downloading a
+// French-from-France Premium voice is therefore the whole cure, and it needs
+// no code: the existing ranking already prefers it.
+test('a good voice from the right region beats a good one from the wrong region', () => {
+  const spoken = speakOnce(loadPage(PAGE, {
+    voices: [v('Amélie (Premium)', 'fr-CA'), v('Thomas (Premium)', 'fr-FR')],
+  }));
+  assert.equal(spoken.voice && spoken.voice.name, 'Thomas (Premium)',
+    'installing a Premium fr-FR voice would not actually change what is spoken, ' +
+    'so the advice given with this change is wrong');
 });
 
 // Two local voices, deliberately. With only one there is nowhere for a second
 // hand-off to go, so the test passed even with the stop removed -- it was
 // describing a machine too poorly equipped to expose the bug.
+//
+// Which means the names here are load-bearing. This fixture used to say
+// Jacques, and the moment Eloquence started being filtered out, Jacques
+// stopped being a candidate: back to one local voice, and the test went
+// quietly back to proving nothing while still passing. Any name used here has
+// to be a real voice, not one of ROBOTS.
 test('the fallback does not itself fall back for ever', () => {
   const page = loadPage(PAGE, {
     voices: [
       v('Google français', 'fr-FR', { localService: false }),
       v('Thomas', 'fr-FR'),
-      v('Jacques', 'fr-FR'),
+      v('Audrey', 'fr-FR'),
     ],
   });
   speakOnce(page).onerror({ error: 'network' });

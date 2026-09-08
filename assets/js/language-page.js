@@ -94,10 +94,43 @@
     var exact = (v.lang || '').toLowerCase().replace('_', '-') === LANG.toLowerCase();
     return voiceRank(v) * 2 + (exact ? 1 : 0);
   }
+  // macOS bundles Eloquence, the DECtalk-descended formant synthesiser Apple
+  // shipped in Ventura for accessibility users who want speed and bite over
+  // naturalness. It is a robot on purpose, and there is a lot of it: 112 of
+  // the 187 voices on the machine this was written on, including 16 of the
+  // 19 French and 16 of the 19 Spanish.
+  //
+  // The ranking could not see any of it. Eloquence voices are local voices
+  // with plain names, so they scored exactly what Thomas and Mónica score and
+  // the winner came down to getVoices() order. They also filled the picker:
+  // nineteen French voices offered, sixteen of them robots.
+  //
+  // Chrome hid this completely -- Google's network voices outrank everything
+  // and the tie is never reached. Safari has no Google voices, which is why
+  // this was only ever wrong in Safari.
+  //
+  // The roster is nine names, checked against all 112 entries. Eight are
+  // obviously silly; Jacques is not, and is the reason this is a list rather
+  // than a guess at what a robot sounds like. voiceURI carries
+  // com.apple.eloquence.* and is the better signal where a browser exposes
+  // it -- but the name list is what actually does the work here.
+  var ELOQUENCE = /^(Eddy|Flo|Grandma|Grandpa|Jacques|Reed|Rocko|Sandy|Shelley)$/;
+  function isRobot(v) {
+    return /eloquence/i.test(v.voiceURI || '') || ELOQUENCE.test(v.name || '');
+  }
+
   function loadVoice() {
     if (!('speechSynthesis' in window)) return;
     var voices = speechSynthesis.getVoices();
     matchingVoices = voices.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf(VOICE_PREFIX) === 0; });
+
+    // Last resort, not banned: a language with nothing but Eloquence should
+    // still speak, badly, rather than go silent. Filtering the one list means
+    // the ranking, the picker and the offline fallback cannot disagree about
+    // what counts as a candidate.
+    var real = matchingVoices.filter(function (v) { return !isRobot(v); });
+    if (real.length) matchingVoices = real;
+
     matchingVoices.sort(function (a, b) { return voiceScore(b) - voiceScore(a); });
     if (matchingVoices.length === 0) { activeVoice = null; return; }
 
