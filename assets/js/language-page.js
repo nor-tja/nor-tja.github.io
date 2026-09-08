@@ -176,15 +176,25 @@
   }
 
   // ── learned dots (per-day, stored locally) ──
-  var todayKey = PREFIX + ':' + DayMath.todayISO();
+  // Worked out on every call, not once at load. This was `var todayKey = ...`,
+  // which freezes whatever day the page was OPENED on. That is fine for a page
+  // you visit and close, and this is not one: it is a daily habit, so a good
+  // share of its visits are last thing at night. Open it at 23:50, tap a word
+  // at 00:05, and the tap was filed under a day that had already ended -- the
+  // page reads the new day's key tomorrow and the word is simply not there.
+  // Third bug in this family; see the header of assets/js/day-math.js for the
+  // first two. All three were a day boundary being decided in the wrong place.
+  function todayKey() {
+    return PREFIX + ':' + DayMath.todayISO();
+  }
   function getLearned() {
-    try { return JSON.parse(localStorage.getItem(todayKey) || '[]'); } catch (e) { return []; }
+    try { return JSON.parse(localStorage.getItem(todayKey()) || '[]'); } catch (e) { return []; }
   }
   function toggleLearned(word) {
     var list = getLearned();
     var idx = list.indexOf(word);
     if (idx === -1) list.push(word); else list.splice(idx, 1);
-    try { localStorage.setItem(todayKey, JSON.stringify(list)); } catch (e) {}
+    try { localStorage.setItem(todayKey(), JSON.stringify(list)); } catch (e) {}
     return list;
   }
 

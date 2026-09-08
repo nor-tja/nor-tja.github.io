@@ -28,6 +28,35 @@
     return false;
   }
 
+  // Where the next apple goes. Enumerates the free cells and picks one,
+  // rather than guessing a cell and re-guessing while the snake is on it.
+  //
+  // Rejection sampling is the obvious way to write this and it degrades in
+  // exactly the wrong direction: cheap while the snake is short, and worst at
+  // the end of a long game, where the expected number of guesses for the last
+  // free cell is the size of the board. On a full board there is no free cell
+  // and the guessing never stops -- the tab locks up on the winning move,
+  // which is a strange reward for filling the board.
+  //
+  // Returns null when there is nowhere left. That is the win, and the caller
+  // has to say so; a null here is not an error.
+  //
+  // rand is injectable so the tests can be about placement instead of luck.
+  function pickFood(body, cols, rows, rand) {
+    var r = rand || Math.random;
+    var taken = {};
+    for (var i = 0; i < body.length; i++) taken[body[i].x + ',' + body[i].y] = true;
+
+    var free = [];
+    for (var y = 0; y < rows; y++) {
+      for (var x = 0; x < cols; x++) {
+        if (!taken[x + ',' + y]) free.push({ x: x, y: y });
+      }
+    }
+    if (!free.length) return null;
+    return free[Math.min(free.length - 1, Math.floor(r() * free.length))];
+  }
+
   // Accepts optional storage; defaults to window.localStorage via defaultStorage().
   // The property access is guarded so Safari private browsing doesn't kill the IIFE.
   function readBest(storage) {
@@ -59,7 +88,7 @@
   }
 
   var api = {
-    canTurn: canTurn, selfCollides: selfCollides,
+    canTurn: canTurn, selfCollides: selfCollides, pickFood: pickFood,
     readBest: readBest, writeBest: writeBest, BEST_KEY: BEST_KEY
   };
   root.SnakeLogic = api;

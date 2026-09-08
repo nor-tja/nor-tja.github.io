@@ -32,7 +32,16 @@ function makeDom() {
   function el(tag) {
     const n = {
       tagName: String(tag).toUpperCase(),
-      children: [], style: {}, dataset: {}, handlers: {},
+      // .style is both a bag of camelCase properties and an object with
+      // setProperty/getPropertyValue. Custom properties (--var) can only be
+      // reached through the methods, and the pomodoro page sets several.
+      children: [],
+      style: {
+        setProperty(k, v) { this[k] = String(v); },
+        getPropertyValue(k) { return this[k] === undefined ? '' : this[k]; },
+        removeProperty(k) { delete this[k]; },
+      },
+      dataset: {}, handlers: {},
       className: '', id: '', textContent: '', value: '',
       type: '', disabled: false, hidden: false, lang: '', title: '', href: '',
       // A real <select> exposes .options; the voice picker reads them.
@@ -92,6 +101,12 @@ function makeDom() {
 
 // opts.voices  what speechSynthesis.getVoices() returns
 // opts.saved   entries seeded into localStorage before the engine loads
+// opts.clock   a mutable { now: <ms since epoch> }. The sandbox reads it on
+//              every `new Date()`, so a test can move the clock AFTER the page
+//              has loaded and see what the already-running page does about it.
+//              That is the only way to ask the question that matters here:
+//              this engine is a daily thing people leave open, and three of its
+//              bugs so far have been about which day it thinks it is.
 function loadPage(page, opts) {
   const o = opts || {};
   const { document, created, byId } = makeDom();
@@ -114,6 +129,19 @@ function loadPage(page, opts) {
     SpeechSynthesisUtterance: function (t) { this.text = t; },
     console, setTimeout, clearTimeout, setInterval, clearInterval,
   };
+  if (o.clock) {
+    const clock = o.clock;
+    sandbox.Date = class extends Date {
+      constructor(...args) {
+        // Only the no-argument form is the "what time is it" call. Every other
+        // form -- new Date(y, m, d) in DayMath.addDays, most obviously -- has
+        // to keep working exactly as it does, or the fake clock would break
+        // the date arithmetic it is supposed to be testing.
+        if (args.length === 0) super(clock.now); else super(...args);
+      }
+      static now() { return clock.now; }
+    };
+  }
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
 

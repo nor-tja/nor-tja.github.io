@@ -294,3 +294,75 @@ test('the mug is one number and the label follows it', () => {
     `which is nearly black, so the accent red reads at 2.4:1 there -- below every ` +
     `threshold there is. It needs to be light.`);
 });
+
+// --- landmarks -------------------------------------------------------------
+
+// Every page had a header, a footer and a nav, and no <main>. Landmark
+// navigation (the R key in NVDA and JAWS) is how a screen reader user skips
+// the furniture, and with nothing to skip TO, the only way to the content was
+// to listen through the header on every page.
+test('every page marks its content with a main landmark', () => {
+  for (const page of PAGES) {
+    const src = readPage(page);
+    const opens = (src.match(/<main[\s>]/g) || []).length;
+    const closes = (src.match(/<\/main>/g) || []).length;
+    assert.equal(opens, 1, `${page} has ${opens} <main> elements; there must be exactly one`);
+    assert.equal(closes, 1, `${page} has ${closes} </main> tags`);
+  }
+});
+
+// The obvious way to do the above is `<main class="wrap">`, and it is wrong
+// here: .wrap holds the footer too, so that puts the site nav and the
+// copyright INSIDE the main landmark. Then "skip to main" lands you in front
+// of the furniture you were trying to skip, and <footer> stops being a
+// contentinfo landmark at all -- a footer nested in main is no longer a
+// top-level region. The footer has to close after </main>, not before.
+test('the site nav is furniture, not content, and sits outside main', () => {
+  for (const page of PAGES) {
+    const src = readPage(page);
+    const nav = src.indexOf('<nav class="sitenav"');
+    if (nav === -1) continue;               // index.html, by design
+    const close = src.indexOf('</main>');
+    assert.ok(close !== -1, `${page} has no </main>`);
+    assert.ok(nav > close,
+      `${page} has its footer nav inside <main>. The main landmark is supposed ` +
+      `to be what you skip TO; it must not contain the nav you are skipping.`);
+  }
+});
+
+// The eight interactive pages carry a <noscript> note saying what will not
+// work. Written straight after <main>, it landed above the <h1>: with
+// JavaScript off, the first thing on the page was a caveat about a page you
+// had not been told the name of yet.
+test('the no-JS note comes after the heading it is a caveat about', () => {
+  for (const page of PAGES) {
+    const src = readPage(page);
+    const note = src.indexOf('<noscript');
+    if (note === -1) continue;
+    const h1 = src.indexOf('<h1');
+    assert.ok(h1 !== -1, `${page} has a no-JS note but no <h1>`);
+    assert.ok(note > h1,
+      `${page} shows its no-JS note before the <h1>, so a reader with ` +
+      `JavaScript off is told what is missing before being told what the ` +
+      `page is`);
+  }
+});
+
+// Placing the note at the top also made its copy wrong, because the copy
+// describes what is missing by pointing at it. coffee.html said "the four
+// figures above" with nothing above it at all.
+//
+// The other false claim in that batch -- "there is nothing below this line",
+// on five pages that render a static "How this works" section below the line
+// -- is not reachable by a regex and was fixed by rewriting the sentence. The
+// general lesson is the one this test can hold: after the header, everything
+// the note is about is below it, so a note that says "above" is wrong.
+test('the no-JS notes do not point at things that are not there', () => {
+  for (const page of PAGES) {
+    const m = /<noscript>([\s\S]*?)<\/noscript>/.exec(readPage(page));
+    if (!m) continue;
+    assert.ok(!/\babove\b/i.test(m[1]),
+      `${page}'s no-JS note points "above" itself, where there is nothing ` +
+      `but the page heading`);
+  }
+});

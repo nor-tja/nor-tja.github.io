@@ -49,6 +49,31 @@ test('the accent colour is also readable on the background', () => {
     `--accent on --bg is ${ratio.toFixed(3)}:1, below 4.5:1`);
 });
 
+// 1.4.11, the one nobody remembers, because it is not about text. A control
+// drawn as nothing but a hairline ring -- the play buttons, the learned dots,
+// the D-pad, the voice picker, all background:transparent -- has no fill and
+// no label inside it, so the border carries the whole job of saying "this is
+// a thing you can press". That makes it required to identify the component,
+// which puts the floor at 3:1. --line, correctly, does not clear it: a rule
+// between two paragraphs is decorative and exempt. That is why there are two
+// tokens, and why only one of them is tested here.
+test('--line-strong clears the 3:1 floor for control borders', () => {
+  const ratio = contrast(varValue('--line-strong'), varValue('--bg'));
+  assert.ok(ratio >= 3,
+    `--line-strong (${varValue('--line-strong')}) on --bg is ` +
+    `${ratio.toFixed(3)}:1, below the 3:1 floor WCAG 1.4.11 sets for the ` +
+    `boundary of a user interface component`);
+});
+
+// The pairing has to stay in that order. If someone "tidies up" by setting
+// --line-strong back to --line, every assertion above still passes and the
+// controls quietly go invisible again.
+test('the two line tokens are actually different weights', () => {
+  assert.notStrictEqual(varValue('--line-strong'), varValue('--line'),
+    '--line-strong has been collapsed back into --line; the transparent ' +
+    'controls have no visible boundary again');
+});
+
 test('all eleven type tokens are defined', () => {
   const EXPECTED = {
     '--fs-3xs': '.65rem', '--fs-2xs': '.7rem', '--fs-xs': '.8rem',

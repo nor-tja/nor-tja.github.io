@@ -106,7 +106,7 @@
     .mode-label.is-break { color: var(--blue-3); }
 
     .dots { display:flex; gap:.5rem; margin-top:1.2rem; }
-    .dot { width:7px; height:7px; border-radius:50%; border:1px solid var(--line); transition: background .3s, border-color .3s; }
+    .dot { width:7px; height:7px; border-radius:50%; border:1px solid var(--line-strong); transition: background .3s, border-color .3s; }
     .dot.filled { background: var(--accent); border-color: var(--accent); }
 
     .daily-summary { margin-top:1.8rem; text-align:center; max-width:320px; }

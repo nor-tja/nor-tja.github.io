@@ -39,6 +39,24 @@ html { font-size: clamp(1rem, .944rem + .25vw, 1.125rem); }
   --accent: #9a2a2a;
   --line: #d8d3cc;
 
+  /* Two greys for lines, because a line drawn under a paragraph and a line
+     that IS a button are not the same object.
+
+     --line stays where it is. At 1.33:1 against the page it is barely there,
+     which is exactly right for a rule between two rows of text: the text is
+     what you read, the rule only says "these are separate". WCAG agrees --
+     purely decorative parts are exempt from 1.4.11.
+
+     --line-strong is for controls whose border is the only thing that makes
+     them a control. The play buttons, the learned dots, the snake D-pad and
+     the voice picker are all background:transparent, so there is no fill to
+     see and no label inside; take the hairline away and there is nothing on
+     the page. Those need 3:1 under 1.4.11, and 1.33:1 was not close.
+     Measured against --bg: #d8d3cc is 1.33:1, this is 3.03:1. It is the same
+     hue walked down in lightness until it cleared the bar, so the controls
+     get more definite without the palette turning cold. */
+  --line-strong: #8f8b87;
+
   /* Three roles, three faces. The split is the one both of the sites this
      design borrows from use: a serif you read, a sans for the furniture
      around it, and a mono reserved for things that are not words.
@@ -236,6 +254,26 @@ footer { text-align: center; }
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Four of these pages are the tool, not a description of the tool: the word
+   lists, the timer, the board and the coffee figures are all built in the
+   browser. With scripting off they do not degrade, they just stop -- a
+   heading and then nothing. There is no build step here and no server, so
+   the content cannot be pre-rendered into the HTML; the honest fix is to say
+   so rather than leave someone looking at a blank page wondering whether it
+   is still loading. Not on cv/resources/languages/index: those are written
+   out in HTML and read the same either way. */
+.noscript-note {
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--ink);
+  background: #efe9df;
+  border-left: 3px solid var(--accent);
+  padding: .9rem 1.1rem;
+  margin: 1.5rem 0;
   border-radius: 2px;
 }
 

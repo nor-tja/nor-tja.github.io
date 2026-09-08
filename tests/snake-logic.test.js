@@ -105,3 +105,78 @@ test('snake.html never references localStorage directly', () => {
     `/ writeBest(score) and let the module resolve storage inside its try/catch.`
   );
 });
+
+// --- placing food ----------------------------------------------------------
+
+// The old placer was rejection sampling with no exit: guess a cell, guess
+// again if the snake is on it. That is fine on an empty board and gets worse
+// with every apple -- on the last free cell it expects ~484 guesses -- and
+// when the snake finally fills the board it never returns at all. The tab
+// freezes on the winning move.
+//
+// Enumerating the free cells costs 484 array writes once per apple, which is
+// nothing, and it makes the full board answerable instead of fatal.
+const { pickFood } = require('../assets/js/snake-logic.js');
+
+// A board small enough to fill by hand.
+const COLS = 3, ROWS = 2;
+const allCells = () => {
+  const out = [];
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) out.push({ x, y });
+  return out;
+};
+
+test('food never lands on the snake', () => {
+  const body = [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 2, y: 1 }];
+  // Sweep the whole random range rather than trusting one draw.
+  for (let i = 0; i < 100; i++) {
+    const f = pickFood(body, COLS, ROWS, () => i / 100);
+    assert.ok(f, 'no cell returned even though two are free');
+    assert.ok(!body.some((s) => s.x === f.x && s.y === f.y),
+      `placed food at ${f.x},${f.y}, which the snake occupies`);
+  }
+});
+
+test('a full board returns nothing instead of hanging', () => {
+  const f = pickFood(allCells(), COLS, ROWS, Math.random);
+  // strict: dropping the guard returns free[NaN], which is undefined, and
+  // undefined == null. A loose check here would have passed the mutation.
+  assert.strictEqual(f, null,
+    'the board is completely full, so there is no cell to return. The old ' +
+    'version looped for ever here and froze the tab on the winning move.');
+});
+
+test('the last free cell is found rather than stumbled upon', () => {
+  const body = allCells().filter((c) => !(c.x === 1 && c.y === 1));
+  // rand is deliberately hostile: always 0, so a rejection sampler that kept
+  // guessing would sit on cell 0,0 for ever.
+  const f = pickFood(body, COLS, ROWS, () => 0);
+  assert.deepEqual(f, { x: 1, y: 1 });
+});
+
+test('every free cell is reachable', () => {
+  const body = [{ x: 0, y: 0 }];
+  const seen = new Set();
+  for (let i = 0; i < 1000; i++) {
+    const f = pickFood(body, COLS, ROWS, () => i / 1000);
+    seen.add(`${f.x},${f.y}`);
+  }
+  assert.equal(seen.size, COLS * ROWS - 1,
+    `only ${seen.size} of the 5 free cells can ever be chosen: ${[...seen].join(' ')}`);
+});
+
+// The module can be as careful as it likes and it buys nothing if the page
+// throws the answer away. This is the one line of wiring that turns "there is
+// nowhere to put an apple" into a win rather than a silent nothing.
+test('snake.html places food through the module and acts on a full board', () => {
+  const src = readPage('snake.html');
+  assert.ok(!/while\s*\(\s*true\s*\)/.test(src),
+    'snake.html still has an unbounded while(true) loop; the food placer used ' +
+    'to be one and froze the tab when the board filled up');
+  assert.match(src, /SnakeLogic\.pickFood\(/,
+    'snake.html no longer places food through SnakeLogic.pickFood, so the ' +
+    'full-board case above is testing a function the page does not call');
+  assert.match(src, /if\s*\(\s*!placeFood\(\)\s*\)/,
+    'the return value of placeFood() is being ignored. It reports the full ' +
+    'board, and ignoring it means the win is never noticed.');
+});
