@@ -1170,7 +1170,11 @@
             b5 = -0.7616 * b5 - white * 0.0168980;
             var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
             b6 = white * 0.115926;
-            output[i] = pink * 0.11; // the unscaled sum of taps above can exceed +-1
+            // 0.08, not the more common 0.11: pink noise has no quiet moments
+            // the way a field recording does (crackle gaps, wave troughs), so
+            // even a lower-amplitude constant signal reads as louder next to
+            // the others when layered together.
+            output[i] = pink * 0.08; // the unscaled sum of taps above can exceed +-1
           }
         };
         gainNode = ctx.createGain();
@@ -1199,7 +1203,7 @@
       { btn: $('forestBtn'), audio: $('forestAudio'), volume: 1 },
       { btn: $('wavesBtn'), audio: $('wavesAudio'), volume: 0.35 },
       { btn: $('fireBtn'), audio: $('fireAudio'), volume: 0.5 },
-      { btn: $('pinkBtn'), audio: createPinkNoiseSource(), volume: 0.4 }
+      { btn: $('pinkBtn'), audio: createPinkNoiseSource(), volume: 0.15 }
     ];
 
     var FADE_SEC = 1.5; // fade window at each end of the loop, so the seam isn't an audible jump
