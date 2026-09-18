@@ -50,20 +50,19 @@
     <p class="noscript-note">The timer and the hourglass both run in the browser, so with JavaScript turned off the glass will not fill and the clock will not count.</p>
   </noscript>
 
-  <div class="focus-block today-focus" id="todayFocus">
-    <p class="eyebrow">Focus for today</p>
-    <p class="today-focus-date" id="todayFocusDate"></p>
+  <div class="focus-block focus-row" id="todayFocus">
+    <label class="focus-label" id="todayFocusLabel" for="todayFocusInput">Focus for today</label>
+    <textarea id="todayFocusInput" class="focus-input" rows="1" placeholder="What's the one thing today?" aria-labelledby="todayFocusLabel"></textarea>
   </div>
 
-  <div class="focus-block week-focus" id="weekFocus">
-    <p class="eyebrow">Focus for this week</p>
-    <p class="week-focus-range" id="weekFocusRange"></p>
-    <div class="week-focus-days" id="weekFocusDays"></div>
+  <div class="focus-block focus-row" id="weekFocus">
+    <label class="focus-label" id="weekFocusLabel" for="weekFocusInput">Focus for this week</label>
+    <textarea id="weekFocusInput" class="focus-input" rows="1" placeholder="What matters most this week?" aria-labelledby="weekFocusLabel"></textarea>
   </div>
 
-  <div class="focus-block other-tasks" id="otherTasks">
-    <p class="eyebrow">Other tasks for today</p>
-    <textarea id="otherTasksInput" class="other-tasks-input" placeholder="Anything else on your plate today?" maxlength="1000" aria-label="Other tasks for today"></textarea>
+  <div class="focus-block focus-row" id="otherTasks">
+    <label class="focus-label" id="otherTasksLabel" for="otherTasksInput">Other tasks for today</label>
+    <textarea id="otherTasksInput" class="focus-input" rows="1" placeholder="Anything else on your plate?" aria-labelledby="otherTasksLabel"></textarea>
   </div>
 
   <div class="glass-section">
@@ -1369,68 +1368,58 @@
     render();
   })();
 
-  // ── today's date, under "Focus for today" ──
+  // ── the three focus rows: each label carries today's (or this week's)
+  // date, each textarea grows with what's typed into it, and each saves to
+  // its own localStorage key so today's/this week's text is still there on
+  // the next visit but doesn't bleed into a different day or week ──
   (function () {
-    var el = $('todayFocusDate');
-    if (!el) return;
+    var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var WEEKDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+    function ordinal(n) {
+      var v = n % 100;
+      if (v >= 11 && v <= 13) return n + 'th';
+      switch (n % 10) {
+        case 1: return n + 'st';
+        case 2: return n + 'nd';
+        case 3: return n + 'rd';
+        default: return n + 'th';
+      }
+    }
+
     var today = new Date();
-    el.textContent = today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-  })();
+    var todayStr = WEEKDAYS[today.getDay()] + ' ' + ordinal(today.getDate()) + ' ' + MONTHS[today.getMonth()];
 
-  // ── other tasks for today — plain text, saved per calendar day so
-  // yesterday's list doesn't linger once a new day starts ──
-  (function () {
-    var el = $('otherTasksInput');
-    if (!el) return;
-    var todayKey = 'pomodoro:otherTasks:' + new Date().toDateString();
-    try { el.value = localStorage.getItem(todayKey) || ''; } catch (e) {}
-    el.addEventListener('input', function () {
-      try { localStorage.setItem(todayKey, el.value); } catch (e) {}
-    });
-  })();
-
-  // ── this week's focus strip — just Mon–Fri of the current ISO week,
-  // recomputed from the local date on every load; nothing is stored ──
-  (function () {
-    var wrap = $('weekFocusDays');
-    var rangeEl = $('weekFocusRange');
-    if (!wrap) return;
-
-    var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    var dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-    var today = new Date();
-    var jsDay = today.getDay(); // 0 = Sun .. 6 = Sat
-    // days to add to reach this ISO week's Monday, even on a Sat/Sun
+    // this ISO week's Monday and Sunday, even when today is itself a Sat/Sun
+    var jsDay = today.getDay();
     var toMonday = jsDay === 0 ? -6 : 1 - jsDay;
     var monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + toMonday);
     var sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
-    var todayStr = today.toDateString();
+    var weekStr = monday.getMonth() === sunday.getMonth()
+      ? monday.getDate() + '-' + ordinal(sunday.getDate()) + ' ' + MONTHS[sunday.getMonth()]
+      : monday.getDate() + ' ' + MONTHS[monday.getMonth()] + ' - ' + ordinal(sunday.getDate()) + ' ' + MONTHS[sunday.getMonth()];
 
-    // full Mon–Sun span for context (the day chips below stay Mon–Fri) —
-    // "14–20 September", or "28 Sep – 4 Oct" when the week crosses a month
-    if (rangeEl) {
-      rangeEl.textContent = monday.getMonth() === sunday.getMonth()
-        ? monday.getDate() + '–' + sunday.getDate() + ' ' + monthNames[monday.getMonth()]
-        : monday.getDate() + ' ' + monthNames[monday.getMonth()].slice(0, 3) + ' – ' + sunday.getDate() + ' ' + monthNames[sunday.getMonth()].slice(0, 3);
+    function autosize(el) {
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
     }
 
-    for (var i = 0; i < 5; i++) {
-      var d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
-      var chip = document.createElement('div');
-      chip.className = 'week-day-chip' + (d.toDateString() === todayStr ? ' is-today' : '');
-
-      var nameEl = document.createElement('span');
-      nameEl.className = 'week-day-name';
-      nameEl.textContent = dayNames[i];
-
-      var numEl = document.createElement('span');
-      numEl.className = 'week-day-num';
-      numEl.textContent = d.getDate();
-
-      chip.appendChild(nameEl);
-      chip.appendChild(numEl);
-      wrap.appendChild(chip);
+    function wireRow(labelId, baseLabel, dateText, inputId, storageKey) {
+      var label = $(labelId);
+      var input = $(inputId);
+      if (label) label.innerHTML = baseLabel + ' <span class="focus-date">(' + dateText + ')</span>';
+      if (!input) return;
+      try { input.value = localStorage.getItem(storageKey) || ''; } catch (e) {}
+      autosize(input);
+      input.addEventListener('input', function () {
+        autosize(input);
+        try { localStorage.setItem(storageKey, input.value); } catch (e) {}
+      });
     }
+
+    wireRow('todayFocusLabel', 'Focus for today', todayStr, 'todayFocusInput', 'pomodoro:focusToday:' + today.toDateString());
+    wireRow('weekFocusLabel', 'Focus for this week', weekStr, 'weekFocusInput', 'pomodoro:focusWeek:' + monday.toDateString());
+    wireRow('otherTasksLabel', 'Other tasks for today', todayStr, 'otherTasksInput', 'pomodoro:otherTasks:' + today.toDateString());
   })();
 
   buildDots();
