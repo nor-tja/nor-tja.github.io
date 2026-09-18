@@ -250,6 +250,7 @@
 
     <div class="controls">
       <button class="btn primary" id="startPauseBtn">Start</button>
+      <button class="btn" id="finishEarlyBtn" title="End this session now and move to the next one">Finish early</button>
       <button class="btn" id="resetBtn">Reset</button>
       <button class="btn" id="paletteToggle" type="button" aria-expanded="false" aria-controls="palettePanel" title="Choose a color combination">
         🎨 <span id="paletteToggleLabel">Change color</span><span class="btn-chevron">›</span>
@@ -348,6 +349,7 @@
   const modeLabel = $('modeLabel');
   const dotsWrap = $('dots');
   const startPauseBtn = $('startPauseBtn');
+  const finishEarlyBtn = $('finishEarlyBtn');
   const resetBtn = $('resetBtn');
   const focusInput = $('focusInput');
   const shortBreakInput = $('shortBreakInput');
@@ -1122,6 +1124,21 @@
 
   startPauseBtn.addEventListener('click', () => {
     isRunning ? pause() : start();
+  });
+  // Ends the current session right now, same path a natural countdown-to-zero
+  // takes (credits the full planned minutes, plays the chime, flips the
+  // glass, advances to the next mode) -- it just skips waiting out the clock.
+  // If the timer was running it stays running into the next session, same as
+  // an ordinary focus -> break handoff; if it was paused, the next session is
+  // set up but left paused, same as reset() leaves a fresh one.
+  finishEarlyBtn.addEventListener('click', () => {
+    clearInterval(timerId);
+    timerId = null;
+    remainingSec = 0;
+    setSand(1);
+    timeDisplay.textContent = fmt(0);
+    document.title = fmt(0) + ' · ' + (mode === 'focus' ? 'Focus' : 'Break');
+    completeSession();
   });
   resetBtn.addEventListener('click', reset);
   const dailyResetBtn = $('dailyResetBtn');
