@@ -50,6 +50,22 @@
     <p class="noscript-note">The timer and the hourglass both run in the browser, so with JavaScript turned off the glass will not fill and the clock will not count.</p>
   </noscript>
 
+  <div class="focus-block today-focus" id="todayFocus">
+    <p class="eyebrow">Focus for today</p>
+    <p class="today-focus-date" id="todayFocusDate"></p>
+  </div>
+
+  <div class="focus-block week-focus" id="weekFocus">
+    <p class="eyebrow">Focus for this week</p>
+    <p class="week-focus-range" id="weekFocusRange"></p>
+    <div class="week-focus-days" id="weekFocusDays"></div>
+  </div>
+
+  <div class="focus-block other-tasks" id="otherTasks">
+    <p class="eyebrow">Other tasks for today</p>
+    <textarea id="otherTasksInput" class="other-tasks-input" placeholder="Anything else on your plate today?" maxlength="1000" aria-label="Other tasks for today"></textarea>
+  </div>
+
   <div class="glass-section">
     <div class="glass-stage">
       <div class="glass-rotor" id="rotor">
@@ -1203,7 +1219,7 @@
       { btn: $('forestBtn'), audio: $('forestAudio'), volume: 1 },
       { btn: $('wavesBtn'), audio: $('wavesAudio'), volume: 0.35 },
       { btn: $('fireBtn'), audio: $('fireAudio'), volume: 0.5 },
-      { btn: $('pinkBtn'), audio: createPinkNoiseSource(), volume: 0.08 }
+      { btn: $('pinkBtn'), audio: createPinkNoiseSource(), volume: 0.15 }
     ];
 
     var FADE_SEC = 1.5; // fade window at each end of the loop, so the seam isn't an audible jump
@@ -1351,6 +1367,70 @@
     }
 
     render();
+  })();
+
+  // ── today's date, under "Focus for today" ──
+  (function () {
+    var el = $('todayFocusDate');
+    if (!el) return;
+    var today = new Date();
+    el.textContent = today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  })();
+
+  // ── other tasks for today — plain text, saved per calendar day so
+  // yesterday's list doesn't linger once a new day starts ──
+  (function () {
+    var el = $('otherTasksInput');
+    if (!el) return;
+    var todayKey = 'pomodoro:otherTasks:' + new Date().toDateString();
+    try { el.value = localStorage.getItem(todayKey) || ''; } catch (e) {}
+    el.addEventListener('input', function () {
+      try { localStorage.setItem(todayKey, el.value); } catch (e) {}
+    });
+  })();
+
+  // ── this week's focus strip — just Mon–Fri of the current ISO week,
+  // recomputed from the local date on every load; nothing is stored ──
+  (function () {
+    var wrap = $('weekFocusDays');
+    var rangeEl = $('weekFocusRange');
+    if (!wrap) return;
+
+    var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    var today = new Date();
+    var jsDay = today.getDay(); // 0 = Sun .. 6 = Sat
+    // days to add to reach this ISO week's Monday, even on a Sat/Sun
+    var toMonday = jsDay === 0 ? -6 : 1 - jsDay;
+    var monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + toMonday);
+    var sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+    var todayStr = today.toDateString();
+
+    // full Mon–Sun span for context (the day chips below stay Mon–Fri) —
+    // "14–20 September", or "28 Sep – 4 Oct" when the week crosses a month
+    if (rangeEl) {
+      rangeEl.textContent = monday.getMonth() === sunday.getMonth()
+        ? monday.getDate() + '–' + sunday.getDate() + ' ' + monthNames[monday.getMonth()]
+        : monday.getDate() + ' ' + monthNames[monday.getMonth()].slice(0, 3) + ' – ' + sunday.getDate() + ' ' + monthNames[sunday.getMonth()].slice(0, 3);
+    }
+
+    for (var i = 0; i < 5; i++) {
+      var d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+      var chip = document.createElement('div');
+      chip.className = 'week-day-chip' + (d.toDateString() === todayStr ? ' is-today' : '');
+
+      var nameEl = document.createElement('span');
+      nameEl.className = 'week-day-name';
+      nameEl.textContent = dayNames[i];
+
+      var numEl = document.createElement('span');
+      numEl.className = 'week-day-num';
+      numEl.textContent = d.getDate();
+
+      chip.appendChild(nameEl);
+      chip.appendChild(numEl);
+      wrap.appendChild(chip);
+    }
   })();
 
   buildDots();

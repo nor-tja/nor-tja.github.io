@@ -109,6 +109,50 @@
     .dot { width:7px; height:7px; border-radius:50%; border:1px solid var(--line-strong); transition: background .3s, border-color .3s; }
     .dot.filled { background: var(--accent); border-color: var(--accent); }
 
+    /* ── TODAY FOCUS / WEEK FOCUS / OTHER TASKS ── */
+    .focus-block {
+      max-width:420px; margin:0 auto 1.2rem; padding:1.2rem 1.4rem;
+      border:1px solid var(--line); border-radius:14px;
+      /* the page background itself is warm and fairly light, so a card in
+         the same tone would vanish -- a translucent white lift is enough to
+         read as a distinct panel without introducing a new hard-coded hue */
+      background: rgba(255,255,255,.55);
+      box-shadow: 0 1px 1px rgba(26,24,20,.06), 0 10px 22px -16px rgba(26,24,20,.28);
+      text-align:center;
+    }
+    .today-focus-date {
+      font-family: var(--font-mono); font-size: var(--fs-md); color:var(--ink); margin-top:.3rem;
+    }
+    .week-focus-range {
+      font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing:.06em;
+      color:var(--muted); margin-top:.2rem;
+    }
+    .other-tasks-input {
+      width:100%; margin-top:.7rem; border:1px solid var(--line); border-radius:8px;
+      background:rgba(255,255,255,.6); resize:vertical; padding:.7rem .8rem;
+      font-family: var(--font-serif); font-size: var(--fs-base); color:var(--ink);
+      line-height:1.6; height:5.5em; outline:none; transition:border-color .2s;
+    }
+    .other-tasks-input:focus { border-color:var(--accent); }
+    .other-tasks-input::placeholder { color:var(--muted); font-style:italic; }
+
+    .week-focus-days { display:flex; justify-content:center; gap:.6rem; margin-top:.6rem; }
+    .week-day-chip {
+      display:flex; flex-direction:column; align-items:center; gap:.15rem;
+      padding:.5rem .7rem; border-radius:10px; border:1px solid var(--line);
+      font-family: var(--font-ui); color:var(--muted); min-width:44px;
+      transition: border-color .2s, color .2s;
+    }
+    .week-day-name { font-size: var(--fs-3xs); letter-spacing:.1em; text-transform:uppercase; }
+    .week-day-num { font-family: var(--font-mono); font-size: var(--fs-md); color:var(--ink); }
+    .week-day-chip.is-today { border-color:var(--accent); color:var(--accent); }
+    .week-day-chip.is-today .week-day-num { color:var(--accent); }
+
+    @media (max-width:480px) {
+      .week-focus-days { gap:.4rem; }
+      .week-day-chip { padding:.4rem .5rem; min-width:38px; }
+    }
+
     .daily-summary { margin-top:1.8rem; text-align:center; max-width:320px; }
     .daily-reset {
       margin-top:.5rem; font-family: var(--font-ui); font-size: var(--fs-4xs); letter-spacing:.08em;
