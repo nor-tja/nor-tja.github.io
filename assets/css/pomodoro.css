@@ -161,7 +161,7 @@
     }
 
     /* ── CONTROLS ── */
-    .controls { display:flex; gap:.9rem; margin-top:1.8rem; }
+    .controls { display:flex; flex-wrap:wrap; justify-content:center; gap:.9rem; margin-top:1.8rem; }
     .btn {
       font-family: var(--font-ui); font-size: var(--fs-2xs); letter-spacing:.12em; text-transform:uppercase;
       padding:.75rem 1.6rem; border-radius:999px; cursor:pointer; border:1px solid var(--line);
