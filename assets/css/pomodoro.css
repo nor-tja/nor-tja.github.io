@@ -13,7 +13,7 @@
     .wrap { max-width: 640px; margin: 0 auto; padding: 0 2rem 4rem; }
 
 
-    header { padding:3rem 0 2rem; border-bottom:1px solid var(--line); opacity:0; animation:rise .8s ease forwards .1s; text-align:center; }
+    header { padding:3rem 0 2rem; opacity:0; animation:rise .8s ease forwards .1s; text-align:center; }
     h1 { font-size:clamp(1.75rem,4.6vw,2.6rem); font-weight:400; line-height:1.1; }
     h1 em { font-style:italic; color:var(--accent); }
     .intro { margin-top:1rem; color:var(--muted); font-size: var(--fs-base); max-width:440px; margin-left:auto; margin-right:auto; }
@@ -108,6 +108,43 @@
     .dots { display:flex; gap:.5rem; margin-top:1.2rem; }
     .dot { width:7px; height:7px; border-radius:50%; border:1px solid var(--line-strong); transition: background .3s, border-color .3s; }
     .dot.filled { background: var(--accent); border-color: var(--accent); }
+
+    /* ── TODAY FOCUS / WEEK FOCUS / OTHER TASKS ── */
+    .focus-block {
+      max-width:560px; margin:0 auto .6rem; padding:.55rem 1rem;
+      border:1px solid var(--line); border-radius:12px;
+      /* the page background itself is warm and fairly light, so a card in
+         the same tone would vanish -- a translucent white lift is enough to
+         read as a distinct panel without introducing a new hard-coded hue */
+      background: rgba(255,255,255,.55);
+      box-shadow: 0 1px 1px rgba(26,24,20,.06), 0 10px 22px -16px rgba(26,24,20,.28);
+    }
+    /* label and its textarea share one line as long as there's room; the
+       textarea has no fixed height of its own; JS sets it to the content's
+       own scrollHeight on every keystroke, so it grows downward with what's
+       typed instead of scrolling inside a fixed box */
+    .focus-row {
+      display:flex; align-items:baseline; flex-wrap:wrap; gap:.3rem .7rem;
+      text-align:left;
+    }
+    .focus-label {
+      font-family: var(--font-ui); font-size: var(--fs-3xs); letter-spacing:.08em;
+      text-transform:uppercase; color:var(--muted); white-space:nowrap; flex-shrink:0;
+    }
+    .focus-date { color:var(--accent); }
+    .focus-input {
+      flex:1 1 220px; min-width:180px; border:none; background:transparent;
+      resize:none; overflow:hidden; outline:none;
+      font-family: var(--font-serif); font-size: var(--fs-sm); color:var(--ink);
+      line-height:1.3; padding:0; margin:0;
+    }
+    .focus-input::placeholder { color:var(--muted); font-style:italic; }
+
+    @media (max-width:480px) {
+      /* not enough width for label + input side by side -- stack them */
+      .focus-row { flex-direction:column; align-items:stretch; }
+      .focus-input { flex-basis:auto; }
+    }
 
     .daily-summary { margin-top:1.8rem; text-align:center; max-width:320px; }
     .daily-reset {
@@ -211,7 +248,7 @@
     }
 
     /* ── POST-IT ── */
-    .postit-wrap { display:flex; justify-content:center; margin-top:2.4rem; }
+    .postit-wrap { display:flex; flex-wrap:wrap; justify-content:center; gap:1.4rem; margin-top:2.4rem; }
     .postit {
       position:relative;
       width:216px;
@@ -294,6 +331,40 @@
     /* 4.8:1 on the darkest corner of the note, so it stays legible while
        still reading as a prompt rather than as writing. */
     .postit textarea::placeholder { color:#625839; font-style:italic; }
+
+    /* A little variety once there's more than one note on the desk, instead
+       of every card lying at the same angle. Selector is on the tag, so the
+       count only ever includes sibling .postit divs -- .postit-add is a
+       <button>, a different type, and doesn't shift the pattern. */
+    .postit:nth-of-type(3n+2) { transform: rotate(1.8deg); }
+    .postit:nth-of-type(3n+3) { transform: rotate(-.8deg); }
+    .postit:nth-of-type(3n+2):hover { transform: rotate(.8deg) translateY(-2px); }
+    .postit:nth-of-type(3n+3):hover { transform: rotate(-1.8deg) translateY(-2px); }
+
+    /* Small round "remove" button, tucked over the note's top-right corner.
+       Hidden until the note is touched, so a desk of notes doesn't read as
+       cluttered with controls at a glance. */
+    .postit-delete {
+      position:absolute; top:-9px; right:-9px; width:22px; height:22px;
+      border-radius:50%; border:1px solid var(--line); background:var(--bg);
+      color:var(--muted); font-family: var(--font-ui); font-size:14px; line-height:1;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      opacity:0; transition:opacity .2s, color .2s, border-color .2s;
+    }
+    .postit:hover .postit-delete, .postit:focus-within .postit-delete { opacity:1; }
+    .postit-delete:hover { color:var(--accent); border-color:var(--accent); }
+
+    /* Sits in the flow next to the notes -- a plain dashed placeholder the
+       same rough footprint as a note, rather than a button off to the side,
+       so "add another" reads as part of the same desk of paper. */
+    .postit-add {
+      width:216px; height:196px;
+      border:2px dashed var(--line); border-radius:8px; background:transparent;
+      color:var(--muted); font-family: var(--font-serif); font-size:2rem;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition: border-color .2s, color .2s, transform .2s;
+    }
+    .postit-add:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-2px); }
 
     /* ── SETTINGS ── */
     .settings { margin-top:2.6rem; border-top:1px solid var(--line); opacity:0; animation:rise .9s ease forwards .4s; }
