@@ -1018,8 +1018,13 @@
     if (isRunning) endTime = Date.now() + remainingSec * 1000;
   }
 
-  function completeSession() {
-    const upcoming = cycle.complete(mode, Math.round(durationSec / 60));
+  // actualMinutes overrides what gets credited to the daily tally — used by
+  // "Finish early" so cutting a 25-minute focus short at 12 minutes records
+  // 12, not the full 25. A natural countdown-to-zero omits it, since at that
+  // point durationSec IS what was spent.
+  function completeSession(actualMinutes) {
+    const minutes = actualMinutes !== undefined ? actualMinutes : Math.round(durationSec / 60);
+    const upcoming = cycle.complete(mode, minutes);
     if (upcoming === null) return;      // already transitioning — the guard
 
     clearInterval(timerId);
@@ -1126,19 +1131,28 @@
     isRunning ? pause() : start();
   });
   // Ends the current session right now, same path a natural countdown-to-zero
-  // takes (credits the full planned minutes, plays the chime, flips the
-  // glass, advances to the next mode) -- it just skips waiting out the clock.
+  // takes (plays the chime, flips the glass, advances to the next mode) -- it
+  // just skips waiting out the clock. Unlike a natural completion, though,
+  // the daily tally is credited with only the minutes actually spent (elapsed
+  // = durationSec - whatever was still left when the button was clicked),
+  // not the full planned length -- cutting a 25-minute focus short at 12
+  // minutes should record 12, not 25.
   // If the timer was running it stays running into the next session, same as
   // an ordinary focus -> break handoff; if it was paused, the next session is
   // set up but left paused, same as reset() leaves a fresh one.
   finishEarlyBtn.addEventListener('click', () => {
+    const liveRemaining = (isRunning && endTime !== null)
+      ? Math.max(0, Math.round((endTime - Date.now()) / 1000))
+      : remainingSec;
+    const elapsedMinutes = Math.round(Math.max(0, durationSec - liveRemaining) / 60);
+
     clearInterval(timerId);
     timerId = null;
     remainingSec = 0;
     setSand(1);
     timeDisplay.textContent = fmt(0);
     document.title = fmt(0) + ' · ' + (mode === 'focus' ? 'Focus' : 'Break');
-    completeSession();
+    completeSession(elapsedMinutes);
   });
   resetBtn.addEventListener('click', reset);
   const dailyResetBtn = $('dailyResetBtn');
